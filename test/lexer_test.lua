@@ -1,76 +1,64 @@
-require("luarocks.require")
-require("lunit")
-require("haml")
+require "luarocks.require"
+require "lunit"
+require "haml"
+require "std"
 module("haml-lexer-test", lunit.testcase, package.seeall)
 
-function test_css_name_chars()
-  local line = "a-CSS_name1"
-  local match = lpeg.match(lpeg.C(haml.lexer.css_name_chars^1), line)
-  assert_not_nil(match)
-  assert_equal(line, match)
+local tokenize = haml.lexer.tokenize
+
+function test_doctype()
+  local output = tokenize("!!! XML")
+  assert_not_nil(output[1]["doctype_operator"])
+  assert_equal("XML", output[1]["unparsed"])
 end
 
-function test_css_id()
-  local line = "#a-CSS_id"
-  local match = lpeg.match(lpeg.C(haml.lexer.css_id), line)
-  assert_not_nil(match)
-  assert_equal(line, match)
+function test_div_with_id_and_classes()
+  local output = tokenize("#my_div.my_classes=")
+  assert_equal("my_div", output[1]["css_id"]) 
+  assert_equal("my_classes", output[1]["css_classes"])
+  assert_not_nil(output[1]["script_operator"])
 end
 
-function test_html_tag()
-  local line = "h2"
-  local match = lpeg.match(lpeg.C(haml.lexer.html_tag), line)
-  assert_not_nil(match)
-  assert_equal(line, match)
+function test_tag_with_whitespace_modifiers()
+  local output = tokenize([=[
+    %p> hello
+    %p< world
+  ]=])
+  assert_not_nil(output[1]["outer_whitespace_modifier"])
+  assert_not_nil(output[2]["inner_whitespace_modifier"])
 end
 
-function test_operator()
-  local line = "&-\\~=/:"
-  local match = lpeg.match(lpeg.C(haml.lexer.operator^1), line)
-  assert_not_nil(match)
-  assert_equal(line, match)
+function test_self_closing_tag()
+  local output = tokenize("%br/")
+  assert_not_nil(output[1]["self_closing_modifier"])
 end
 
-function test_haml_tag()
-  local line = "%h1#id.class"
-  local match = lpeg.match(lpeg.C(haml.lexer.haml_tag), line)
-  assert_not_nil(match)
-  assert_equal(line, match)
+function test_basic_attributes()
+  local output = tokenize([=[
+    %html{lang = en}
+      %body(style="color: green")
+  ]=])
+  assert_equal("{lang = en}", output[1]["attributes"][1])
+  assert_equal('(style="color: green")', output[2]["attributes"][1])
 end
 
-function test_ruby_style_haml_attributes()
-  local line = "{:key => 'value'}"
-  local match = lpeg.match(lpeg.C(haml.lexer.attributes), line)
-  assert_not_nil(match)
-  assert_equal(line, match)
+function test_multiple_attributes()
+  local output = tokenize([=[
+    %h1(a=b){c=d}
+    %h2{e=f}(g=h)
+    %h3(1=2){3=4}(5=6)
+  ]=])
+  assert_equal('(a=b)', output[1]["attributes"][1])
+  assert_equal('{c=d}', output[1]["attributes"][2])
+  assert_equal('{e=f}', output[2]["attributes"][1])
+  assert_equal('(g=h)', output[2]["attributes"][2])
+  assert_equal('(5=6)', output[3]["attributes"][3])  
 end
 
-function test_portable_style_haml_attributes()
-  local line = "(key = 'value')"
-  local match = lpeg.match(lpeg.C(haml.lexer.attributes), line)
-  assert_not_nil(match)
-  assert_equal(line, match)
-end
-
-function test_haml_line()
-  local line = "%p#my_id.my_class('key' = 'value')= my_function()"
-  local match = lpeg.match(lpeg.C(haml.lexer.haml_line), line)
-  assert_not_nil(match)
-  assert_equal(line, match)
-end
-
-function test_single_token_lines()
-  -- Haml, token, expectation
-  local expectations = {
-    {"aaa", "subject", "aaa"},
-    {"%p", "html_tag", "p"},
-    {"!!!", "operator", "!!!"},
-    {"#id", "css_id", "#id"},
-    {".class1.class2", "css_classes", ".class1.class2"}
-  }
-  for _, t in pairs(expectations) do
-    result = haml.lexer.tokenize_line(t[1])
-    assert_not_nil(result, 'Testing "' .. t[1] .. '"')
-    assert_equal(result[t[2]], t[3])
-  end
+function test_multiline_attributes()
+  local output = tokenize([=[
+    %html{ lang = 'en',
+      whatever = 'ok' }
+  ]=])
+  assert_equal("{ lang = 'en',\n      whatever = 'ok' }", output[1]["attributes"][1])
 end

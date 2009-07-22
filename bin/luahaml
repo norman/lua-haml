@@ -1,0 +1,25 @@
+#!/usr/bin/env lua
+require "luarocks.require"
+require "haml"
+require "std"
+
+function run_lexer(file)
+  local fh = assert(io.open(file))
+  local input = fh:read '*a'
+  fh:close()
+  for _, t in pairs(haml.lexer.tokenize(input)) do
+    print(t)
+  end
+  os.exit()
+end 
+
+prog = {name = "luahaml", banner = "luahaml 0.0.1"}
+options = Options {
+  Option {{"lex", "l"}, "show the lexer output of the file", "Req", "FILE", run_lexer}
+}
+
+getopt.processArgs()
+
+if not arg[1] then
+  getopt.dieWithUsage()
+end
