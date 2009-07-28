@@ -7,6 +7,7 @@ local P, S, R, C, Cg, Ct, V = lpeg.P, lpeg.S, lpeg.R, lpeg.C, lpeg.Cg, lpeg.Ct, 
 local script_operator = Cg(P"=", "script_operator")
 local escape_operator = Cg(P"\\", "escape_operator")
 local doctype_operator = Cg(P"!!!", "doctype_operator")
+local markup_comment_operator = Cg(P"/", "markup_comment_operator")
 local tag_indicator = P"%"
 local self_closing_modifier = Cg(P"/", "self_closing_modifier")
 local inner_whitespace_modifier = Cg(P"<", "inner_whitespace_modifier")
@@ -36,12 +37,16 @@ local unparsed = Cg((1 - eol)^1, "unparsed")
 local haml_element = leading_whitespace * (
   -- doctype or prolog
   (doctype_operator * (inline_whitespace^1 * unparsed)^0) +
-  -- HAML HTML
+  -- HAML markup
   (haml_tag * attributes^0 * tag_modifiers^-1 * script_operator^0 * unparsed^0) +
+  -- Markup comment
+  (markup_comment_operator * unparsed^0) +
   -- Escaped
   (escape_operator * unparsed^0) +
-  -- Last resort: unparsed content
-  unparsed
+  -- Unparsed content
+  unparsed +
+  -- Empty line
+  Cg(P(""), "empty_line")
 )
 local chunk = Ct(haml_element)
 local grammar = Ct(chunk * (eol * chunk)^0)
