@@ -14,16 +14,19 @@ local eol                = S"\n" + S"\r\n" + S"\r"
 local empty_line         = Cg(P(""), "empty_line")
 local unparsed           = Cg((1 - eol)^1, "unparsed")
 
--- Haml operators
-local operators = {
-  tag            = P"%",
-  script         = Cg(P"=",   "script_operator"),
-  escape         = Cg(P"\\",  "escape_operator"),
-  doctype        = Cg(P"!!!", "doctype_operator"),
-  markup_comment = Cg(P"/",   "markup_comment_operator")
+local operator_symbols = {
+  tag            = "%",
+  script         = "=",
+  escape         = "\\",
+  doctype        = "!!!",
+  markup_comment = "/"
 }
+local operators = {}
+for k, v in pairs(operator_symbols) do
+  operators[k] = Cg(P(v) / function() return k end, "operator")
+end
 
--- Modifiers that follow Haml markup tags
+-- Modifiers that follow Haml markup tags or content
 local modifiers = {
   self_closing     = Cg(P"/", "self_closing_modifier"),
   inner_whitespace = Cg(P"<", "inner_whitespace_modifier"),

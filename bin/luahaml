@@ -13,9 +13,18 @@ function run_lexer(file)
   os.exit()
 end 
 
+function run_precompiler(file)
+  local fh = assert(io.open(file))
+  local input = fh:read '*a'
+  fh:close()
+  haml.precompiler.precompile(input)
+  os.exit()
+end 
+
 prog = {name = "luahaml", banner = "luahaml 0.0.1"}
 options = Options {
-  Option {{"lex", "l"}, "show the lexer output of the file", "Req", "FILE", run_lexer}
+  Option {{"lex", "l"}, "show the lexer output of the file", "Req", "FILE", run_lexer},
+  Option {{"precompile", "p"}, "show the precompiler output of the file", "Req", "FILE", run_precompiler}
 }
 
 getopt.processArgs()
