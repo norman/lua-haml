@@ -35,24 +35,24 @@ end
 
 function test_basic_attributes()
   local output = tokenize([=[
-    %html{lang = en}
+    %html{lang=en}
       %body(style="color: green")
   ]=])
-  assert_equal("{lang = en}", output[1]["attributes"][1])
-  assert_equal('(style="color: green")', output[2]["attributes"][1])
+  assert_equal("en", output[1]["attributes"]["lang"])
+  assert_equal("color: green", output[2]["attributes"]["style"])
 end
 
 function test_multiple_attributes()
   local output = tokenize([=[
     %h1(a=b){c=d}
     %h2{e=f}(g=h)
-    %h3(1=2){3=4}(5=6)
+    %h3(a=b){c=d}(e=f)
   ]=])
-  assert_equal('(a=b)', output[1]["attributes"][1])
-  assert_equal('{c=d}', output[1]["attributes"][2])
-  assert_equal('{e=f}', output[2]["attributes"][1])
-  assert_equal('(g=h)', output[2]["attributes"][2])
-  assert_equal('(5=6)', output[3]["attributes"][3])  
+  assert_equal('b', output[1]["attributes"]["a"])
+  assert_equal('d', output[1]["attributes"]["c"])
+  assert_equal('f', output[2]["attributes"]["e"])
+  assert_equal('h', output[2]["attributes"]["g"])
+  assert_equal('f', output[3]["attributes"]["e"])
 end
 
 function test_multiline_attributes()
@@ -60,5 +60,6 @@ function test_multiline_attributes()
     %html{ lang = 'en',
       whatever = 'ok' }
   ]=])
-  assert_equal("{ lang = 'en',\n      whatever = 'ok' }", output[1]["attributes"][1])
+  assert_equal("en", output[1]["attributes"]["lang"])
+  assert_equal("ok", output[1]["attributes"]["whatever"])
 end

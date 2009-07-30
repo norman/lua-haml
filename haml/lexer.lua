@@ -1,9 +1,8 @@
 --- Haml Lexer
 module("haml.lexer", package.seeall)
 
--- Lua Haml's lexer uses the Lua Parsing Expression Grammar. For more 
--- information on how to read and understand this code, see: 
--- http://www.inf.puc-rio.br/~roberto/lpeg/lpeg.html
+-- Lua Haml's lexer uses the Lua Parsing Expression Grammar. For more
+-- information see: http://www.inf.puc-rio.br/~roberto/lpeg/lpeg.html
 require "lpeg"
 
 local P, S, R, C, Cg, Ct, V = lpeg.P, lpeg.S, lpeg.R, lpeg.C, lpeg.Cg, lpeg.Ct, lpeg.V
@@ -44,10 +43,58 @@ local css_id      = P"#" * Cg(css_ident^1, "css_id")
 local css_classes = P"." * Cg((css_ident + P".")^1, "css_classes")
 
 -- Markup attributes
+local function parse_attributes(t)
+  if not t then return end
+  local function split(str, separator, elements)
+    local elem = C(elements^1)
+    local p = Ct(elem * (separator * elem)^0)
+    return lpeg.match(p, str)
+  end
+
+  local function clean_value(str)
+    -- @TODO replace these with lpeg, this temporary, end of day code!
+    str = string.gsub(str, "^['\"]", "")
+    str = string.gsub(str, "['\"]$", "")
+    return str
+  end
+
+  local function clean_key(str)
+    -- @TODO replace these with lpeg, this temporary, end of day code!
+    str = string.gsub(str, "^['\"]", "")
+    str = string.gsub(str, "['\"]$", "")
+    str = string.gsub(str, ":", "")
+    return str
+  end
+
+  local function clean_str(str)
+    str = string.gsub(str, "%s*[{}\(\)]%s*", "")
+    str = string.gsub(str, "%s*\n%s*", " ")
+    return str
+  end
+
+  local bare_element = R("az", "AZ")^1 * (R("az", "AZ", "09") + P"_")^0
+  local quoted_element = P{"'" * ((1 - S"'") + V(1))^0 * "'"} + P{'"' * ((1 - S'"') + V(1))^0 * '"'}
+  local element = (bare_element + quoted_element)
+  local ruby_symbol = P":" * element
+  local item_sep = P" "^0 * P"," * P" "^0
+  local item_list = (ruby_symbol + element) * P" "^0 * (P"=>" + P"=") * P" "^0 * (element)
+  local assignment_sep = P" "^0 * (P"=>" + P"=") * P" "^0
+  local assignment_list = (ruby_symbol + element)
+  local attributes = {}
+  for _, str in pairs(t) do
+    local items = split(clean_str(str), item_sep, item_list)
+    for _, v in pairs(items) do
+      kv = split(v, assignment_sep, assignment_list)
+      attributes[clean_key(kv[1])] = clean_value(kv[2])
+    end
+  end
+  return attributes
+end
+
 local paren_attributes = P{"(" * ((1 - S"()") + V(1))^0 * ")"}
 local brace_attributes = P{"{" * ((1 - S"{}") + V(1))^0 * "}"}
 local any_attributes   = Cg(paren_attributes + brace_attributes)
-local attributes       = Cg(Ct(any_attributes * any_attributes^0), "attributes")
+local attributes       = Cg(Ct(any_attributes * any_attributes^0) / parse_attributes, "attributes")
 
 -- Haml HTML elements
 local css_id_and_classes = ((css_id^1 * css_classes^0) + (css_classes^1 * css_id^0))

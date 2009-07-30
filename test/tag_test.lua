@@ -10,6 +10,6 @@ function test_bare_tag()
 end
 
 function test_tag_with_id()
-  local output = haml.render("%li#myid")
-  assert_equal('<li id="myid"></li>', output)
+  local output = haml.render("%li#myid 1")
+  assert_equal("<li id='myid'>1</li>", output)
 end
