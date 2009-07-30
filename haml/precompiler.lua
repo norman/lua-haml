@@ -1,21 +1,13 @@
 --- Haml precompiler
 module("haml.precompiler", package.seeall)
-require "std"
-
-local function handle_doctype(phrase, state, buffer)
-  local output
-  if phrase["unparsed"] == "XML" then
-    output = "print '" .. '<?xml version="1.0" encoding="utf-8" ?>' .. "'"
-  else
-    output = "print '" .. '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">' .. "'"
-  end
-  table.insert(buffer, output)
-  state.space = phrase.space
-  state.current = "doctype"
-end
+require("haml.markup.tags")
 
 local function ws(level)
   return string.format('%' .. level .. 's', '')
+end
+
+local function println(space, str)
+  return string.format("print '%s%s'", ws(space), string.gsub(str, "'", "\\'"))
 end
 
 local function close_tags(level, state, buffer)
@@ -26,19 +18,40 @@ local function close_tags(level, state, buffer)
   end
 end
 
+local function handle_doctype(phrase, state, buffer)
+  local output
+  if phrase["unparsed"] == "XML" then
+    output = println(0, "<?xml version='1.0' encoding='utf-8' ?>")
+  else
+    output = println(0, '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">')
+  end
+  table.insert(buffer, output)
+  state.space = phrase.space
+  state.current = "doctype"
+end
+
 local function handle_tag(phrase, state, buffer)
+  
   if (phrase.space <= state.space) and state.space > 0  then
     close_tags((state.space - phrase.space) / 2, state, buffer)
   end
   local output
-  output = string.format("<%s>", phrase.markup_tag)
-  table.insert(buffer, "print '" .. ws(phrase.space) .. output .. "'")
-  table.insert(state.tagstack, phrase.markup_tag)
+  local buf = {}
+  table.insert(buf, haml.markup.tags.open(phrase))
+  
+  if phrase.unparsed then
+    table.insert(buf, string.trim(phrase.unparsed))
+    table.insert(buf, string.format("</%s>", phrase.markup_tag))
+    table.insert(buffer, println(phrase.space, table.concat(buf, "")))
+  else
+    table.insert(buffer, println(phrase.space, table.concat(buf, "")))
+    table.insert(state.tagstack, phrase.markup_tag)
+  end
   state.current = "tag"
 end
 
 local function handle_unparsed(phrase, state, buffer)
-  table.insert(buffer, "print '" .. ws(phrase.space) .. string.trim(phrase.unparsed) .. "'")
+  table.insert(buffer, println(phrase.space, string.trim(phrase.unparsed)))
   state.space = phrase.space
   state.current = "unparsed"
 end
@@ -59,5 +72,5 @@ function precompile(haml_string)
   end
   state.space = 0
   close_tags(#state.tagstack, state, buffer)
-  print(table.concat(buffer, "\n"))
+  return table.concat(buffer, "\n")
 end

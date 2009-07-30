@@ -10,7 +10,7 @@ local P, S, R, C, Cg, Ct, V = lpeg.P, lpeg.S, lpeg.R, lpeg.C, lpeg.Cg, lpeg.Ct, 
 
 local leading_whitespace = Cg(S" "^0 / string.len, "space")
 local inline_whitespace  = S" \t"
-local eol                = S"\n" + S"\r\n" + S"\r"
+local eol                = P"\n" + P"\r\n" + P"\r"
 local empty_line         = Cg(P(""), "empty_line")
 local unparsed           = Cg((1 - eol)^1, "unparsed")
 
@@ -21,12 +21,15 @@ local operator_symbols = {
   doctype        = "!!!",
   markup_comment = "/"
 }
+
+-- This uilds a table of capture patterns that return the operator name rather
+-- than the literal operator string.
 local operators = {}
 for k, v in pairs(operator_symbols) do
   operators[k] = Cg(P(v) / function() return k end, "operator")
 end
 
--- Modifiers that follow Haml markup tags or content
+-- Modifiers that follow Haml markup tags
 local modifiers = {
   self_closing     = Cg(P"/", "self_closing_modifier"),
   inner_whitespace = Cg(P"<", "inner_whitespace_modifier"),

@@ -3,32 +3,42 @@ require "luarocks.require"
 require "haml"
 require "std"
 
-function run_lexer(file)
+local function read_file(file)
   local fh = assert(io.open(file))
   local input = fh:read '*a'
   fh:close()
-  for _, t in pairs(haml.lexer.tokenize(input)) do
+  return input
+end
+
+local function run_lexer(file)
+  for _, t in pairs(haml.lexer.tokenize(read_file(file))) do
     print(t)
   end
   os.exit()
 end 
 
-function run_precompiler(file)
-  local fh = assert(io.open(file))
-  local input = fh:read '*a'
-  fh:close()
-  haml.precompiler.precompile(input)
+local function run_precompiler(file)
+  print(haml.precompiler.precompile(read_file(file)))
   os.exit()
-end 
+end
+
+local function render_haml(file)
+  local output = haml.render(read_file(file))
+  print(output)
+  os.exit()
+end
 
 prog = {name = "luahaml", banner = "luahaml 0.0.1"}
 options = Options {
+  Option {{"run", nil}, "run haml", "Req", "FILE", run_haml},
   Option {{"lex", "l"}, "show the lexer output of the file", "Req", "FILE", run_lexer},
   Option {{"precompile", "p"}, "show the precompiler output of the file", "Req", "FILE", run_precompiler}
 }
 
-getopt.processArgs()
+local myargs, opt, errors = getopt.getOpt(arg, options)
 
-if not arg[1] then
+if myargs[1] then
+  render_haml(myargs[1])
+else
   getopt.dieWithUsage()
 end

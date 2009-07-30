@@ -8,7 +8,7 @@ local tokenize = haml.lexer.tokenize
 
 function test_doctype()
   local output = tokenize("!!! XML")
-  assert_not_nil(output[1]["doctype_operator"])
+  assert_not_nil(output[1]["operator"])
   assert_equal("XML", output[1]["unparsed"])
 end
 
@@ -16,7 +16,7 @@ function test_div_with_id_and_classes()
   local output = tokenize("#my_div.my_classes=")
   assert_equal("my_div", output[1]["css_id"]) 
   assert_equal("my_classes", output[1]["css_classes"])
-  assert_not_nil(output[1]["script_operator"])
+  assert_not_nil(output[1]["operator"])
 end
 
 function test_tag_with_whitespace_modifiers()
