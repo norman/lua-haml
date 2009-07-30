@@ -4,21 +4,40 @@ h2. About
 
 Lua Haml is an in-progress implementation of the "Haml":http://haml-lang.com markup language for Lua.
 
-At the moment, the only thing implemented is a buggy Haml lexer and some tests. It's a long way from being useful.
+At the moment, only a small subset of the Haml language works. It's a long way from completion, but I am currently working on it as my full time job, so expect rapid progress.
 
-This is also my first "real" project in Lua, which I'm doing to learn more about both Lua and Ruby.
+To see what language features are supported, view the "hello world" file in test/samples/hello_world.haml.
 
-Therefore, it's *very* unlikely you will want to use this any time soon.
+h2. Playing around with it
 
-That being said, if you're interested, please check back in a few weeks, and feel free to offer your suggestions and withering criticism.
+Install Lua and Luarocks on your computer. If you're on a Mac, "here's a tutorial":http://blog.njclarke.com/posts/setting-up-g-for-web-development-on-os-x.
 
+Install the "stdlib":http://luaforge.net/projects/stdlib/ rock (i.e., luarocks install stdlib).
+
+Clone this repository.
+
+Play with the provided script:
+
+<pre>
+<code>
+-- see HTML output
+./bin/luahaml test/samples/hello_world.haml
+
+-- see lexer output
+./bin/luahaml -l test/samples/hello_world.haml
+
+-- see precompiler output
+./bin/luahaml -p test/samples/hello_world.haml
+</code>
+</pre>
+  
 h2. Author
 
 "Norman Clarke":mailto://norman@njclarke.com
 
 h2. Attributions
 
-Many of the sample files in test/samples were taken from "Ruby's Haml":github.com/nex3/haml/.
+Some of the sample files in test/samples were taken from "Ruby's Haml":github.com/nex3/haml/.
 
 h2. License
 
