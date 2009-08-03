@@ -9,7 +9,22 @@ function test_bare_tag()
   assert_equal("<li>1</li>", output)
 end
 
-function test_tag_with_id()
+function test_id()
   local output = haml.render("%li#myid 1")
   assert_equal("<li id='myid'>1</li>", output)
+end
+
+function test_ruby_style_attributes()
+  local output = haml.render('%li{:hello => "world"} 1')
+  assert_equal("<li hello='world'>1</li>", output)
+end
+
+function test_lua_style_attributes()
+  local output = haml.render('%li{hello = "world"} 1')
+  assert_equal("<li hello='world'>1</li>", output)
+end
+
+function test_portable_style_attributes()
+  local output = haml.render('%li(hello = "world") 1')
+  assert_equal("<li hello='world'>1</li>", output)
 end

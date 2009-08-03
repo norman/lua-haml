@@ -1,76 +1,45 @@
 --- Haml precompiler
 module("haml.precompiler", package.seeall)
-require("haml.markup.tags")
+
+require "haml.markup.headers"
 
 local function ws(level)
   return string.format('%' .. level .. 's', '')
 end
 
-local function println(space, str)
+-- TODO make this publically inaccessible
+function println(space, str)
   return string.format("print '%s%s'", ws(space), string.gsub(str, "'", "\\'"))
 end
 
-local function close_tags(level, state, buffer)
-  for i = 0, level do
-    if #state.tagstack == 0  then break end
-    local tag = string.format("</%s>", table.remove(state.tagstack))
-    table.insert(buffer, "print '" .. ws((#state.tagstack) * 2) .. tag .. "'")
-  end
-end
+function precompile(haml_string, options)
 
-local function handle_doctype(phrase, state, buffer)
-  local output
-  if phrase["unparsed"] == "XML" then
-    output = println(0, "<?xml version='1.0' encoding='utf-8' ?>")
-  else
-    output = println(0, '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">')
-  end
-  table.insert(buffer, output)
-  state.space = phrase.space
-  state.current = "doctype"
-end
-
-local function handle_tag(phrase, state, buffer)
-  
-  if (phrase.space <= state.space) and state.space > 0  then
-    close_tags((state.space - phrase.space) / 2, state, buffer)
-  end
-  local output
-  local buf = {}
-  table.insert(buf, haml.markup.tags.open(phrase))
-  
-  if phrase.unparsed then
-    table.insert(buf, string.trim(phrase.unparsed))
-    table.insert(buf, string.format("</%s>", phrase.markup_tag))
-    table.insert(buffer, println(phrase.space, table.concat(buf, "")))
-  else
-    table.insert(buffer, println(phrase.space, table.concat(buf, "")))
-    table.insert(state.tagstack, phrase.markup_tag)
-  end
-  state.current = "tag"
-end
-
-local function handle_unparsed(phrase, state, buffer)
-  table.insert(buffer, println(phrase.space, string.trim(phrase.unparsed)))
-  state.space = phrase.space
-  state.current = "unparsed"
-end
-
-function precompile(haml_string)
   local phrases = haml.lexer.tokenize(haml_string)
-  local buffer = {}
-  local state = {current = "init", space = 0, tagstack = {}}
-  for _, phrase in pairs(phrases) do
-    local op
-    if phrase.operator == "doctype" then
-      handle_doctype(phrase, state, buffer)
-    elseif phrase.operator == "tag" then
-      handle_tag(phrase, state, buffer)
-    elseif phrase.unparsed then
-      handle_unparsed(phrase, state, buffer)
+  local state = {
+    options = {
+      format   = 'xhtml',
+      encoding = 'utf-8'
+    },
+    tagstack     = {},
+    buffer       = {},
+    curr_phrase  = {},
+    next_phrase  = {},
+    prev_phrase  = {}
+  }
+  
+  local function handle_current_phrase()
+    if state.curr_phrase.operator == "header" then
+      haml.markup.headers.header_for(state)
     end
   end
-  state.space = 0
-  close_tags(#state.tagstack, state, buffer)
-  return table.concat(buffer, "\n")
+
+  for index, phrase in ipairs(phrases) do
+    state.next_phrase = phrases[index + 1]
+    state.prev_phrase = current_phrase
+    state.curr_phrase = phrase
+    handle_current_phrase()
+  end
+  
+  return table.concat(state.buffer, "\n")
+
 end

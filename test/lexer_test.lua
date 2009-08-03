@@ -6,7 +6,7 @@ module("haml-lexer-test", lunit.testcase, package.seeall)
 
 local tokenize = haml.lexer.tokenize
 
-function test_doctype()
+function test_header()
   local output = tokenize("!!! XML")
   assert_not_nil(output[1]["operator"])
   assert_equal("XML", output[1]["unparsed"])
@@ -62,4 +62,20 @@ function test_multiline_attributes()
   ]=])
   assert_equal("en", output[1]["attributes"]["lang"])
   assert_equal("ok", output[1]["attributes"]["whatever"])
+end
+
+
+function test_attributes_with_commas()
+  local output = tokenize("%p{'a,b' => 'c, d'}")
+  assert_equal('c, d', output[1]["attributes"]["a,b"])
+end
+
+function test_attributes_with_separators()
+  local output = tokenize("%p{'a=>b' => 'c => d'}")
+  assert_equal('c => d', output[1]["attributes"]["a=>b"])
+end
+
+function test_attributes_with_braces()
+  local output = tokenize("%p('a' = ')b')")
+  assert_equal('}b', output[1]["attributes"]["a"])
 end

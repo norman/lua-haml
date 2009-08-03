@@ -6,19 +6,18 @@ Lua Haml is an in-progress implementation of the "Haml":http://haml-lang.com mar
 
 At the moment, only a small subset of the Haml language works. It's a long way from completion, but I am currently working on it as my full time job, so expect rapid progress.
 
+To see what language features are currently supported, view the "hello world" file in test/samples/hello_world.haml.
+
 h3. Immediate project goals
 
 * Support the same Haml language as Ruby Haml with no unecessary changes. Lua Haml should just be Haml, with no embracing and extending.
 * Add only minimal changes to make Haml more comfortable for Lua; i.e., "--" for comments rather than "#", and Lua tables as attributes.
 * Include a cache for compiled templates.
-* Help with and contribute to other Haml implementations. 
+* Help with and contribute to other Haml implementations.
 
 h3. Potential goals
 
 * Compile templates using any programming language. Ideally Lua Haml could potentially be used in place of Ruby's Haml by using "Rufus-Lua":github.com/jmettraux/rufus-lua.
-
-
-To see what language features are supported, view the "hello world" file in test/samples/hello_world.haml.
 
 h2. Playing around with it
 

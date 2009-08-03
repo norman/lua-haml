@@ -2,7 +2,7 @@ module("haml.markup.tags", package.seeall)
 
 function open(phrase)
   local attributes = phrase.attributes or {}
-  local buffer = {"<", phrase.markup_tag}
+  local buffer = {"<", phrase.markup_tag or "div"}
   if phrase.css_classes then
     attributes.class = string.gsub(phrase.css_classes, "%.", " ")
   end

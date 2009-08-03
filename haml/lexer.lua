@@ -17,7 +17,7 @@ local operator_symbols = {
   tag            = "%",
   script         = "=",
   escape         = "\\",
-  doctype        = "!!!",
+  header         = "!!!",
   markup_comment = "/"
 }
 
@@ -27,6 +27,18 @@ local operators = {}
 for k, v in pairs(operator_symbols) do
   operators[k] = Cg(P(v) / function() return k end, "operator")
 end
+
+-- (X)HTML Doctype or XML prolog
+local header =  {
+  "header";
+  prolog             = Cg(P"XML" + P"xml" / string.upper, "prolog"),
+  charset            = Cg((R("az", "AZ", "09") + S"-")^1, "charset"),
+  version            = Cg(P"1.1" + P"1.0", "version"),
+  doctype            = Cg(R("az", "AZ")^1 / string.upper, "doctype"),
+  prolog_and_charset = (V("prolog") * (inline_whitespace^1 * V("charset")^1)^0),
+  doctype_or_version = V("doctype") + V("version"),
+  header             = operators["header"] * (inline_whitespace * (V("prolog_and_charset") + V("doctype_or_version")))^0
+}
 
 -- Modifiers that follow Haml markup tags
 local modifiers = {
@@ -73,16 +85,21 @@ local function parse_attributes(t)
   end
 
   local bare_element = R("az", "AZ")^1 * (R("az", "AZ", "09") + P"_")^0
-  local quoted_element = P{"'" * ((1 - S"'") + V(1))^0 * "'"} + P{'"' * ((1 - S'"') + V(1))^0 * '"'}
-  local element = (bare_element + quoted_element)
+  local singlequoted_string = P("'" * ((1 - S "'\r\n\f\\") + (P '\\' * 1))^0 * "'")
+  local doublequoted_string = P('"' * ((1 - S '"\r\n\f\\') + (P '\\' * 1))^0 * '"')
+
+
+  local quoted_element = singlequoted_string + doublequoted_string
+  local element = (quoted_element + bare_element)
   local ruby_symbol = P":" * element
   local item_sep = P" "^0 * P"," * P" "^0
   local item_list = (ruby_symbol + element) * P" "^0 * (P"=>" + P"=") * P" "^0 * (element)
   local assignment_sep = P" "^0 * (P"=>" + P"=") * P" "^0
-  local assignment_list = (ruby_symbol + element)
+  local assignment_list = ruby_symbol + element
   local attributes = {}
   for _, str in pairs(t) do
     local items = split(clean_str(str), item_sep, item_list)
+    if not items then error(string.format("Could not parse attributes '%s'", str)) end
     for _, v in pairs(items) do
       kv = split(v, assignment_sep, assignment_list)
       attributes[clean_key(kv[1])] = clean_value(kv[2])
@@ -107,7 +124,7 @@ local haml_element = leading_whitespace * (
   -- Haml markup
   (haml_tag * attributes^0 * tag_modifiers^-1 * operators["script"]^0 * unparsed^0) +
   -- doctype or prolog
-  (operators["doctype"] * (inline_whitespace^1 * unparsed)^0) +
+  (header) +
   -- Markup comment
   (operators["markup_comment"] * unparsed^0) +
   -- Escaped
