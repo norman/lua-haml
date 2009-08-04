@@ -14,13 +14,31 @@ local html4_doctypes = {
   DEFAULT  = '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">'
 }
 
-local function buffer(state, output)
-  table.insert(state.buffer, haml.precompiler.println(0, output))
-end
-
 local function prolog_for(state)
   local charset = state.curr_phrase.charset or state.options.encoding
-  return buffer(state, string.format('<?xml version="1.0" encoding="%s" ?>', charset))
+  state.buffer:string(string.format("<?xml version='1.0' encoding='%s' ?>", charset), true)
+end
+
+local function doctype_for(state)
+
+  if state.options.format == 'html5' then
+    return state.buffer:string('<!DOCTYPE html>', true)
+
+  elseif state.curr_phrase.version == "1.1" then
+    return state.buffer:string('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">', true)
+
+  elseif state.options.format == 'xhtml' then
+    local doctype = xhtml_doctypes[state.curr_phrase.doctype] or xhtml_doctypes.DEFAULT
+    return state.buffer:string(doctype, true)
+
+  elseif state.options.format == 'html4' then
+    local doctype = html4_doctypes[state.curr_phrase.doctype] or html4_doctypes.DEFAULT
+    return state.buffer:string(doctype, true)
+
+  else
+    error(string.format('Don\'t understand doctype "%s"', state.curr_phrase.doctype))
+  end
+
 end
 
 function header_for(state)
@@ -31,23 +49,8 @@ function header_for(state)
 
   if state.curr_phrase.prolog then
     return prolog_for(state)
-
-  elseif state.options.format == 'html5' then
-    return buffer(state, '<!DOCTYPE html>')
-
-  elseif state.curr_phrase.version == "1.1" then
-    return buffer(state, '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">')
-
-  elseif state.options.format == 'xhtml' then
-    local doctype = xhtml_doctypes[state.curr_phrase.doctype] or xhtml_doctypes.DEFAULT
-    return buffer(state, doctype)
-
-  elseif state.options.format == 'html4' then
-    local doctype = html4_doctypes[state.curr_phrase.doctype] or html4_doctypes.DEFAULT
-    return buffer(state, doctype)
-  
   else
-    error(string.format('Don\'t understand doctype "%s"', state.curr_phrase.doctype))
+    return doctype_for(state)
   end
 
 end

@@ -6,19 +6,31 @@ module("haml-lexer-test", lunit.testcase, package.seeall)
 
 local tokenize = haml.lexer.tokenize
 
-function test_header()
+function test_prolog()
   local output = tokenize("!!! XML")
   assert_not_nil(output[1]["operator"])
-  assert_equal("XML", output[1]["unparsed"])
+  assert_equal("XML", output[1]["prolog"])
+end
+
+function test_doctype()
+  local output = tokenize("!!! strict")
+  assert_not_nil(output[1]["operator"])
+  assert_equal("STRICT", output[1]["doctype"])
+end
+
+function test_doctype_version()
+  local output = tokenize("!!! 1.1")
+  assert_not_nil(output[1]["operator"])
+  assert_equal("1.1", output[1]["version"])
 end
 
 function test_div_with_id_and_classes()
   local output = tokenize("#my_div.my_classes=")
-  assert_equal("my_div", output[1]["css_id"]) 
-  assert_equal("my_classes", output[1]["css_classes"])
+  assert_equal("my_div", output[1].css.id) 
+  assert_equal("my_classes", output[1].css.class) 
   assert_not_nil(output[1]["operator"])
 end
-
+-- 
 function test_tag_with_whitespace_modifiers()
   local output = tokenize([=[
     %p> hello
@@ -27,7 +39,7 @@ function test_tag_with_whitespace_modifiers()
   assert_not_nil(output[1]["outer_whitespace_modifier"])
   assert_not_nil(output[2]["inner_whitespace_modifier"])
 end
-
+-- 
 function test_self_closing_tag()
   local output = tokenize("%br/")
   assert_not_nil(output[1]["self_closing_modifier"])
@@ -39,7 +51,7 @@ function test_basic_attributes()
       %body(style="color: green")
   ]=])
   assert_equal("en", output[1]["attributes"]["lang"])
-  assert_equal("color: green", output[2]["attributes"]["style"])
+  assert_equal('"color: green"', output[2]["attributes"]["style"])
 end
 
 function test_multiple_attributes()
@@ -55,6 +67,7 @@ function test_multiple_attributes()
   assert_equal('f', output[3]["attributes"]["e"])
 end
 
+
 function test_multiline_attributes()
   local output = tokenize([=[
     %html{ lang = 'en',
@@ -67,15 +80,15 @@ end
 
 function test_attributes_with_commas()
   local output = tokenize("%p{'a,b' => 'c, d'}")
-  assert_equal('c, d', output[1]["attributes"]["a,b"])
+  assert_equal("'c, d'", output[1]["attributes"]["'a,b'"])
 end
-
+-- 
 function test_attributes_with_separators()
   local output = tokenize("%p{'a=>b' => 'c => d'}")
-  assert_equal('c => d', output[1]["attributes"]["a=>b"])
+  assert_equal("'c => d'", output[1]["attributes"]["'a=>b'"])
 end
-
+-- 
 function test_attributes_with_braces()
   local output = tokenize("%p('a' = ')b')")
-  assert_equal('}b', output[1]["attributes"]["a"])
+  assert_equal("')b'", output[1]["attributes"]["'a'"])
 end

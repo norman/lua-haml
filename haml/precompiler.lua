@@ -3,30 +3,35 @@ module("haml.precompiler", package.seeall)
 
 require "haml.markup.headers"
 
-local function ws(level)
-  return string.format('%' .. level .. 's', '')
-end
+--- Default precompiler options.
+-- @field format The output format. Can be xhtml, html4 or html5. Defaults to xhtml.
+-- @field encoding The output encoding. Defaults to utf-8.
+-- @field newline The string value to use for newlines. Defaults to "\n".
+-- @field space The string value to use for spaces. Defaults to " ".
+default_options = {
+  format   = 'xhtml',
+  encoding = 'utf-8',
+  newline  = "\n",
+  space    = " "
+}
 
--- TODO make this publically inaccessible
-function println(space, str)
-  return string.format("print '%s%s'", ws(space), string.gsub(str, "'", "\\'"))
-end
+--- Precompile Haml into Lua code.
+-- @param haml_string A Haml string
+-- @param options The options.
+function precompile(haml_string, options, locals)
 
-function precompile(haml_string, options)
-
+  options = apply_defaults(options, default_options)
   local phrases = haml.lexer.tokenize(haml_string)
+
   local state = {
-    options = {
-      format   = 'xhtml',
-      encoding = 'utf-8'
-    },
+    buffer       = string_buffer(options),
+    options      = options,
     tagstack     = {},
-    buffer       = {},
     curr_phrase  = {},
     next_phrase  = {},
     prev_phrase  = {}
   }
-  
+
   local function handle_current_phrase()
     if state.curr_phrase.operator == "header" then
       haml.markup.headers.header_for(state)
@@ -39,7 +44,7 @@ function precompile(haml_string, options)
     state.curr_phrase = phrase
     handle_current_phrase()
   end
-  
-  return table.concat(state.buffer, "\n")
+
+  return state.buffer:cat()
 
 end
