@@ -54,28 +54,19 @@ local modifiers = {
 }
 
 -- Markup attributes
--- TODO handle multiple lists of attributes
 function parse_attributes(a)
-  local name_chars    = R("az", "AZ")^1 * (R("az", "AZ", "09") + P"_")^0
-  local name          = lpeg.C(P':'^0 * (quoted_string + name_chars^1)) * inline_whitespace^0
-  local function_call = P{
-    "function_call";
-    function_name   = R("az", "AZ") * R("az", "AZ", "09")^0,
-    balanced_parens = "(" * ((1 - S"()") + V("balanced_parens"))^0 * ")",
-    function_call   = V("function_name")^1 * V("balanced_parens")
-  }
-  local value         = lpeg.C(function_call + quoted_string + name_chars^1) * inline_whitespace^0
-  local sep           = lpeg.S(",") * inline_whitespace^0
-  local assign        = (P'=>' + P'=')
-  local pair          = lpeg.Cg(name * assign * inline_whitespace^0 * value) * sep^-1
-  local list          = S("{(") * lpeg.Cf(lpeg.Ct("") * pair^0, rawset) * S("})")
-  return lpeg.match(list, a)
-
+  local name   = C((R("az", "AZ", "09") + S"-:_")^1 )
+  local value  = C(quoted_string + name)
+  local sep    = (P" " + eol)^1
+  local assign = P'='
+  local pair   = lpeg.Cg(name * assign * value) * sep^-1
+  local list   = S("(") * lpeg.Cf(lpeg.Ct("") * pair^0, rawset) * S(")")
+  return lpeg.match(list, a) or error(string.format("Could not parse attributes '%s'", a))
 end
-local paren_attributes = P{"(" * ((1 - S"()") + V(1))^0 * ")"}
-local brace_attributes = P{"{" * ((1 - S"{}") + V(1))^0 * "}"}
-local any_attributes   = (paren_attributes + brace_attributes) / parse_attributes
+local html_style_attributes = P{"(" * ((quoted_string + (P(1) - S"()")) + V(1))^0 * ")"}
+local any_attributes   = html_style_attributes / parse_attributes
 local attributes       = Cg(Ct((any_attributes * any_attributes^0)) / flatten, "attributes")
+
 
 -- Haml HTML elements
 -- Character sequences for CSS and XML/HTML elements. Note that many invalid

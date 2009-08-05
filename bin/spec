@@ -1,0 +1,2 @@
+#!/bin/bash
+luaspec `find spec -name '*_spec.lua'`
