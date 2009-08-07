@@ -1,11 +1,19 @@
+-# XML prolog
 !!! XML
+-# XML doctype
 !!!
-%html{"xmlns" => "http://www.w3.org/1999/xhtml", "xml:lang" => "en-US", "lang" => "en-US"}
+-# HTML-style attributes. Ruby-style attributes are not yet supported.
+%html(xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en")
+  -# generic HTML tag
   %body
-    %ul.colors
-      %li Red
-      %li Yellow
-      %li Orange
-    %p
-      This paragraph should render with the opening tag above the content and
-      the closing tag below it.
+    -# '#' and '.' open a new div
+    #content
+      -# tags with CSS id and classes
+      %ul#greetings.multilingual
+        -# Tags with inline content
+        %li.en hello world!
+        %li.es ¡hola mundo!
+        %li.pt olá mundo!
+        %li.de hallo Welt!
+    #goodbye
+      %p.es ¡Adiós!

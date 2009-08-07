@@ -1,5 +1,3 @@
-module("haml.markup.headers", package.seeall)
-
 local xhtml_doctypes = {
   STRICT   = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">',
   FRAMESET = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">',
@@ -43,7 +41,7 @@ end
 
 function header_for(state)
 
-  if (state.next_phrase.space or 0) > 0 then
+  if (string.len(state.next_phrase.space) or 0) > 0 then
     error("Syntax error: you can not nest within a doctype declaration or XML prolog.")
   end
 

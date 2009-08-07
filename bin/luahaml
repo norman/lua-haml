@@ -1,7 +1,7 @@
 #!/usr/bin/env lua
 require "luarocks.require"
+require "getopt"
 require "haml"
-require "std"
 
 local function read_file(file)
   local fh = assert(io.open(file))
@@ -11,34 +11,49 @@ local function read_file(file)
 end
 
 local function run_lexer(file)
-  for _, t in pairs(haml.lexer.tokenize(read_file(file))) do
+  local phrases = haml.lexer.tokenize(read_file(file))
+  for _, t in pairs(phrases) do
     print(t)
   end
   os.exit()
-end 
+end
 
 local function run_precompiler(file)
-  print(haml.precompiler.precompile(read_file(file)))
+  print(haml.precompiler.precompile(haml.lexer.tokenize(read_file(file))))
   os.exit()
 end
 
-local function render_haml(file)
-  local output = haml.render(read_file(file))
+local function render_file(file)
+  local output = haml.render_file(file)
+  print(output)
+  os.exit()
+end
+
+local function render_stdin(input)
+  local output = haml.render(io.stdin:read '*a')
+  print(output)
+  os.exit()
+end
+
+local function render_string(input)
+  local output = haml.render(input .. "\n")
   print(output)
   os.exit()
 end
 
 prog = {name = "luahaml", banner = "luahaml 0.0.1"}
-options = Options {
-  Option {{"run", nil}, "run haml", "Req", "FILE", run_haml},
+opts = Options {
+  Option {{"run", ""}, "run haml", "Req", "FILE", run_haml},
   Option {{"lex", "l"}, "show the lexer output of the file", "Req", "FILE", run_lexer},
-  Option {{"precompile", "p"}, "show the precompiler output of the file", "Req", "FILE", run_precompiler}
+  Option {{"precompile", "p"}, "show the precompiler output of the file", "Req", "FILE", run_precompiler},
+  Option {{"stdin", "s"}, "render stdin", "Opt", "STDIN", render_stdin},
+  Option {{"haml", "a"}, "render argument as a haml string", "Req", "INPUT", render_string},
 }
 
-local myargs, opt, errors = getopt.getOpt(arg, options)
+local myargs, opt, errors = getopt.getOpt(arg, opts)
 
 if myargs[1] then
-  render_haml(myargs[1])
+  render_file(myargs[1])
 else
   getopt.dieWithUsage()
 end

@@ -4,9 +4,9 @@ h2. About
 
 Lua Haml is an in-progress implementation of the "Haml":http://haml-lang.com markup language for Lua.
 
-At the moment, only a small subset of the Haml language works. It's a long way from completion, but I am currently working on it as my full time job, so expect rapid progress.
+At the moment, only a small subset of the Haml language works, but it's fairly close to being usable for simple template work.
 
-To see what language features are currently supported, view the "hello world" file in test/samples/hello_world.haml.
+To see what language features are currently supported, view the "currently support language" template in the spec directory.
 
 h3. Immediate project goals
 
@@ -17,17 +17,12 @@ h3. Immediate project goals
 
 h3. Potential goals
 
-* Compile templates using any programming language. Ideally Lua Haml could potentially be used in place of Ruby's Haml by using "Rufus-Lua":github.com/jmettraux/rufus-lua.
+* Compile templates for other programming language. Ideally Lua Haml could be used in place of Ruby's Haml by using "Rufus-Lua":github.com/jmettraux/rufus-lua. The precompiler does only minimal code interpretation; far less than an editor like vim does. So this should very doable.
+
+* Support source languages other than Haml. The lexer and precompiler are fairly well decoupled, so in theory it should be possible to create a lexer
+for a different language that targets Lua Haml's precompiler. In practice this might not be worth doing - time will tell.
 
 h2. Playing around with it
-
-Install Lua and Luarocks on your computer. If you're on a Mac, "here's a tutorial":http://blog.njclarke.com/posts/setting-up-g-for-web-development-on-os-x.
-
-Install the "stdlib":http://luaforge.net/projects/stdlib/ rock (i.e., luarocks install stdlib).
-
-Clone this repository.
-
-Play with the provided script:
 
 <pre>
 <code>
@@ -43,6 +38,9 @@ Play with the provided script:
 </pre>
 
 You can also install on your system via Luarocks by running "luarocks make" in the repository.
+
+If you want to run the specs, you need to first install Luaspec, which you can
+find at: "http://github.com/mirven/luaspec":http://github.com/mirven/luaspec.
 
 h2. Author
 

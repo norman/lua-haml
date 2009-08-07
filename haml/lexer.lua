@@ -8,7 +8,7 @@ require "haml.ext"
 
 local P, S, R, C, Cg, Ct, V = lpeg.P, lpeg.S, lpeg.R, lpeg.C, lpeg.Cg, lpeg.Ct, lpeg.V
 
-local leading_whitespace  = Cg(S" "^0 / string.len, "space")
+local leading_whitespace  = Cg(S" \t"^0, "space")
 local inline_whitespace   = S" \t"
 local eol                 = P"\n" + P"\r\n" + P"\r"
 local empty_line          = Cg(P(""), "empty_line")
@@ -18,7 +18,6 @@ local singlequoted_string = P("'" * ((1 - S "'\r\n\f\\") + (P '\\' * 1))^0 * "'"
 local doublequoted_string = P('"' * ((1 - S '"\r\n\f\\') + (P '\\' * 1))^0 * '"')
 local quoted_string       = singlequoted_string + doublequoted_string
 
-
 local operator_symbols = {
   tag            = "%",
   script         = "=",
@@ -27,7 +26,7 @@ local operator_symbols = {
   markup_comment = "/"
 }
 
--- This uilds a table of capture patterns that return the operator name rather
+-- This builds a table of capture patterns that return the operator name rather
 -- than the literal operator string.
 local operators = {}
 for k, v in pairs(operator_symbols) do
@@ -67,7 +66,6 @@ local html_style_attributes = P{"(" * ((quoted_string + (P(1) - S"()")) + V(1))^
 local any_attributes   = html_style_attributes / parse_attributes
 local attributes       = Cg(Ct((any_attributes * any_attributes^0)) / flatten, "attributes")
 
-
 -- Haml HTML elements
 -- Character sequences for CSS and XML/HTML elements. Note that many invalid
 -- names are allowed because of Haml's flexibility.
@@ -76,11 +74,15 @@ local function flatten_ids_and_classes(t)
   ids = {}
   for _, t in pairs(t) do
     if t.id then
-    table.insert(ids, t.id)
-    else 
-    table.insert(classes, t.class) end
+      table.insert(ids, t.id)
+    else
+      table.insert(classes, t.class)
+    end
   end
-  return {class = table.concat(classes, " "), id = table.remove(ids)}
+  local out = {}
+  if next(ids) then out.id = string.format("'%s'", table.remove(ids)) end
+  if next(classes) then out.class = string.format("'%s'", table.concat(classes, " ")) end
+  return out
 end
 
 local haml_tag = P{
@@ -95,13 +97,23 @@ local haml_tag = P{
   implict_tag  = Cg(-S(1) * #V("css") / function() return default_tag end, "tag"),
   haml_tag     = (V("explicit_tag") + V("implict_tag")) * Cg(Ct(V("css")) / flatten_ids_and_classes, "css")^0
 }
+local inline_code = operators.script * inline_whitespace^0 * Cg(unparsed^0, "inline_code")
+local inline_content = inline_whitespace^0 * Cg(unparsed, "inline_content")
 local tag_modifiers = (modifiers.self_closing + (modifiers.inner_whitespace + modifiers.outer_whitespace))
 
+local format_chunk = (function()
+  local line = 0
+  return function(chunk)
+    line = line + 1
+    return string.format("%d: %s", line, strip(chunk))
+  end
+end)()
+local chunk_capture = #Cg((P(1) - eol)^1 / format_chunk, "chunk")
 
 -- Core Haml grammar
-local haml_element = leading_whitespace * (
+local haml_element = chunk_capture * leading_whitespace * (
   -- Haml markup
-  (haml_tag * attributes^0 * tag_modifiers^0 * operators.script^0 * unparsed^0) +
+  (haml_tag * attributes^0 * tag_modifiers^0 * (inline_code + inline_content)^0) +
   -- doctype or prolog
   (header) +
   -- Markup comment
