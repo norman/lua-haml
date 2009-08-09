@@ -14,17 +14,16 @@ description = {
 dependencies = {
    "lua >= 5.1"
 }
+
 build = {
   type = "none",
   install = {
     lua = {
       "haml.lua",
-      "haml/ext.lua",
-      "haml/lexer.lua",
-      "haml/precompiler/headers.lua",
-      "haml/precompiler/tags.lua",
-      "haml/precompiler.lua",
-      "haml/renderer.lua",
+      ["haml.ext"]         = "haml/ext.lua",
+      ["haml.lexer"]       = "haml/lexer.lua",
+      ["haml.precompiler"] = "haml/precompiler.lua",
+      ["haml.renderer"]    = "haml/renderer.lua"
     },
     bin = {
       ["luahaml"] = "bin/luahaml"
