@@ -3,7 +3,16 @@ module("haml.renderer", package.seeall)
 local function render_attributes(attr)
   local buffer = {""}
   for k, v in sorted_pairs(attr) do
-    table.insert(buffer, string.format("%s='%s'", k, v))
+    if type(v) == "table" then
+      if k == "class" then
+        table.sort(v)
+        table.insert(buffer, string.format("%s='%s'", k, table.concat(v, ' ')))
+      elseif k == "id" then
+        table.insert(buffer, string.format("%s='%s'", k, table.concat(v, '_')))
+      end
+    else
+      table.insert(buffer, string.format("%s='%s'", k, v))
+    end
   end
   return table.concat(buffer, " ")
 end

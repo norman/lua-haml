@@ -4,10 +4,16 @@ function log(level, v)
 end
 
 function do_error(chunk, message, ...)
-  error(string.format(message, ...) .. " around " .. chunk)
+  error(string.format("Haml error: " .. message, ...) .. " (around line " .. chunk .. ")")
 end
 
---- Works exactly like pairs() but iterators over sorted table keys.
+-- strip quotes from a string
+function dequote(str)
+  local s = string.gsub(str, "['\"]", "")
+  return s
+end
+
+--- Like pairs() but iterates over sorted table keys.
 -- @param t The table to iterate over
 -- @param func An option sorting function
 -- @return The iterator function
@@ -29,16 +35,10 @@ end
 
 --- Merge two or more tables together.
 -- Duplicate keys are overridden left to right, so for example merge(t1, t2)
--- will use key values from t2. If there is only one argument, and that
--- argument, then the table's contents are treated as the function call's
--- arguments, making merge({a = "b"}, {c = "d"}) the same as 
--- merge({{a = "b"}, {c = "d"}}).
+-- will use key values from t2.
 -- @return A table containing all the values of all the tables.
 function merge_tables(...)
   local numargs = select('#', ...)
-  -- if numargs == 1 and type(select(1, ...) == "table") then
-  --   return merge_tables(unpack(select(1, ...)))
-  -- end
   local out = {}
   for i = 1, numargs do
     local t = select(i, ...)
@@ -51,14 +51,33 @@ function merge_tables(...)
   return out
 end
 
---- Strips leading and trailing space from a string
-function strip(str)
-  -- assign to local because gsub returns two values and we only want one.
-  local s = string.gsub(string.gsub(str, "^[%s]*", ""), "[%s]*$", "")
-  return s
+--- Merge two or more tables together.
+-- Duplicate keys cause the value to be added as a table containing all the
+-- values for the key in every table.
+-- @return A table containing all the values of all the tables.
+function join_tables(...)
+  local numargs = select('#', ...)
+  local out = {}
+  for i = 1, numargs do
+    local t = select(i, ...)
+    if type(t) == "table" then
+      for k, v in pairs(t) do
+        if out[k] then
+          if type(out[k]) == "table" then
+            table.insert(out[k], v)
+          else
+            out[k] = {out[k], v}
+          end
+        else
+          out[k] = v
+        end
+      end
+    end
+  end
+  return out
 end
 
---- Flattens a table of tables
+--- Flattens a table of tables.
 function flatten(...)
   local out = {}
   for _, attr in ipairs(arg) do
@@ -67,4 +86,11 @@ function flatten(...)
     end
   end
   return out
+end
+
+--- Strip leading and trailing space from a string.
+function strip(str)
+  -- assign to local because gsub returns two values and we only want one.
+  local s = string.gsub(string.gsub(str, "^[%s]*", ""), "[%s]*$", "")
+  return s
 end

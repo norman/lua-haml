@@ -23,7 +23,9 @@ build = {
       ["haml.ext"]         = "haml/ext.lua",
       ["haml.lexer"]       = "haml/lexer.lua",
       ["haml.precompiler"] = "haml/precompiler.lua",
-      ["haml.renderer"]    = "haml/renderer.lua"
+      ["haml.renderer"]    = "haml/renderer.lua",
+      ["haml.tags"]        = "haml/tags.lua",
+      ["haml.headers"]     = "haml/headers.lua"
     },
     bin = {
       ["luahaml"] = "bin/luahaml"
