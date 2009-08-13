@@ -7,6 +7,30 @@ function do_error(chunk, message, ...)
   error(string.format("Haml error: " .. message, ...) .. " (around line " .. chunk .. ")")
 end
 
+function render_table(t)
+  local buffer = {}
+  for k, v in pairs(t) do
+    if type(v) == "table" then
+      v = render_table(v)
+    end
+    table.insert(buffer, string.format("%s=%s", k, v))
+  end
+  return "{" .. table.concat(buffer, ' ') .. "}"
+end
+
+_print = print
+function print(...)
+  local toprint = {}
+  for _, v in ipairs({...}) do
+    if type(v) == "table" then
+      table.insert(toprint, render_table(v))
+    else
+      table.insert(toprint, v)
+    end
+  end
+  _print(unpack(toprint))
+end
+
 -- strip quotes from a string
 function dequote(str)
   local s = string.gsub(str, "['\"]", "")
