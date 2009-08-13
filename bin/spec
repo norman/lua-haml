@@ -1,4 +1,4 @@
 #!/usr/bin/env lua
 dofile("spec/lexer_spec.lua")
 dofile("spec/renderer_spec.lua")
-spec:report(true)
+spec:report()
