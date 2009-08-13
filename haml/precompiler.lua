@@ -22,14 +22,8 @@ default_options = {
 -- @param options Possible values are "newline" and "space". They default to "\n" and " ".
 local function string_buffer(options)
 
-  local options = merge_tables(options, {
-    newline = '"\n"',
-    space   = " "
-  })
-
-  local string_buffer = {
-    buffer = {}
-  }
+  local options = merge_tables(options, { newline = '"\n"', space   = " " })
+  local string_buffer = { buffer = {} }
 
   function string_buffer:code(value)
     table.insert(self.buffer, value)
@@ -37,7 +31,7 @@ local function string_buffer(options)
 
   function string_buffer:space(length)
     if length == 0 then return end
-    table.insert(self.buffer, string.format('%' .. length .. 's', options.space))
+    table.insert(self.buffer, string.rep(options.space, length))
   end
 
   function string_buffer:newline()
@@ -108,13 +102,15 @@ function precompile(phrases, options)
   local function validate_whitespace()
     if not state.space_sequence then return end
     if state.curr_phrase.space == "" then return end
-    if string.len(state.curr_phrase.space) <= string.len(state.prev_phrase.space) then return end
-    if state.curr_phrase.space == (state.prev_phrase.space .. state.space_sequence) then return end
+    local prev_space = ''
+    if state.prev_phrase then prev_space = state.prev_phrase end
+    if string.len(state.curr_phrase.space) <= string.len(prev_space) then return end
+    if state.curr_phrase.space == (prev_space .. state.space_sequence) then return end
     do_error(state.curr_phrase.chunk,
       string.format(
         "bad indentation, current line = %d, previous = %d",
         string.len(state.curr_phrase.space),
-        string.len(state.prev_phrase.space)
+        string.len(prev_space)
       )
     )
   end
