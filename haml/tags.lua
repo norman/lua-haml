@@ -16,7 +16,7 @@ auto_closing_tags = {
 
 function serialize_table(t)
   local buffer = {}
-  
+
   local function kv(k, v)
     if type(k) == "number" then
       return string.format('%s, ', v)
@@ -24,7 +24,7 @@ function serialize_table(t)
       return string.format('["%s"] = %s, ', k, v)
     end
   end
-  
+
   table.insert(buffer, "{")
   for k, v in pairs(t) do
     if type(v) == "table" then
@@ -58,6 +58,7 @@ end
 
 local function should_close_inline(state)
   return state.curr_phrase.inline_content or
+    state.curr_phrase.inline_code or
     not state.next_phrase or
     state.next_phrase.space == state.curr_phrase.space
 end
@@ -67,43 +68,14 @@ function tag_for(state)
 
   local c = state.curr_phrase
 
-  -- if the current indent level is less than the previous phrase's, close
-  -- endings from the ending stack
-  if state:indent_diff() < 0 then
-    local i = state:indent_diff()
-    repeat
-      state.buffer:string(
-        string.rep(state.options.indent, #state.endstack - 1) ..
-        table.remove(state.endstack),
-        true
-      )
-      i = i + 1
-    until i == 0
-  end
+  -- close any open tags if need be
+  state:close_tags()
 
   -- open the tag
   state.buffer:string(state:indents() .. '<' .. c.tag)
 
   -- add any attributes
   if c.attributes or c.css then
-    -- local attributes = merge_tables()
-    -- -- Include classes set by css and set by attributes hash. i.e.,
-    -- -- %p.class1(class='class2')
-    -- if c.css and c.css.class and attributes.class ~= c.css.class then
-    --   local classes = { dequote(c.css.class), dequote(attributes.class) }
-    --   table.sort(classes)
-    --   attributes.class = table.concat(classes, " ")
-    --   -- require 'std'
-    --   -- print(attributes)
-    -- end
-    -- -- Join id's set by CSS and attributes hashes with underscores.
-    -- -- %p.class1(class='class2')
-    -- if c.css and c.css.id and attributes.id ~= c.css.id then
-    --   attributes.id = string.format("'%s_%s'",
-    --     string.gsub(c.css.id, "'", ""),
-    --     string.gsub(attributes.id, "'", "")
-    --   )
-    -- end
     state.buffer:code(format_attributes(c.css or {}, unpack(c.attributes or {})))
   end
 
@@ -112,13 +84,14 @@ function tag_for(state)
     state.buffer:string('/>')
   else
     state.buffer:string('>')
-    table.insert(state.endstack, string.format("</%s>", c.tag))
+    state.endings:push(string.format("</%s>", c.tag))
     if should_close_inline(state) then
       if c.inline_content then
         state.buffer:string(strip(c.inline_content))
+      elseif c.inline_code then
+        state.buffer:code('print(' .. c.inline_code .. ')')
       end
-      state.buffer:string(table.remove(state.endstack))
-      state.endstack[c.space] = nil
+      state.buffer:string(state.endings:pop())
     end
   end
   state.buffer:newline()

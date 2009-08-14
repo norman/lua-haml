@@ -1,3 +1,4 @@
+-# Silent comment
 -# XML prolog
 !!! XML
 -# XML doctype
@@ -15,5 +16,18 @@
         %li.es ¡hola mundo!
         %li.pt olá mundo!
         %li.de hallo Welt!
+    #stuff
+      This is content.
     #goodbye
-      %p.es ¡Adiós!
+      -# Silent code
+      - local my_class = 'bye-bye'
+      - local goodbye  = '¡Adiós!'
+      - local closing  = function() return "The end of the template" end
+      -# Silent code with inferred endings
+      - for i=1,4 do
+        -# Combine classes and ids from various sources
+        %p#bye.es(class=my_class id=i)
+          -# Printed code as content
+          = goodbye
+    -# Printed code as inline content
+    #the_end= closing()

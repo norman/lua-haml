@@ -21,6 +21,8 @@ local quoted_string       = singlequoted_string + doublequoted_string
 local operator_symbols = {
   tag            = "%",
   script         = "=",
+  silent_script  = "-",
+  silent_comment = P("-#") + P("--"),
   escape         = "\\",
   header         = "!!!",
   markup_comment = "/"
@@ -114,8 +116,12 @@ local chunk_capture = #Cg((P(1) - eol)^1 / format_chunk, "chunk")
 local haml_element = chunk_capture * leading_whitespace * (
   -- Haml markup
   (haml_tag * attributes^0 * tag_modifiers^0 * (inline_code + inline_content)^0) +
-  -- doctype or prolog
+  -- Doctype or prolog
   (header) +
+  -- Silent comment
+  (operators.silent_comment) * inline_whitespace^0 * Cg(unparsed^0, "comment") +
+  -- Code
+  (operators.silent_script + operators.script) * inline_whitespace^1 * Cg(unparsed^0, "code") +
   -- Markup comment
   (operators.markup_comment * unparsed^0) +
   -- Escaped

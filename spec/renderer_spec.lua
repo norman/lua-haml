@@ -44,7 +44,10 @@ local passing_expectations = {
   -- Tags with inline content
   ["%p hello"]         = "<p>hello</p>",
   ["%p.class1 hello"]  = "<p class='class1'>hello</p>",
-  
+
+  -- Tags with nested content
+  ["%p\n  hello"] = "<p>\n  hello\n</p>",
+
   -- Tags with portable-style attributes
   ["%p(a='b')"]          = "<p a='b'></p>",
   ["%p(class='class1')"] = "<p class='class1'></p>",
@@ -53,7 +56,16 @@ local passing_expectations = {
   [".hello(class=world)"]   = "<div class='hello world'></div>",
   [".b(class=last)"]   = "<div class='b z'></div>",
   [".b(class=first)"]   = "<div class='a b'></div>",
+
+  -- Inline comments
+  ["-# hello\n%p"] = "<p></p>",
+  ["-- hello\n%p"] = "<p></p>",
+
+  -- Script
+  ["- a = 'b'\n%p=a"] = "<p>b</p>"
 }
+
+
 describe["The LuaHaml Renderer:"] = function()
 
   describe["When handling Haml tags"] = function()

@@ -58,6 +58,16 @@ describe["The LuaHaml Lexer:"] = function()
       expect(output[1].self_closing_modifier).should_not_be(nil)
     end
 
+    it["should parse '=' following a tag as a script operator"] = function()
+      local output = tokenize("%p=a")
+      expect(output[1].operator).should_be("script")
+    end
+
+    it["should parse content after a script operator as inline code"] = function()
+      local output = tokenize("%p=a")
+      expect(output[1].inline_code).should_be("a")
+    end
+
   end
 
   describe["When handling Haml tags with portable-style attributes (a='b')"] = function()
@@ -98,6 +108,38 @@ describe["The LuaHaml Lexer:"] = function()
 
     it["should not parse quoted attribute keys"] = function()
       expect(tokenize, "%p('a' = 'b')").should_error()
+    end
+
+  end
+
+  describe["When handling silent script"] = function()
+    it["should parse '- ' as the start of script"] = function()
+      local output = tokenize("- a")
+      expect(output[1].operator).should_be("silent_script")
+      expect(output[1].code).should_be("a")
+    end
+  end
+
+  describe["When handling script"] = function()
+    it["should parse '= ' as the start of script"] = function()
+      local output = tokenize("= a")
+      expect(output[1].operator).should_be("script")
+      expect(output[1].code).should_be("a")
+    end
+  end
+
+  describe["When handling silent comments"] = function()
+
+    it["Should parse '-#' as the start of a silent comment"] = function()
+      local output = tokenize("-# a")
+      expect(output[1].operator).should_be("silent_comment")
+      expect(output[1].comment).should_be("a")
+    end
+
+    it["Should parse '--' as the start of a silent comment"] = function()
+      local output = tokenize("-- a")
+      expect(output[1].operator).should_be("silent_comment")
+      expect(output[1].comment).should_be("a")
     end
 
   end

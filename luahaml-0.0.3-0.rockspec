@@ -1,7 +1,7 @@
 package = "luahaml"
-version = "0.0.2-0"
+version = "0.0.3-0"
 source = {
-   url = "http://github.com/norman/lua-haml/tarball/REL_0_0_2",
+   url = "http://github.com/norman/lua-haml/tarball/REL_0_0_3",
 }
 description = {
    summary = "An implementation of the Haml markup language for Lua.",
@@ -25,7 +25,8 @@ build = {
       ["haml.precompiler"] = "haml/precompiler.lua",
       ["haml.renderer"]    = "haml/renderer.lua",
       ["haml.tags"]        = "haml/tags.lua",
-      ["haml.headers"]     = "haml/headers.lua"
+      ["haml.headers"]     = "haml/headers.lua",
+      ["haml.code"]        = "haml/code.lua"
     },
     bin = {
       ["luahaml"] = "bin/luahaml"

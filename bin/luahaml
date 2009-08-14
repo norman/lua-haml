@@ -2,7 +2,7 @@
 require "luarocks.require"
 require "haml"
 
-local VERSION = "0.0.2"
+local VERSION = "0.0.3"
 
 local banner = "LuaHaml %s, copyright Norman Clarke <norman@njclarke.com>"
 

@@ -2,6 +2,7 @@
 module("haml.precompiler", package.seeall)
 require "haml.tags"
 require "haml.headers"
+require "haml.code"
 
 --- Default precompiler options.
 -- @field format The output format. Can be xhtml, html4 or html5. Defaults to xhtml.
@@ -58,6 +59,38 @@ local function string_buffer(options)
 
 end
 
+function endstack()
+
+  local stack = {endings = {}, indents = 0}
+
+  function stack:push(ending)
+    table.insert(self.endings, ending)
+    if string.match(ending, '^<') then
+      self.indents = self.indents + 1
+    end
+  end
+
+  function stack:pop()
+    if #self.endings == 0 then return nil end
+    local ending = table.remove(self.endings)
+    if string.match(ending, '^<') then
+      self.indents = self.indents - 1
+    end
+    return ending
+  end
+
+  function stack:indent_level()
+    return self.indents
+  end
+
+  function stack:size()
+    return #self.endings
+  end
+
+  return stack
+
+end
+
 --- Precompile Haml into Lua code.
 -- @param phrases A table of parsed phrases produced by the lexer.
 -- @param options Precompiler options.
@@ -67,7 +100,7 @@ function precompile(phrases, options)
   local state      = {
     buffer         = string_buffer(options),
     options        = options,
-    endstack       = {},
+    endings        = endstack(),
     curr_phrase    = {},
     next_phrase    = {},
     prev_phrase    = {},
@@ -88,8 +121,26 @@ function precompile(phrases, options)
   end
 
   function state:indents()
-    return string.rep(options.indent, self:indent_level())
+    return string.rep(self.options.indent, self.endings:indent_level())
   end
+
+  function state:close_tags()
+    -- if the current indent level is less than the previous phrase's, close
+    -- endings from the ending stack
+    if self:indent_diff() < 0 then
+      local i = self:indent_diff()
+      repeat
+        local ending = self.endings:pop()
+        if string.match(ending, "^<") then
+          self.buffer:string(self:indents() .. ending, true)
+        else
+          self.buffer:code(ending)
+        end
+        i = i + 1
+      until i == 0
+    end
+  end
+
 
   local function detect_whitespace_format()
     if state.space_sequence then return end
@@ -103,7 +154,7 @@ function precompile(phrases, options)
     if not state.space_sequence then return end
     if state.curr_phrase.space == "" then return end
     local prev_space = ''
-    if state.prev_phrase then prev_space = state.prev_phrase end
+    if state.prev_phrase then prev_space = state.prev_phrase.space end
     if string.len(state.curr_phrase.space) <= string.len(prev_space) then return end
     if state.curr_phrase.space == (prev_space .. state.space_sequence) then return end
     do_error(state.curr_phrase.chunk,
@@ -115,12 +166,18 @@ function precompile(phrases, options)
     )
   end
 
-  -- TODO put these functions in a table and just access them by name
   local function handle_current_phrase()
     if state.curr_phrase.operator == "header" then
       haml.headers.header_for(state)
     elseif state.curr_phrase.tag then
       haml.tags.tag_for(state)
+    elseif state.curr_phrase.code then
+      haml.code.code_for(state)
+    elseif state.curr_phrase.operator == "silent_comment" then
+      state:close_tags()
+    elseif state.curr_phrase.unparsed then
+      state:close_tags()
+      state.buffer:string(state:indents() .. state.curr_phrase.unparsed, true)
     end
   end
 
@@ -135,11 +192,15 @@ function precompile(phrases, options)
   end
 
   -- close all open tags
-  while #state.endstack ~= 0 do
-    state.buffer:string(
-      string.rep(state.options.indent, #state.endstack - 1) ..
-      table.remove(state.endstack), true)
+  while state.endings:size() > 0 do
+    local ending = state.endings:pop()
+    if string.match(ending, "^<") then
+      state.buffer:string(state:indents() .. ending, true)
+    else
+      state.buffer:code(ending)
+    end
   end
+
   return state.buffer:cat()
 
 end
