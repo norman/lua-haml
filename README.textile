@@ -4,34 +4,25 @@ h2. About
 
 Lua Haml is an in-progress implementation of the "Haml":http://haml-lang.com markup language for Lua.
 
-At the moment, only a small subset of the Haml language works, but it's fairly close to being usable for simple template work.
+It currently supports the main features of Ruby's Haml, and can be used for real work. However, many of the finer details of the language, some of them important, are still being implemented.
 
 To see what language features are currently supported, view the "currently support language" template in the spec directory, or take a look at the list of language samples in the renderer spec.
 
 h3. Immediate project goals
 
 * Support the same Haml language as Ruby Haml with no unecessary changes. Lua Haml should just be Haml, with no embracing and extending.
-* Add only minimal changes to make Haml more comfortable for Lua; i.e., "--" for comments rather than "#", and Lua tables as attributes.
+* Allow some tiny changes to make Haml more comfortable for Lua; i.e., "--" for comments in addition to "#", and Lua tables as attributes.
 * Include a cache for compiled templates.
 * Help with and contribute to other Haml implementations.
-
-h3. Potential goals
-
-* Compile templates for other programming language. Ideally Lua Haml could be used in place of Ruby's Haml by using "Rufus-Lua":http://github.com/jmettraux/rufus-lua. The precompiler does only minimal code interpretation; far less than an editor like vim does. So this should very doable.
-
-* Support source languages other than Haml. The lexer and precompiler are fairly well decoupled, so in theory it should be possible to create a lexer
-for a different language that targets Lua Haml's precompiler. In practice this might not be worth doing - time will tell.
+* Since Lua is designed to be embeddded, develop with an architecture that allows for easy support of other target languages.
 
 h2. Playing around with it
 
-The command line utility in @bin/luahaml@ can be used to exercise most of the functionality of Luahaml. Simply clone the git repo and play with it; Luahaml's only dependency is Lua 5.1.
+The command line utility in @bin/luahaml@ can be used to exercise most of the functionality of Luahaml. To get it running, you need to install Luahaml's dependencies, which are:
 
-If you want to run the specs, you need to first install Luaspec, which you can
-find at: "http://github.com/mirven/luaspec":http://github.com/mirven/luaspec.
-
-To install Luaspec from Luarocks, clone the repo, cd into it and enter:
-
-@sudo luarocks make *.rockspec@
+* Lua 5.1
+* Luarocks
+* LPeg
 
 h2. Author
 

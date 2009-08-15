@@ -1,4 +1,4 @@
--# Silent comment
+-# Silent comment; for now only 1-line comments are supported.
 -# XML prolog
 !!! XML
 -# XML doctype
@@ -17,7 +17,9 @@
         %li.pt olá mundo!
         %li.de hallo Welt!
     #stuff
-      This is content.
+      This is nested tag content.
+      -# auto-closing tag
+      %img(src="http://google.com/logo.jpg")
     #goodbye
       -# Silent code
       - local my_class = 'bye-bye'
