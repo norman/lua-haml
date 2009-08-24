@@ -1,11 +1,7 @@
 require 'luarocks.require'
-require 'luaspec'
+require 'telescope'
 require "haml"
 
--- reimport some functions hidden by luaspec
-local pairs = _G["pairs"]
-local type = _G["type"]
-local string = _G["string"]
 local locals = {
   value = "value",
   hello = "hello",
@@ -66,16 +62,14 @@ local passing_expectations = {
 }
 
 
-describe["The LuaHaml Renderer:"] = function()
+describe("The LuaHaml Renderer", function()
 
-  describe["When handling Haml tags"] = function()
+  describe("When handling Haml tags", function()
     for k, v in pairs(passing_expectations) do
-      it[string.format("should render '%s' as '%s'", k, v)] = function()
-        expect(haml.render(k, {}, locals)).should_be(v)
-      end
+      it(string.format("should render '%s' as '%s'", string.gsub(k, "\n", "\\n"),
+          string.gsub(v, "\n", "\\n")), function()
+        assert_equal(haml.render(k, {}, locals), v)
+      end)
     end
-  end
-
-end
-
-describe = nil
+  end)
+end)

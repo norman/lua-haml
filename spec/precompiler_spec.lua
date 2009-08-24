@@ -1,52 +1,51 @@
 require 'luarocks.require'
-require 'luaspec'
-require "haml"
+haml = require "haml"
 
 local endstack = haml.precompiler.endstack
 
-describe["The LuaHaml Precompiler:"] = function()
+describe("The LuaHaml Precompiler:", function()
 
-  describe["the endstack"] = function()
+  describe("the endstack", function()
 
-    it["should have an initial indent level of 0"] = function()
+    it("should have an initial indent level of 0", function()
       local es = endstack()
-      expect(es:indent_level()).should_be(0)
-    end
+      assert_equal(es:indent_level(), 0)
+    end)
 
-    it["should add an HTML tag and increase the indent level"] = function()
+    it("should add an HTML tag and increase the indent level", function()
       local es = endstack()
       es:push("</p>")
-      expect(es:indent_level()).should_be(1)
-    end
+      assert_equal(es:indent_level(), 1)
+    end)
 
-    it["should not increase the indent level for code endings"] = function()
+    it("should not increase the indent level for code endings", function()
       local es = endstack()
       es:push("end")
-      expect(es:indent_level()).should_be(0)
-    end
+      assert_equal(es:indent_level(), 0)
+    end)
 
-    it["should pop an HTML tag an decrease the indent level"] = function()
+    it("should pop an HTML tag an decrease the indent level", function()
       local es = endstack()
       es:push("</html>")
       es:push("</body>")
-      expect(es:indent_level()).should_be(2)
+      assert_equal(es:indent_level(), 2)
       es:pop()
-      expect(es:indent_level()).should_be(1)
-    end
+      assert_equal(es:indent_level(), 1)
+    end)
 
-    it["should not decrease indent level when popping code endings"] = function()
+    it("should not decrease indent level when popping code endings", function()
       local es = endstack()
       es:push("</html>")
       es:push("end")
-      expect(es:indent_level()).should_be(1)
+      assert_equal(es:indent_level(), 1)
       es:pop()
-      expect(es:indent_level()).should_be(1)
-    end
+      assert_equal(es:indent_level(), 1)
+    end)
 
-    it["should return nil when popping an empty stack"] = function()
+    it("should return nil when popping an empty stack", function()
       local es = endstack()
-      expect(es:pop()).should_be(nil)
-    end
+      assert_equal(es:pop(), nil)
+    end)
 
-  end
-end
+  end)
+end)

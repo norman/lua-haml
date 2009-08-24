@@ -1,7 +1,1 @@
-#!/usr/bin/env lua
-require 'luarocks.require'
-require 'luaspec'
-dofile("spec/precompiler_spec.lua")
-dofile("spec/lexer_spec.lua")
-dofile("spec/renderer_spec.lua")
-spec:report()
+exec ts spec/*_spec.lua
