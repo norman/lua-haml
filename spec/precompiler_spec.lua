@@ -1,5 +1,4 @@
-require 'luarocks.require'
-haml = require "haml"
+require "haml"
 
 local endstack = haml.precompiler.endstack
 
