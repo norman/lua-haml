@@ -6,7 +6,7 @@ Lua Haml is an in-progress implementation of the "Haml":http://haml-lang.com mar
 
 It currently supports the main features of Ruby's Haml, and can be used for real work. However, many of the finer details of the language, some of them important, are still being implemented.
 
-To see what language features are currently supported, view the "currently support language" template in the spec directory, or take a look at the list of language samples in the renderer spec.
+To see what language features are currently supported, view the "currently supported language" template in the spec directory, or view the list of language samples in the renderer spec.
 
 h3. Immediate project goals
 
@@ -14,7 +14,12 @@ h3. Immediate project goals
 * Allow some tiny changes to make Haml more comfortable for Lua; i.e., "--" for comments in addition to "#", and Lua tables as attributes.
 * Include a cache for compiled templates.
 * Help with and contribute to other Haml implementations.
-* Since Lua is designed to be embeddded, develop with an architecture that allows for easy support of other target languages.
+* Since Lua is designed to be embeddded, develop with an architecture that allows for reasonably easy support for using Haml with other languages (Ruby, PHP, Perl, Python, etc.).
+
+h3. Long term goals
+
+* Include parsers/lexers for Textile, Markdown, etc. for Lua Haml's precompiler.
+
 
 h2. Playing around with it
 
