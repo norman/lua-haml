@@ -1,6 +1,6 @@
-h1. Lua Haml
+# Lua Haml #
 
-h2. About
+## About ##
 
 Lua Haml is an in-progress implementation of the "Haml":http://haml-lang.com markup language for Lua.
 
@@ -8,7 +8,7 @@ It currently supports the main features of Ruby's Haml, and can be used for real
 
 To see what language features are currently supported, view the "currently supported language" template in the spec directory, or view the list of language samples in the renderer spec.
 
-h3. Immediate project goals
+### Immediate project goals ###
 
 * Support the same Haml language as Ruby Haml with no unecessary changes. Lua Haml should just be Haml, with no embracing and extending.
 * Allow some tiny changes to make Haml more comfortable for Lua; i.e., "--" for comments in addition to "#", and Lua tables as attributes.
@@ -16,12 +16,12 @@ h3. Immediate project goals
 * Help with and contribute to other Haml implementations.
 * Since Lua is designed to be embeddded, develop with an architecture that allows for reasonably easy support for using Haml with other languages (Ruby, PHP, Perl, Python, etc.).
 
-h3. Long term goals
+### Long term goals ###
 
 * Include parsers/lexers for Textile, Markdown, etc. for Lua Haml's precompiler.
 
 
-h2. Playing around with it
+## Playing around with it ##
 
 The command line utility in @bin/luahaml@ can be used to exercise most of the functionality of Luahaml. To get it running, you need to install Luahaml's dependencies, which are:
 
@@ -29,15 +29,15 @@ The command line utility in @bin/luahaml@ can be used to exercise most of the fu
 * Luarocks
 * LPeg
 
-h2. Author
+## Author ##
 
-"Norman Clarke":mailto://norman@njclarke.com
+[Norman Clarke](mailto://norman@njclarke.com)
 
-h2. Attributions
+## Attributions ##
 
-Some of the sample files in test/samples were taken from "Ruby's Haml":http://github.com/nex3/haml/.
+Some of the sample files in test/samples were taken from [Ruby's Haml](http://github.com/nex3/haml/).
 
-h2. License
+## License ##
 
 The MIT License
 
