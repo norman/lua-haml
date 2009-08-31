@@ -1,6 +1,4 @@
-require 'luarocks.require'
-local haml = require "haml"
-require 'telescope'
+require "haml"
 
 local tokenize = haml.lexer.tokenize
 

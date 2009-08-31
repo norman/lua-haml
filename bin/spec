@@ -1,1 +1,1 @@
-exec ts spec/*_spec.lua
+exec tsc spec/*_spec.lua
