@@ -1,8 +1,9 @@
 --- Haml precompiler
 module("haml.precompiler", package.seeall)
-require "haml.tags"
-require "haml.headers"
 require "haml.code"
+require "haml.filter"
+require "haml.headers"
+require "haml.tags"
 
 --- Default precompiler options.
 -- @field format The output format. Can be xhtml, html4 or html5. Defaults to xhtml.
@@ -44,6 +45,11 @@ local function string_buffer(options)
   -- @param add_newline If true, then append a newline to the buffer after the value.
   function string_buffer:string(value, add_newline)
     table.insert(self.buffer, string.format("print '%s'", string.gsub(value, "'", "\\'")))
+    if add_newline then self:newline() end
+  end
+
+  function string_buffer:long_string(value, add_newline)
+    table.insert(self.buffer, string.format("print [==========[%s]==========]", value))
     if add_newline then self:newline() end
   end
 
@@ -173,6 +179,8 @@ function precompile(phrases, options)
       haml.tags.tag_for(state)
     elseif state.curr_phrase.code then
       haml.code.code_for(state)
+    elseif state.curr_phrase.filter then
+      haml.filter.filter_for(state)
     elseif state.curr_phrase.operator == "silent_comment" then
       state:close_tags()
     elseif state.curr_phrase.unparsed then

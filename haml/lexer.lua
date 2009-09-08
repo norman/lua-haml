@@ -6,7 +6,7 @@ module("haml.lexer", package.seeall)
 require "lpeg"
 require "haml.ext"
 
-local P, S, R, C, Cg, Ct, V = lpeg.P, lpeg.S, lpeg.R, lpeg.C, lpeg.Cg, lpeg.Ct, lpeg.V
+local P, S, R, C, Cg, Ct, Cb, Cmt, V = lpeg.P, lpeg.S, lpeg.R, lpeg.C, lpeg.Cg, lpeg.Ct, lpeg.Cb, lpeg.Cmt, lpeg.V
 
 local leading_whitespace  = Cg(S" \t"^0, "space")
 local inline_whitespace   = S" \t"
@@ -87,6 +87,16 @@ local function flatten_ids_and_classes(t)
   return out
 end
 
+local filtered_block = P{
+  "filter",
+  open = P":" * Cg((P(1) - eol)^0, "filter") * eol,
+  filtered = (Cmt(Cb("space") * eol^0 * C(inline_whitespace^1),
+    function(s, i, a, b)
+      return tostring(a or ''):len() < tostring(b or ''):len()
+    end) * (P(1) - eol)^1),
+  filter = V("open") * Cg(V("filtered")^0, "content")
+}
+
 local haml_tag = P{
   "haml_tag";
   alnum        = R("az", "AZ", "09"),
@@ -124,6 +134,8 @@ local haml_element = chunk_capture * leading_whitespace * (
   (operators.silent_script + operators.script) * inline_whitespace^1 * Cg(unparsed^0, "code") +
   -- Markup comment
   (operators.markup_comment * unparsed^0) +
+  -- Unparsed filtered block
+  (filtered_block) +
   -- Escaped
   (operators.escape * unparsed^0) +
   -- Unparsed content

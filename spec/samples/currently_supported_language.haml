@@ -1,35 +1,53 @@
--# Silent comment; for now only 1-line comments are supported.
--# XML prolog
+- local title = "Lua Haml: Currently Supported Language"
 !!! XML
--# XML doctype
 !!!
--# HTML-style attributes. Ruby-style attributes are not yet supported.
 %html(xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en")
-  -# generic HTML tag
+  %head
+    %title= title
+    %meta(http-equiv="Content-Type" content="text/html; charset=utf-8")
+    %style(type="text/css")
+      :plain
+        body { background-color: #fff }
+        h1 { font-size: 25px; }
+        textarea { font-family: monaco, fixed; font-size: 14px; }
   %body
-    -# '#' and '.' open a new div
+    %h1= title
+    %p
+      This file demonstrates every implemented feature of Lua Haml.
+    %p
+      If you're viewing the output and wondering what's so interesting, then
+      you should probably be looking at the Haml source instead.
     #content
-      -# tags with CSS id and classes
+      - local greetings = {en = "hello world!", es = "¡hola mundo!", pt = "olá mundo!"}
       %ul#greetings.multilingual
-        -# Tags with inline content
-        %li.en hello world!
-        %li.es ¡hola mundo!
-        %li.pt olá mundo!
-        %li.de hallo Welt!
+        - for lang, greeting in pairs(greetings) do
+          %li.greeting(class=lang)= greeting
     #stuff
       This is nested tag content.
-      -# auto-closing tag
-      %img(src="http://google.com/logo.jpg")
-    #goodbye
-      -# Silent code
-      - local my_class = 'bye-bye'
-      - local goodbye  = '¡Adiós!'
-      - local closing  = function() return "The end of the template" end
-      -# Silent code with inferred endings
-      - for i=1,4 do
-        -# Combine classes and ids from various sources
-        %p#bye.es(class=my_class id=i)
-          -# Printed code as content
-          = goodbye
-    -# Printed code as inline content
-    #the_end= closing()
+    :javascript
+      var greeting_en = "hello world!";
+    #more_stuff
+      %textarea(cols="100" rows="17")
+        :preserve
+                ___           ___           ___           ___
+               /\__\         /\  \         /\__\         /\__\
+              /:/  /        /::\  \       /::|  |       /:/  /
+             /:/__/        /:/\:\  \     /:|:|  |      /:/  /
+            /::\  \ ___   /::\~\:\  \   /:/|:|__|__   /:/  /
+           /:/\:\  /\__\ /:/\:\ \:\__\ /:/ |::::\__\ /:/__/
+           \/__\:\/:/  / \/__\:\/:/  / \/__/~~/:/  / \:\  \
+                \::/  /       \::/  /        /:/  /   \:\  \
+                /:/  /        /:/  /        /:/  /     \:\  \
+               /:/  /        /:/  /        /:/  /       \:\__\
+               \/__/         \/__/         \/__/         \/__/
+
+               Many
+                             thanks
+                     to
+                                          http://www.network-science.de/ascii
+  #more_stuff
+    :plain
+      <p>
+        <a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10-blue"
+          alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
+      </p>

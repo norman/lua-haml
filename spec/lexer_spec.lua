@@ -178,4 +178,23 @@ describe("The LuaHaml Lexer", function()
 
   end)
 
+  describe("When handling filtered blocks", function()
+    it("should return filtered content with 0-level indentation", function()
+      local output = tokenize(":javascript\n  alert('hello world!');")
+      assert_not_nil(output[1].filter)
+      assert_not_nil(output[1].content)
+      assert_equal("javascript", output[1].filter)
+      assert_equal("  alert('hello world!');", output[1].content)
+    end)
+
+    it("should return filtered content with 2-level indentation", function()
+      local output = tokenize("    :javascript\n      alert('hello world!');\n    %h2 Hello")
+      assert_not_nil(output[1].filter)
+      assert_not_nil(output[1].content)
+      assert_equal("javascript", output[1].filter)
+      assert_equal("      alert('hello world!');", output[1].content)
+    end)
+
+  end)
+
 end)
