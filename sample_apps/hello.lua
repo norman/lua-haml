@@ -5,7 +5,7 @@ module("hello", package.seeall, orbit.new)
 
 local views = {}
 
-views.layout = [[
+views.index = [[
 !!! XML
 !!! Strict
 %html(xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en")
