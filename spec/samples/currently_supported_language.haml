@@ -22,6 +22,8 @@
       %ul#greetings.multilingual
         - for lang, greeting in pairs(greetings) do
           %li.greeting(class=lang)= greeting
+    #escaped_content
+      \#this content is escaped
     #stuff
       This is nested tag content.
     :javascript

@@ -14,6 +14,7 @@ The following features of Ruby's Haml are working in Lua Haml:
 
 * Options: format, autoclose, encoding
 * Plain text
+* Escapes
 * HTML elements
 * HTML-style attributes
 * Classes and id's (. and #)
@@ -32,7 +33,6 @@ The following features of Ruby's Haml are working in Lua Haml:
 The following feautes of Ruby's Haml are not yet working in Lua Haml:
 
 * Options: escape\_html, suppress\_eval, attr\_wrapper, preserve
-* Escapes
 * Ruby-style attributes
 * Attribute methods
 * Boolean attributes
