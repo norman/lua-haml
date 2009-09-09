@@ -60,7 +60,14 @@ local passing_expectations = {
   },
   { "script",
       {"- a = 'b'\n%p=a", "<p>b</p>"}
+  },
+
+  { "filters",
+      {":preserve\n  hello\n\n%p", "  hello&#x0A;\n<p></p>"},
+      {":plain\n  hello\n\n%p", "  hello\n\n<p></p>"},
+      {":javascript\n  a();\n%p", "<script type='text/javascript'>\n  // <![CDATA[\na();\n  // ]]>\n</script>\n<p></p>"}
   }
+
 }
 
 

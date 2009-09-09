@@ -87,14 +87,34 @@ local function flatten_ids_and_classes(t)
   return out
 end
 
+local function psplit(s, sep)
+  sep = lpeg.P(sep)
+  local elem = lpeg.C((1 - sep)^0)
+  local p = lpeg.Ct(elem * (sep * elem)^0)   -- make a table capture
+  return lpeg.match(p, s)
+end
+
 local filtered_block = P{
   "filter",
   open = P":" * Cg((P(1) - eol)^0, "filter") * eol,
-  filtered = (Cmt(Cb("space") * eol^0 * C(inline_whitespace^1),
-    function(s, i, a, b)
-      return tostring(a or ''):len() < tostring(b or ''):len()
-    end) * (P(1) - eol)^1),
-  filter = V("open") * Cg(V("filtered")^0, "content")
+  filtered = (Cmt(Cb("space"),
+    function(s, i, a)
+      local buffer = {}
+      local num_spaces = tostring(a or ""):len()
+      local start = s:sub(i)
+      for _, line in ipairs(psplit(start, "\n")) do
+        if lpeg.match(P" "^(num_spaces + 1), line) then
+          table.insert(buffer, line)
+        elseif line == "" then
+          table.insert(buffer, line)
+        else
+          break
+        end
+      end
+      local match = table.concat(buffer, "\n")
+      return i + match:len(), match
+    end)),
+  filter = V("open") * Cg(V("filtered"), "content")
 }
 
 local haml_tag = P{
@@ -143,7 +163,7 @@ local haml_element = chunk_capture * leading_whitespace * (
   -- Last resort
   empty_line
 )
-local grammar = Ct(Ct(haml_element) * (eol * Ct(haml_element))^0)
+local grammar = Ct(Ct(haml_element) * (eol^1 * Ct(haml_element))^0)
 
 function tokenize(input)
   return lpeg.match(grammar, input)

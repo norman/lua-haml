@@ -17,11 +17,11 @@ function javascript_filter(content, options, indents, indent_level)
   local buffer = {}
   table.insert(buffer, "<script type='text/javascript'>")
   if options.format == "xhtml" then
-    table.insert(buffer, "  /* <![CDATA[ */")
+    table.insert(buffer, "  // <![CDATA[")
   end
   table.insert(buffer, shorten_space(content, options))
   if options.format == "xhtml" then
-    table.insert(buffer, "  /* ]]> */")
+    table.insert(buffer, "  // ]]>")
   end
   table.insert(buffer, "</script>")
   local output = table.concat(buffer, options.newline)
