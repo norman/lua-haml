@@ -4,7 +4,7 @@
 -- and the <a href="http://haml-lang.com/docs/yardoc/HAML_REFERENCE.md.html">Haml language reference</a>.
 -- </p>
 module("haml", package.seeall)
-require "haml.lexer"
+require "haml.parser"
 require "haml.precompiler"
 require "haml.renderer"
 require "haml.ext"
@@ -14,7 +14,7 @@ require "haml.ext"
 -- @param options Options for the precompiler
 -- @param locals Local variable values to set for the rendered template
 function render(haml_string, options, locals)
-  local phrases = haml.lexer.tokenize(haml_string)
+  local phrases = haml.parser.tokenize(haml_string)
   local template = precompiler.precompile(phrases, options)
   return haml.renderer.render(template, locals)
 end

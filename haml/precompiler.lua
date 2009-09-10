@@ -98,7 +98,7 @@ function endstack()
 end
 
 --- Precompile Haml into Lua code.
--- @param phrases A table of parsed phrases produced by the lexer.
+-- @param phrases A table of parsed phrases produced by the parser.
 -- @param options Precompiler options.
 function precompile(phrases, options)
 

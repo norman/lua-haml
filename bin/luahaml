@@ -18,8 +18,8 @@ Options:
 
   -s, --stdin          Read from standard input
   -i, --inline         Read input from the command line
-  -l, --parse          Show the lexer/parser's output for debugging
-  -p, --precompile     Show the precompiler's output for debugging
+  -p, --parse          Show the parser's output for debugging
+  -c, --precompile     Show the precompiler's output for debugging
   -v, --version        Show the LuaHaml version
   -?, -h, --help       Show this message
 
@@ -27,7 +27,7 @@ Examples:
 
   Render a template:
   # luahaml my_template.haml > my_template.haml
-  Read input from the command line and show the lexer's output
+  Read input from the command line and show the parser's output
   # luahaml -l -i '%p'
 
 ]]
@@ -44,15 +44,15 @@ local function read_stdin()
   return io.stdin:read('*a')
 end
 
-local function run_lexer(haml_string)
-  local phrases = haml.lexer.tokenize(haml_string)
+local function run_parser(haml_string)
+  local phrases = haml.parser.tokenize(haml_string)
   for _, t in pairs(phrases) do
     print(t)
   end
 end
 
 local function run_precompiler(haml_string)
-  print(haml.precompiler.precompile(haml.lexer.tokenize(haml_string)))
+  print(haml.precompiler.precompile(haml.parser.tokenize(haml_string)))
 end
 
 local function render(haml_string)
@@ -74,10 +74,10 @@ local input_func = read_file
 if #arg == 0 then show_usage() end
 
 for i, v in ipairs(arg) do
-  if v == '-p' or v == '--precompile' then
+  if v == '-c' or v == '--precompile' then
     exec_func = run_precompiler
-  elseif v == '-l' or v == '--parse' then
-    exec_func = run_lexer
+  elseif v == '-p' or v == '--parse' then
+    exec_func = run_parser
   elseif v == '-s' or v == '--stdin' then
     input_func = read_stdin
   elseif v == '-i' or v == '--inline' then

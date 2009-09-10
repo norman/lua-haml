@@ -7,7 +7,7 @@ local watchfiles = {
   "haml.lua",
   "haml/ext.lua",
   "haml/headers.lua",
-  "haml/lexer.lua",
+  "haml/parser.lua",
   "haml/precompiler.lua",
   "haml/renderer.lua",
   "haml/tags.lua",
@@ -16,7 +16,7 @@ local watchfiles = {
 }
 
 local specs = {
-  "spec/lexer_spec.lua",
+  "spec/parser_spec.lua",
   "spec/renderer_spec.lua",
   "spec/precompiler_spec.lua"
 }

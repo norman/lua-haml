@@ -1,7 +1,7 @@
---- Haml Lexer
-module("haml.lexer", package.seeall)
+--- Haml parser
+module("haml.parser", package.seeall)
 
--- Lua Haml's lexer uses the Lua Parsing Expression Grammar. For more
+-- Lua Haml's parser uses the Lua Parsing Expression Grammar. For more
 -- information see: http://www.inf.puc-rio.br/~roberto/lpeg/lpeg.html
 require "lpeg"
 require "haml.ext"

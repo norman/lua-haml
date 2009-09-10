@@ -1,8 +1,8 @@
 require "haml"
 
-local tokenize = haml.lexer.tokenize
+local tokenize = haml.parser.tokenize
 
-describe("The LuaHaml Lexer", function()
+describe("The LuaHaml parser", function()
 
   describe("When handling Haml tags", function()
     it("should parse a bare css class as a div of that class ('.class1')", function()

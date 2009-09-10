@@ -21,7 +21,7 @@ build = {
     lua = {
       "haml.lua",
       ["haml.ext"]         = "haml/ext.lua",
-      ["haml.lexer"]       = "haml/lexer.lua",
+      ["haml.parser"]      = "haml/parser.lua",
       ["haml.precompiler"] = "haml/precompiler.lua",
       ["haml.renderer"]    = "haml/renderer.lua",
       ["haml.tags"]        = "haml/tags.lua",
