@@ -10,22 +10,23 @@ local P, S, R, C, Cg, Ct, Cb, Cmt, V = lpeg.P, lpeg.S, lpeg.R, lpeg.C, lpeg.Cg, 
 
 local leading_whitespace  = Cg(S" \t"^0, "space")
 local inline_whitespace   = S" \t"
-local eol                 = P"\n" + P"\r\n" + P"\r"
-local empty_line          = Cg(P(""), "empty_line")
+local eol                 = P"\n" + "\r\n" + "\r"
+local empty_line          = Cg(P"", "empty_line")
 local unparsed            = Cg((1 - eol)^1, "unparsed")
 local default_tag         = "div"
-local singlequoted_string = P("'" * ((1 - S "'\r\n\f\\") + (P '\\' * 1))^0 * "'")
-local doublequoted_string = P('"' * ((1 - S '"\r\n\f\\') + (P '\\' * 1))^0 * '"')
+local singlequoted_string = P("'" * ((1 - S "'\r\n\f\\") + (P'\\' * 1))^0 * "'")
+local doublequoted_string = P('"' * ((1 - S '"\r\n\f\\') + (P'\\' * 1))^0 * '"')
 local quoted_string       = singlequoted_string + doublequoted_string
 
 local operator_symbols = {
-  tag            = "%",
-  script         = "=",
-  silent_script  = "-",
-  silent_comment = P("-#") + P("--"),
   escape         = "\\",
+  filter         = ":",
   header         = "!!!",
-  markup_comment = "/"
+  markup_comment = "/",
+  script         = "=",
+  silent_comment = P"-#" + "--",
+  silent_script  = "-",
+  tag            = "%"
 }
 
 -- This builds a table of capture patterns that return the operator name rather
@@ -40,11 +41,11 @@ local header =  {
   "header";
   prolog             = Cg(P"XML" + P"xml" / string.upper, "prolog"),
   charset            = Cg((R("az", "AZ", "09") + S"-")^1, "charset"),
-  version            = Cg(P"1.1" + P"1.0", "version"),
+  version            = Cg(P"1.1" + "1.0", "version"),
   doctype            = Cg(R("az", "AZ")^1 / string.upper, "doctype"),
-  prolog_and_charset = (V("prolog") * (inline_whitespace^1 * V("charset")^1)^0),
-  doctype_or_version = V("doctype") + V("version"),
-  header             = operators.header * (inline_whitespace * (V("prolog_and_charset") + V("doctype_or_version")))^0
+  prolog_and_charset = (V"prolog" * (inline_whitespace^1 * V"charset"^1)^0),
+  doctype_or_version = V"doctype" + V"version",
+  header             = operators.header * (inline_whitespace * (V"prolog_and_charset" + V"doctype_or_version"))^0
 }
 
 -- Modifiers that follow Haml markup tags
@@ -88,15 +89,15 @@ local function flatten_ids_and_classes(t)
 end
 
 local function psplit(s, sep)
-  sep = lpeg.P(sep)
-  local elem = lpeg.C((1 - sep)^0)
-  local p = lpeg.Ct(elem * (sep * elem)^0)
+  sep = P(sep)
+  local elem = C((1 - sep)^0)
+  local p = Ct(elem * (sep * elem)^0)
   return lpeg.match(p, s)
 end
 
 local filtered_block = P{
   "filter",
-  open = P":" * Cg((P(1) - eol)^0, "filter") * eol,
+  open = operators.filter * Cg((P(1) - eol)^0, "filter") * eol,
   filtered = (Cmt(Cb("space"),
     function(s, i, a)
       local buffer = {}
@@ -114,20 +115,20 @@ local filtered_block = P{
       local match = table.concat(buffer, "\n")
       return i + match:len(), match
     end)),
-  filter = V("open") * Cg(V("filtered"), "content")
+  filter = V"open" * Cg(V"filtered", "content")
 }
 
 local haml_tag = P{
   "haml_tag";
   alnum        = R("az", "AZ", "09"),
-  css_name     = S"-_" + V("alnum")^1,
-  class        = P"." * Ct(Cg(V("css_name")^1, "class")),
-  id           = P"#" * Ct(Cg(V("css_name")^1, "id")),
-  css          = (V("class") + V("id")) * V("css")^0,
+  css_name     = S"-_" + V"alnum"^1,
+  class        = P"." * Ct(Cg(V"css_name"^1, "class")),
+  id           = P"#" * Ct(Cg(V"css_name"^1, "id")),
+  css          = (V"class" + V"id") * V"css"^0,
   html_name    = R("az", "AZ", "09") + S":-_",
-  explicit_tag = "%" * Cg(V("html_name")^1, "tag"),
-  implict_tag  = Cg(-S(1) * #V("css") / function() return default_tag end, "tag"),
-  haml_tag     = (V("explicit_tag") + V("implict_tag")) * Cg(Ct(V("css")) / flatten_ids_and_classes, "css")^0
+  explicit_tag = "%" * Cg(V"html_name"^1, "tag"),
+  implict_tag  = Cg(-S(1) * #V"css" / function() return default_tag end, "tag"),
+  haml_tag     = (V"explicit_tag" + V"implict_tag") * Cg(Ct(V"css") / flatten_ids_and_classes, "css")^0
 }
 local inline_code = operators.script * inline_whitespace^0 * Cg(unparsed^0, "inline_code")
 local inline_content = inline_whitespace^0 * Cg(unparsed, "inline_content")

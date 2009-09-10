@@ -33,24 +33,28 @@ local function string_buffer(options)
 
   function string_buffer:space(length)
     if length == 0 then return end
-    table.insert(self.buffer, string.rep(options.space, length))
+    table.insert(self.buffer, options.space:rep(length))
   end
 
   function string_buffer:newline()
-    table.insert(self.buffer, string.format("print \"\\n\""))
+    table.insert(self.buffer, "print \"\\n\"")
   end
 
   --- Add a string to the buffer, wrapped in a print() statement.
   -- @param value The string to add.
-  -- @param add_newline If true, then append a newline to the buffer after the value.
-  function string_buffer:string(value, add_newline)
-    table.insert(self.buffer, string.format("print '%s'", string.gsub(value, "'", "\\'")))
-    if add_newline then self:newline() end
-  end
-
-  function string_buffer:long_string(value, add_newline)
-    table.insert(self.buffer, string.format("print [==========[%s]==========]", value))
-    if add_newline then self:newline() end
+  -- @param opts A table of optiions:
+  -- <ul>
+  -- <li><tt>add_newline</tt> If true, then append a newline to the buffer after the value.</li>
+  -- <li><tt>long</tt> If true, then insert a Lua long string.</li>
+  -- <li><tt>interpolate</tt> If true, then allow Ruby-style string interpolation.</li>
+  -- </ul>
+  function string_buffer:string(value, opts)
+    local opts                    = opts or {}
+    local code                    = "print(%s)"
+    local str                     = "[=[%s]=]"
+    if opts.interpolate then code = "print(interpolate(%s))" end
+    table.insert(self.buffer, code:format(str:format(value)))
+    if opts.newline then self:newline() end
   end
 
   function string_buffer:cat()
@@ -71,7 +75,7 @@ function endstack()
 
   function stack:push(ending)
     table.insert(self.endings, ending)
-    if string.match(ending, '^<') then
+    if ending:match '^<' then
       self.indents = self.indents + 1
     end
   end
@@ -79,7 +83,7 @@ function endstack()
   function stack:pop()
     if #self.endings == 0 then return nil end
     local ending = table.remove(self.endings)
-    if string.match(ending, '^<') then
+    if ending:match '^<' then
       self.indents = self.indents - 1
     end
     return ending
@@ -117,17 +121,17 @@ function precompile(phrases, options)
     if not self.space_sequence then
       return 0
     else
-      return string.len(self.curr_phrase.space)  / string.len(self.space_sequence)
+      return self.curr_phrase.space:len() / self.space_sequence:len()
     end
   end
 
   function state:indent_diff()
     if not self.space_sequence then return 0 end
-    return self:indent_level() - string.len(self.prev_phrase.space)  / string.len(self.space_sequence)
+    return self:indent_level() - self.prev_phrase.space:len()  / self.space_sequence:len()
   end
 
   function state:indents()
-    return string.rep(self.options.indent, self.endings:indent_level())
+    return self.options.indent:rep(self.endings:indent_level())
   end
 
   function state:close_tags()
@@ -137,8 +141,8 @@ function precompile(phrases, options)
       local i = self:indent_diff()
       repeat
         local ending = self.endings:pop()
-        if string.match(ending, "^<") then
-          self.buffer:string(self:indents() .. ending, true)
+        if ending:match "^<" then
+          self.buffer:string(self:indents() .. ending, {newline = true})
         else
           self.buffer:code(ending)
         end
@@ -161,13 +165,13 @@ function precompile(phrases, options)
     if state.curr_phrase.space == "" then return end
     local prev_space = ''
     if state.prev_phrase then prev_space = state.prev_phrase.space end
-    if string.len(state.curr_phrase.space) <= string.len(prev_space) then return end
+    if state.curr_phrase.space:len() <= prev_space:len() then return end
     if state.curr_phrase.space == (prev_space .. state.space_sequence) then return end
     do_error(state.curr_phrase.chunk,
       string.format(
         "bad indentation, current line = %d, previous = %d",
-        string.len(state.curr_phrase.space),
-        string.len(prev_space)
+        state.curr_phrase.space:len(),
+        prev_space:len()
       )
     )
   end
@@ -175,17 +179,17 @@ function precompile(phrases, options)
   local function handle_current_phrase()
     if state.curr_phrase.operator == "header" then
       haml.headers.header_for(state)
+    elseif state.curr_phrase.operator == "filter" then
+      haml.filter.filter_for(state)
+    elseif state.curr_phrase.operator == "silent_comment" then
+      state:close_tags()
     elseif state.curr_phrase.tag then
       haml.tags.tag_for(state)
     elseif state.curr_phrase.code then
       haml.code.code_for(state)
-    elseif state.curr_phrase.filter then
-      haml.filter.filter_for(state)
-    elseif state.curr_phrase.operator == "silent_comment" then
-      state:close_tags()
     elseif state.curr_phrase.unparsed then
       state:close_tags()
-      state.buffer:string(state:indents() .. state.curr_phrase.unparsed, true)
+      state.buffer:string(state:indents() .. state.curr_phrase.unparsed, {newline = true})
     end
   end
 
@@ -202,8 +206,8 @@ function precompile(phrases, options)
   -- close all open tags
   while state.endings:size() > 0 do
     local ending = state.endings:pop()
-    if string.match(ending, "^<") then
-      state.buffer:string(state:indents() .. ending, true)
+    if ending:match "^<" then
+      state.buffer:string(state:indents() .. ending, {newline = true})
     else
       state.buffer:code(ending)
     end

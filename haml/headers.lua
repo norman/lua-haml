@@ -19,25 +19,25 @@ html4_doctypes = {
 --- Returns an XML prolog for the precompiler state.
 local function prolog_for(state)
   local charset = state.curr_phrase.charset or state.options.encoding
-  state.buffer:string(string.format("<?xml version='1.0' encoding='%s' ?>", charset), true)
+  state.buffer:string(string.format("<?xml version='1.0' encoding='%s' ?>", charset), {newline = true})
 end
 
 --- Returns an (X)HTML doctype for the precompiler state.
 local function doctype_for(state)
 
   if state.options.format == 'html5' then
-    return state.buffer:string('<!DOCTYPE html>', true)
+    return state.buffer:string('<!DOCTYPE html>', {newline = true})
 
   elseif state.curr_phrase.version == "1.1" then
-    return state.buffer:string('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">', true)
+    return state.buffer:string('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">', {newline = true})
 
   elseif state.options.format == 'xhtml' then
     local doctype = xhtml_doctypes[state.curr_phrase.doctype] or xhtml_doctypes.DEFAULT
-    return state.buffer:string(doctype, true)
+    return state.buffer:string(doctype, {newline = true})
 
   elseif state.options.format == 'html4' then
     local doctype = html4_doctypes[state.curr_phrase.doctype] or html4_doctypes.DEFAULT
-    return state.buffer:string(doctype, true)
+    return state.buffer:string(doctype, {newline = true})
 
   else
     do_error(state.curr_phrase.chunk, 'don\'t understand doctype "%s"', state.curr_phrase.doctype)

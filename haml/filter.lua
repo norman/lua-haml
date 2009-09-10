@@ -38,7 +38,8 @@ end
 filters = {
   javascript = javascript_filter,
   plain = plain_filter,
-  preserve = preserve_filter
+  preserve = preserve_filter,
+  test = function() return nil end
 }
 
 function filter_for(state)
@@ -49,6 +50,8 @@ function filter_for(state)
     do_error(state.curr_phrase.chunk, "No such filter \"%s\"", state.curr_phrase.filter)
   end
   local content = func(state.curr_phrase.content, state.options, state:indents(), state:indent_level())
-  state.buffer:long_string(content)
-  state.buffer:newline()
+  if content then
+    state.buffer:string(content, {long = true, interpolate = true})
+    state.buffer:newline()
+  end
 end

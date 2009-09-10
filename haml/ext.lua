@@ -33,7 +33,7 @@ end
 
 -- strip quotes from a string
 function dequote(str)
-  local s = string.gsub(str, "['\"]", "")
+  local s = str:gsub("['\"]", "")
   return s
 end
 
@@ -115,6 +115,6 @@ end
 --- Strip leading and trailing space from a string.
 function strip(str)
   -- assign to local because gsub returns two values and we only want one.
-  local s = string.gsub(string.gsub(str, "^[%s]*", ""), "[%s]*$", "")
+  local s = str:gsub("^[%s]*", ""):gsub("[%s]*$", "")
   return s
 end

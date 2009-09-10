@@ -17,6 +17,14 @@ local function render_attributes(attr)
   return table.concat(buffer, " ")
 end
 
+local function interpolate(str)
+  env = getfenv()
+  print(str:gsub("([^\\])#{(.-)}", function(a, b)
+    local func = loadstring("return " .. b)
+    setfenv(func, env)
+    return a .. assert(func)()
+  end))
+end
 
 function render(precompiled, locals)
   local buffer = {}
@@ -27,6 +35,7 @@ function render(precompiled, locals)
     table.insert(__buffer, str)
   end
   env.render_attributes = render_attributes
+  env.interpolate = interpolate
   -- assign local variables to the env
   for k, v in pairs(locals) do
     env[k] = v

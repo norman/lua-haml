@@ -1,7 +1,7 @@
 module("haml.code", package.seeall)
 
 local function ending_for(code)
-  if string.match(code, "do%s*$") or string.match(code, "then%s*$") then
+  if code:match "do%s*$" or code:match "then%s*$" then
     return "end"
   end
   return nil
@@ -15,7 +15,7 @@ function code_for(state)
       state.endings:push(ending)
     end
   elseif state.curr_phrase.operator == "script" then
-    state.buffer:string(string.rep(state.options.indent, state.endings:indent_level()))
+    state.buffer:string(state.options.indent:rep(state.endings:indent_level()))
     state.buffer:code(string.format('print(%s)', state.curr_phrase.code))
     state.buffer:newline()
   end
