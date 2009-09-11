@@ -18,6 +18,7 @@ tests.headers = {
 
 tests["basic Haml tags and CSS"] = {
   {"%p", "<p></p>"},
+  {"%meta", "<meta/>"},
   {"#id1", "<div id='id1'></div>"},
   {".class1", "<div class='class1'></div>"},
   {"%p.class1", "<p class='class1'></p>"},
@@ -67,7 +68,8 @@ tests["inline comments"] = {
 }
 
 tests.script = {
-  {"- a = 'b'\n%p=a", "<p>b</p>"}
+  {"- a = 'b'\n%p=a", "<p>b</p>"},
+  {"- for k,v in pairs({a = 'a'}) do\n  %p(class=k)=v", "<p class='a'>a</p>"}
 }
 
 tests.filters = {

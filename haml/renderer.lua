@@ -47,5 +47,5 @@ function render(precompiled, locals)
   local func = loadstring(precompiled)
   setfenv(func, env)
   func()
-  return table.concat(buffer, "")
+  return table.concat(buffer, ""):gsub("[%s]*$", "")
 end

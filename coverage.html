@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+  <html>
+  <head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <title>Luacov Coverage Report
+  </title>
+  <style type="text/css">
+    body { text-align: center; }
+    #wrapper { width: 800px; margin: auto; text-align: left; }
+    pre, ul, li { margin: 0; padding: 0 }
+    li { list-style-type: none; font-size: 11px}
+    .covered { background-color: #98FB98 }
+    .uncovered { background-color: #FFC0CB }
+    .file { width: 800px;
+      background-color: #c0c0c0;
+      padding: 3px;
+      overflow: hidden;
+      -webkit-border-radius: 5px;
+      -moz-border-radius: 5px;
+      border-radius: 5px; }
+  </style>
+  </head>
+  <body>
+  <div id="wrapper">
+  <h1>Luacov Code Coverage Report</h1>
+  <p>Generated on Fri Sep 11 14:10:18 2009</p>
+<h2>haml.lua</h2>
+<div class='file'><ul>
+<li> <pre class='covered'>6   1   &nbsp;module("haml", package.seeall)</pre></li>
+<li> <pre class='covered'>7   1   &nbsp;require "haml.parser"</pre></li>
+<li> <pre class='covered'>8   1   &nbsp;require "haml.precompiler"</pre></li>
+<li> <pre class='covered'>9   1   &nbsp;require "haml.renderer"</pre></li>
+<li> <pre class='covered'>10  1   &nbsp;require "haml.ext"</pre></li>
+<li><pre>11        </pre></li>
+<li> <pre class='covered'>16  1   &nbsp;function render(haml_string, options, locals)</pre></li>
+<li> <pre class='covered'>17  40  &nbsp;  local phrases = haml.parser.tokenize(haml_string)</pre></li>
+<li> <pre class='covered'>18  40  &nbsp;  local template = precompiler.precompile(phrases, options)</pre></li>
+<li> <pre class='covered'>19  40  &nbsp;  return haml.renderer.render(template, locals)</pre></li>
+<li><pre>20        end</pre></li>
+<li><pre>21        </pre></li>
+<li> <pre class='covered'>26  1   &nbsp;function render_file(file, options, locals)</pre></li>
+<li> <pre class='uncovered'>27  0   &nbsp;  local fh = assert(io.open(file))</pre></li>
+<li> <pre class='uncovered'>28  0   &nbsp;  local haml_string = fh:read '*a'</pre></li>
+<li> <pre class='uncovered'>29  0   &nbsp;  fh:close()</pre></li>
+<li> <pre class='uncovered'>30  0   &nbsp;  return render(haml_string, options, locals)</pre></li>
+<li><pre>31        end</pre></li>
+</ul>
+</div>
+<h2>haml/code.lua</h2>
+<div class='file'><ul>
+<li> <pre class='covered'>1   1   &nbsp;module("haml.code", package.seeall)</pre></li>
+<li><pre>2         </pre></li>
+<li> <pre class='uncovered'>3   0   &nbsp;local function ending_for(code)</pre></li>
+<li> <pre class='covered'>4   2   &nbsp;  if code:match "do%s*$" or code:match "then%s*$" then</pre></li>
+<li> <pre class='covered'>5   1   &nbsp;    return "end"</pre></li>
+<li><pre>6           end</pre></li>
+<li> <pre class='covered'>7   1   &nbsp;  return nil</pre></li>
+<li><pre>8         end</pre></li>
+<li><pre>9         </pre></li>
+<li> <pre class='covered'>10  1   &nbsp;function code_for(state)</pre></li>
+<li> <pre class='covered'>11  2   &nbsp;  if state.curr_phrase.operator == "silent_script" then</pre></li>
+<li> <pre class='covered'>12  2   &nbsp;    state.buffer:code(state.curr_phrase.code)</pre></li>
+<li> <pre class='covered'>13  2   &nbsp;    local ending = ending_for(state.curr_phrase.code)</pre></li>
+<li> <pre class='covered'>14  2   &nbsp;    if ending then</pre></li>
+<li> <pre class='covered'>15  1   &nbsp;      state.endings:push(ending)</pre></li>
+<li><pre>16            end</pre></li>
+<li> <pre class='uncovered'>17  0   &nbsp;  elseif state.curr_phrase.operator == "script" then</pre></li>
+<li> <pre class='uncovered'>18  0   &nbsp;    state.buffer:string(state.options.indent:rep(state.endings:indent_level()))</pre></li>
+<li> <pre class='uncovered'>19  0   &nbsp;    state.buffer:code(string.format('print(%s)', state.curr_phrase.code))</pre></li>
+<li><pre>21          end</pre></li>
+<li><pre>22        end</pre></li>
+</ul>
+</div>
+<h2>haml/ext.lua</h2>
+<div class='file'><ul>
+<li> <pre class='covered'>2   1   &nbsp;function log(level, v)</pre></li>
+<li><pre>4         end</pre></li>
+<li><pre>5         </pre></li>
+<li> <pre class='covered'>6   1   &nbsp;function do_error(chunk, message, ...)</pre></li>
+<li> <pre class='uncovered'>7   0   &nbsp;  error(string.format("Haml error: " .. message, ...) .. " (around line " .. chunk .. ")")</pre></li>
+<li><pre>8         end</pre></li>
+<li><pre>9         </pre></li>
+<li> <pre class='covered'>10  1   &nbsp;function render_table(t)</pre></li>
+<li> <pre class='uncovered'>11  0   &nbsp;  local buffer = {}</pre></li>
+<li> <pre class='uncovered'>12  0   &nbsp;  for k, v in pairs(t) do</pre></li>
+<li> <pre class='uncovered'>13  0   &nbsp;    if type(v) == "table" then</pre></li>
+<li> <pre class='uncovered'>14  0   &nbsp;      v = render_table(v)</pre></li>
+<li><pre>15            end</pre></li>
+<li> <pre class='uncovered'>16  0   &nbsp;    table.insert(buffer, string.format("%s=%s", k, v))</pre></li>
+<li><pre>17          end</pre></li>
+<li> <pre class='uncovered'>18  0   &nbsp;  return "{" .. table.concat(buffer, ' ') .. "}"</pre></li>
+<li><pre>19        end</pre></li>
+<li><pre>20        </pre></li>
+<li> <pre class='covered'>21  1   &nbsp;_print = print</pre></li>
+<li> <pre class='covered'>22  1   &nbsp;function print(...)</pre></li>
+<li> <pre class='covered'>23  1   &nbsp;  local toprint = {}</pre></li>
+<li> <pre class='covered'>24  2   &nbsp;  for _, v in ipairs({...}) do</pre></li>
+<li> <pre class='covered'>25  1   &nbsp;    if type(v) == "table" then</pre></li>
+<li> <pre class='uncovered'>26  0   &nbsp;      table.insert(toprint, render_table(v))</pre></li>
+<li><pre>27            else</pre></li>
+<li> <pre class='covered'>28  1   &nbsp;      table.insert(toprint, v)</pre></li>
+<li><pre>29            end</pre></li>
+<li><pre>30          end</pre></li>
+<li> <pre class='covered'>31  1   &nbsp;  _print(unpack(toprint))</pre></li>
+<li><pre>32        end</pre></li>
+<li><pre>33        </pre></li>
+<li> <pre class='covered'>35  1   &nbsp;function dequote(str)</pre></li>
+<li> <pre class='uncovered'>36  0   &nbsp;  local s = str:gsub("['\"]", "")</pre></li>
+<li> <pre class='uncovered'>37  0   &nbsp;  return s</pre></li>
+<li><pre>38        end</pre></li>
+<li><pre>39        </pre></li>
+<li> <pre class='covered'>46  1   &nbsp;function sorted_pairs(t, func)</pre></li>
+<li> <pre class='covered'>47  20  &nbsp;  local keys = {}</pre></li>
+<li> <pre class='covered'>48  42  &nbsp;  for key in pairs(t) do</pre></li>
+<li> <pre class='covered'>49  22  &nbsp;    table.insert(keys, key)</pre></li>
+<li><pre>50          end</pre></li>
+<li> <pre class='covered'>51  20  &nbsp;  table.sort(keys, func)</pre></li>
+<li> <pre class='covered'>52  20  &nbsp;  local iterator, _, index = ipairs(keys)</pre></li>
+<li> <pre class='uncovered'>53  0   &nbsp;  return function()</pre></li>
+<li> <pre class='covered'>54  42  &nbsp;    local _, key = iterator(keys, index)</pre></li>
+<li> <pre class='covered'>55  42  &nbsp;    index = index + 1</pre></li>
+<li> <pre class='covered'>56  42  &nbsp;    return key, t[key]</pre></li>
+<li> <pre class='covered'>57  20  &nbsp;  end, tab, index</pre></li>
+<li><pre>58        end</pre></li>
+<li><pre>59        </pre></li>
+<li> <pre class='covered'>64  1   &nbsp;function merge_tables(...)</pre></li>
+<li> <pre class='covered'>65  80  &nbsp;  local numargs = select('#', ...)</pre></li>
+<li> <pre class='covered'>66  80  &nbsp;  local out = {}</pre></li>
+<li> <pre class='covered'>67  240 &nbsp;  for i = 1, numargs do</pre></li>
+<li> <pre class='covered'>68  160 &nbsp;    local t = select(i, ...)</pre></li>
+<li> <pre class='covered'>69  160 &nbsp;    if type(t) == "table" then</pre></li>
+<li> <pre class='covered'>70  720 &nbsp;      for k, v in pairs(t) do</pre></li>
+<li> <pre class='covered'>71  560 &nbsp;        out[k] = v</pre></li>
+<li><pre>72              end</pre></li>
+<li><pre>73            end</pre></li>
+<li><pre>74          end</pre></li>
+<li> <pre class='covered'>75  80  &nbsp;  return out</pre></li>
+<li><pre>76        end</pre></li>
+<li><pre>77        </pre></li>
+<li> <pre class='covered'>82  1   &nbsp;function join_tables(...)</pre></li>
+<li> <pre class='covered'>83  20  &nbsp;  local numargs = select('#', ...)</pre></li>
+<li> <pre class='covered'>84  20  &nbsp;  local out = {}</pre></li>
+<li> <pre class='covered'>85  48  &nbsp;  for i = 1, numargs do</pre></li>
+<li> <pre class='covered'>86  28  &nbsp;    local t = select(i, ...)</pre></li>
+<li> <pre class='covered'>87  28  &nbsp;    if type(t) == "table" then</pre></li>
+<li> <pre class='covered'>88  55  &nbsp;      for k, v in pairs(t) do</pre></li>
+<li> <pre class='covered'>89  27  &nbsp;        if out[k] then</pre></li>
+<li> <pre class='covered'>90  5   &nbsp;          if type(out[k]) == "table" then</pre></li>
+<li> <pre class='uncovered'>91  0   &nbsp;            table.insert(out[k], v)</pre></li>
+<li><pre>92                  else</pre></li>
+<li> <pre class='covered'>93  5   &nbsp;            out[k] = {out[k], v}</pre></li>
+<li><pre>94                  end</pre></li>
+<li><pre>95                else</pre></li>
+<li> <pre class='covered'>96  22  &nbsp;          out[k] = v</pre></li>
+<li><pre>97                end</pre></li>
+<li><pre>98              end</pre></li>
+<li><pre>99            end</pre></li>
+<li><pre>100         end</pre></li>
+<li> <pre class='covered'>101 20  &nbsp;  return out</pre></li>
+<li><pre>102       end</pre></li>
+<li><pre>103       </pre></li>
+<li> <pre class='covered'>105 1   &nbsp;function flatten(...)</pre></li>
+<li> <pre class='covered'>106 13  &nbsp;  local out = {}</pre></li>
+<li> <pre class='covered'>107 26  &nbsp;  for _, attr in ipairs(arg) do</pre></li>
+<li> <pre class='covered'>108 26  &nbsp;    for k, v in pairs(attr) do</pre></li>
+<li> <pre class='covered'>109 13  &nbsp;      out[k] = v</pre></li>
+<li><pre>110           end</pre></li>
+<li><pre>111         end</pre></li>
+<li> <pre class='covered'>112 13  &nbsp;  return out</pre></li>
+<li><pre>113       end</pre></li>
+<li><pre>114       </pre></li>
+<li> <pre class='covered'>116 1   &nbsp;function strip(str)</pre></li>
+<li> <pre class='covered'>118 122 &nbsp;  local s = str:gsub("^[%s]*", ""):gsub("[%s]*$", "")</pre></li>
+<li> <pre class='covered'>119 122 &nbsp;  return s</pre></li>
+<li><pre>120       end</pre></li>
+</ul>
+</div>
+<h2>haml/filter.lua</h2>
+<div class='file'><ul>
+<li> <pre class='covered'>1   1   &nbsp;module("haml.filter", package.seeall)</pre></li>
+<li><pre>2         </pre></li>
+<li> <pre class='uncovered'>3   0   &nbsp;local function change_indents(str, len, options)</pre></li>
+<li> <pre class='covered'>4   4   &nbsp;  local output = str:gsub("^" .. options.space, options.space:rep(len))</pre></li>
+<li> <pre class='covered'>5   4   &nbsp;  output = output:gsub(options.newline .. options.space, options.newline .. options.space:rep(len))</pre></li>
+<li> <pre class='covered'>6   4   &nbsp;  return output</pre></li>
+<li><pre>7         end</pre></li>
+<li><pre>8         </pre></li>
+<li> <pre class='uncovered'>9   0   &nbsp;local function preserve_filter(content, options, indents, indent_level)</pre></li>
+<li> <pre class='covered'>10  1   &nbsp;  local output = change_indents(content, indent_level - 1, options)</pre></li>
+<li> <pre class='covered'>11  1   &nbsp;  output = output:gsub("\n", '&#x000A;'):gsub("\r", '&#x000D;')</pre></li>
+<li> <pre class='covered'>12  1   &nbsp;  return output</pre></li>
+<li><pre>13        end</pre></li>
+<li><pre>14        </pre></li>
+<li> <pre class='uncovered'>15  0   &nbsp;local function javascript_filter(content, options, indents, indent_level)</pre></li>
+<li> <pre class='covered'>16  1   &nbsp;  local buffer = {}</pre></li>
+<li> <pre class='covered'>17  1   &nbsp;  table.insert(buffer, options.space:rep(indent_level) .. "&lt;script type='text/javascript'&gt;")</pre></li>
+<li> <pre class='covered'>18  1   &nbsp;  table.insert(buffer, change_indents(content:gsub(options.newline .. '*$', ''), 2, options))</pre></li>
+<li> <pre class='covered'>19  1   &nbsp;  table.insert(buffer, options.space:rep(indent_level) .. "&lt;/script&gt;")</pre></li>
+<li> <pre class='covered'>20  1   &nbsp;  if options.format == "xhtml" then</pre></li>
+<li> <pre class='covered'>21  1   &nbsp;    table.insert(buffer, 2, options.space:rep(indent_level + 1) .. "//&lt;![CDATA[")</pre></li>
+<li> <pre class='covered'>22  1   &nbsp;    table.insert(buffer, #buffer, options.space:rep(indent_level + 1) .. "//]]&gt;")</pre></li>
+<li><pre>23          end</pre></li>
+<li> <pre class='covered'>24  1   &nbsp;  local output = table.concat(buffer, options.newline)</pre></li>
+<li> <pre class='covered'>25  1   &nbsp;  return output</pre></li>
+<li><pre>26        end</pre></li>
+<li><pre>27        </pre></li>
+<li> <pre class='uncovered'>28  0   &nbsp;local function plain_filter(content, options, indents, indent_level)</pre></li>
+<li> <pre class='covered'>29  2   &nbsp;  return change_indents(content, indent_level - 1, options)</pre></li>
+<li><pre>30        end</pre></li>
+<li><pre>31        </pre></li>
+<li> <pre class='covered'>32  1   &nbsp;filters = {</pre></li>
+<li> <pre class='covered'>33  1   &nbsp;  javascript = javascript_filter,</pre></li>
+<li> <pre class='covered'>34  1   &nbsp;  plain = plain_filter,</pre></li>
+<li> <pre class='covered'>35  1   &nbsp;  preserve = preserve_filter,</pre></li>
+<li><pre>36        }</pre></li>
+<li><pre>37        </pre></li>
+<li> <pre class='covered'>38  1   &nbsp;function filter_for(state)</pre></li>
+<li> <pre class='covered'>39  4   &nbsp;  state:close_tags()</pre></li>
+<li> <pre class='covered'>40  4   &nbsp;  local func</pre></li>
+<li> <pre class='covered'>41  4   &nbsp;  if filters[state.curr_phrase.filter] then</pre></li>
+<li> <pre class='covered'>42  4   &nbsp;    func = filters[state.curr_phrase.filter]</pre></li>
+<li><pre>43          else</pre></li>
+<li> <pre class='uncovered'>44  0   &nbsp;    do_error(state.curr_phrase.chunk, "No such filter \"%s\"", state.curr_phrase.filter)</pre></li>
+<li><pre>45          end</pre></li>
+<li> <pre class='covered'>46  4   &nbsp;  local content = func(state.curr_phrase.content, state.options, state:indents(), state:indent_level())</pre></li>
+<li> <pre class='covered'>47  4   &nbsp;  if content then</pre></li>
+<li> <pre class='covered'>48  4   &nbsp;    state.buffer:string(content, {long = true, interpolate = true})</pre></li>
+<li> <pre class='covered'>49  4   &nbsp;    state.buffer:newline()</pre></li>
+<li><pre>50          end</pre></li>
+<li><pre>51        end</pre></li>
+</ul>
+</div>
+<h2>haml/headers.lua</h2>
+<div class='file'><ul>
+<li> <pre class='covered'>1   1   &nbsp;module("haml.headers", package.seeall)</pre></li>
+<li><pre>2         </pre></li>
+<li> <pre class='covered'>4   1   &nbsp;xhtml_doctypes = {</pre></li>
+<li> <pre class='covered'>5   1   &nbsp;  STRICT   = '&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"&gt;',</pre></li>
+<li> <pre class='covered'>6   1   &nbsp;  FRAMESET = '&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd"&gt;',</pre></li>
+<li> <pre class='covered'>7   1   &nbsp;  MOBILE   = '&lt;!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.2//EN" "http://www.openmobilealliance.org/tech/DTD/xhtml-mobile12.dtd"&gt;',</pre></li>
+<li> <pre class='covered'>8   1   &nbsp;  BASIC    = '&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML Basic 1.1//EN" "http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd"&gt;',</pre></li>
+<li> <pre class='covered'>9   1   &nbsp;  DEFAULT  = '&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;'</pre></li>
+<li><pre>10        }</pre></li>
+<li><pre>11        </pre></li>
+<li> <pre class='covered'>13  1   &nbsp;html4_doctypes = {</pre></li>
+<li> <pre class='covered'>14  1   &nbsp;  STRICT   = '&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"&gt;',</pre></li>
+<li> <pre class='covered'>15  1   &nbsp;  FRAMESET = '&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd"&gt;',</pre></li>
+<li> <pre class='covered'>16  1   &nbsp;  DEFAULT  = '&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"&gt;'</pre></li>
+<li><pre>17        }</pre></li>
+<li><pre>18        </pre></li>
+<li> <pre class='uncovered'>20  0   &nbsp;local function prolog_for(state)</pre></li>
+<li> <pre class='covered'>21  1   &nbsp;  local charset = state.curr_phrase.charset or state.options.encoding</pre></li>
+<li> <pre class='covered'>22  1   &nbsp;  state.buffer:string(string.format("&lt;?xml version='1.0' encoding='%s' ?&gt;", charset), {newline = true})</pre></li>
+<li><pre>23        end</pre></li>
+<li><pre>24        </pre></li>
+<li> <pre class='uncovered'>26  0   &nbsp;local function doctype_for(state)</pre></li>
+<li><pre>27        </pre></li>
+<li> <pre class='covered'>28  3   &nbsp;  if state.options.format == 'html5' then</pre></li>
+<li> <pre class='uncovered'>29  0   &nbsp;    return state.buffer:string('&lt;!DOCTYPE html&gt;', {newline = true})</pre></li>
+<li><pre>30        </pre></li>
+<li> <pre class='covered'>31  3   &nbsp;  elseif state.curr_phrase.version == "1.1" then</pre></li>
+<li> <pre class='covered'>32  1   &nbsp;    return state.buffer:string('&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"&gt;', {newline = true})</pre></li>
+<li><pre>33        </pre></li>
+<li> <pre class='covered'>34  2   &nbsp;  elseif state.options.format == 'xhtml' then</pre></li>
+<li> <pre class='covered'>35  2   &nbsp;    local doctype = xhtml_doctypes[state.curr_phrase.doctype] or xhtml_doctypes.DEFAULT</pre></li>
+<li> <pre class='covered'>36  2   &nbsp;    return state.buffer:string(doctype, {newline = true})</pre></li>
+<li><pre>37        </pre></li>
+<li> <pre class='uncovered'>38  0   &nbsp;  elseif state.options.format == 'html4' then</pre></li>
+<li> <pre class='uncovered'>39  0   &nbsp;    local doctype = html4_doctypes[state.curr_phrase.doctype] or html4_doctypes.DEFAULT</pre></li>
+<li> <pre class='uncovered'>40  0   &nbsp;    return state.buffer:string(doctype, {newline = true})</pre></li>
+<li><pre>41        </pre></li>
+<li><pre>42          else</pre></li>
+<li> <pre class='uncovered'>43  0   &nbsp;    do_error(state.curr_phrase.chunk, 'don\'t understand doctype "%s"', state.curr_phrase.doctype)</pre></li>
+<li><pre>44          end</pre></li>
+<li><pre>45        </pre></li>
+<li><pre>46        end</pre></li>
+<li><pre>47        </pre></li>
+<li> <pre class='covered'>49  1   &nbsp;function header_for(state)</pre></li>
+<li><pre>50        </pre></li>
+<li> <pre class='covered'>51  4   &nbsp;  if state.next_phrase and (string.len(state.next_phrase.space) or 0) &gt; 0 then</pre></li>
+<li> <pre class='uncovered'>52  0   &nbsp;    do_error(state.curr_phrase.chunk, "you can not nest within a doctype declaration or XML prolog")</pre></li>
+<li><pre>53          end</pre></li>
+<li><pre>54        </pre></li>
+<li> <pre class='covered'>55  4   &nbsp;  if state.curr_phrase.prolog then</pre></li>
+<li> <pre class='covered'>56  1   &nbsp;    return prolog_for(state)</pre></li>
+<li><pre>57          else</pre></li>
+<li> <pre class='covered'>58  3   &nbsp;    return doctype_for(state)</pre></li>
+<li><pre>59          end</pre></li>
+<li><pre>60        </pre></li>
+<li><pre>61        end</pre></li>
+</ul>
+</div>
+<h2>haml/precompiler.lua</h2>
+<div class='file'><ul>
+<li> <pre class='covered'>2   1   &nbsp;module("haml.precompiler", package.seeall)</pre></li>
+<li> <pre class='covered'>3   1   &nbsp;require "haml.code"</pre></li>
+<li> <pre class='covered'>4   1   &nbsp;require "haml.filter"</pre></li>
+<li> <pre class='covered'>5   1   &nbsp;require "haml.headers"</pre></li>
+<li> <pre class='covered'>6   1   &nbsp;require "haml.tags"</pre></li>
+<li><pre>7         </pre></li>
+<li> <pre class='covered'>14  1   &nbsp;default_options = {</pre></li>
+<li> <pre class='covered'>15  1   &nbsp;  auto_close = true,</pre></li>
+<li> <pre class='covered'>16  1   &nbsp;  encoding   = 'utf-8',</pre></li>
+<li> <pre class='covered'>17  1   &nbsp;  format     = 'xhtml',</pre></li>
+<li> <pre class='covered'>18  1   &nbsp;  indent     = "  ",</pre></li>
+<li> <pre class='covered'>19  1   &nbsp;  newline    = "\n",</pre></li>
+<li> <pre class='covered'>20  1   &nbsp;  space      = "  "</pre></li>
+<li><pre>21        }</pre></li>
+<li><pre>22        </pre></li>
+<li> <pre class='uncovered'>26  0   &nbsp;local function string_buffer(options)</pre></li>
+<li><pre>27        </pre></li>
+<li> <pre class='covered'>28  40  &nbsp;  local options = merge_tables(options, { newline = '"\n"', space   = " " })</pre></li>
+<li> <pre class='covered'>29  40  &nbsp;  local string_buffer = { buffer = {} }</pre></li>
+<li><pre>30        </pre></li>
+<li> <pre class='covered'>31  40  &nbsp;  function string_buffer:code(value)</pre></li>
+<li> <pre class='covered'>32  25  &nbsp;    table.insert(self.buffer, value)</pre></li>
+<li><pre>33          end</pre></li>
+<li><pre>34        </pre></li>
+<li> <pre class='covered'>35  40  &nbsp;  function string_buffer:space(length)</pre></li>
+<li> <pre class='uncovered'>36  0   &nbsp;    if length == 0 then return end</pre></li>
+<li> <pre class='uncovered'>37  0   &nbsp;    table.insert(self.buffer, options.space:rep(length))</pre></li>
+<li><pre>38          end</pre></li>
+<li><pre>39        </pre></li>
+<li> <pre class='covered'>40  40  &nbsp;  function string_buffer:newline()</pre></li>
+<li> <pre class='covered'>41  45  &nbsp;    table.insert(self.buffer, "print \"\\n\"")</pre></li>
+<li><pre>42          end</pre></li>
+<li><pre>43        </pre></li>
+<li> <pre class='covered'>52  40  &nbsp;  function string_buffer:string(value, opts)</pre></li>
+<li> <pre class='covered'>53  115 &nbsp;    local opts                    = opts or {}</pre></li>
+<li> <pre class='covered'>54  115 &nbsp;    local code                    = "print(%s)"</pre></li>
+<li> <pre class='covered'>55  115 &nbsp;    local str                     = "[=[%s]=]"</pre></li>
+<li> <pre class='covered'>56  115 &nbsp;    if opts.interpolate then code = "print(interpolate(%s))" end</pre></li>
+<li> <pre class='covered'>57  115 &nbsp;    table.insert(self.buffer, code:format(str:format(value)))</pre></li>
+<li> <pre class='covered'>58  115 &nbsp;    if opts.newline then self:newline() end</pre></li>
+<li><pre>59          end</pre></li>
+<li><pre>60        </pre></li>
+<li> <pre class='covered'>61  40  &nbsp;  function string_buffer:cat()</pre></li>
+<li> <pre class='covered'>63  40  &nbsp;    if self.buffer[#self.buffer] == 'print "\\n"' then</pre></li>
+<li> <pre class='covered'>64  39  &nbsp;      table.remove(self.buffer)</pre></li>
+<li><pre>65            end</pre></li>
+<li> <pre class='covered'>66  40  &nbsp;    return strip(table.concat(self.buffer, "\n"))</pre></li>
+<li><pre>67          end</pre></li>
+<li><pre>68        </pre></li>
+<li> <pre class='covered'>69  40  &nbsp;  return string_buffer</pre></li>
+<li><pre>70        </pre></li>
+<li><pre>71        end</pre></li>
+<li><pre>72        </pre></li>
+<li> <pre class='covered'>73  1   &nbsp;function endstack()</pre></li>
+<li><pre>74        </pre></li>
+<li> <pre class='covered'>75  46  &nbsp;  local stack = {endings = {}, indents = 0}</pre></li>
+<li><pre>76        </pre></li>
+<li> <pre class='covered'>77  46  &nbsp;  function stack:push(ending)</pre></li>
+<li> <pre class='covered'>78  41  &nbsp;    table.insert(self.endings, ending)</pre></li>
+<li> <pre class='covered'>79  41  &nbsp;    if ending:match '^&lt;' then</pre></li>
+<li> <pre class='covered'>80  38  &nbsp;      self.indents = self.indents + 1</pre></li>
+<li><pre>81            end</pre></li>
+<li><pre>82          end</pre></li>
+<li><pre>83        </pre></li>
+<li> <pre class='covered'>84  46  &nbsp;  function stack:pop()</pre></li>
+<li> <pre class='covered'>85  38  &nbsp;    if #self.endings == 0 then return nil end</pre></li>
+<li> <pre class='covered'>86  37  &nbsp;    local ending = table.remove(self.endings)</pre></li>
+<li> <pre class='covered'>87  37  &nbsp;    if ending:match '^&lt;' then</pre></li>
+<li> <pre class='covered'>88  35  &nbsp;      self.indents = self.indents - 1</pre></li>
+<li><pre>89            end</pre></li>
+<li> <pre class='covered'>90  37  &nbsp;    return ending</pre></li>
+<li><pre>91          end</pre></li>
+<li><pre>92        </pre></li>
+<li> <pre class='covered'>93  46  &nbsp;  function stack:indent_level()</pre></li>
+<li> <pre class='covered'>94  48  &nbsp;    return self.indents</pre></li>
+<li><pre>95          end</pre></li>
+<li><pre>96        </pre></li>
+<li> <pre class='covered'>97  46  &nbsp;  function stack:size()</pre></li>
+<li> <pre class='covered'>98  42  &nbsp;    return #self.endings</pre></li>
+<li><pre>99          end</pre></li>
+<li><pre>100       </pre></li>
+<li> <pre class='covered'>101 46  &nbsp;  return stack</pre></li>
+<li><pre>102       </pre></li>
+<li><pre>103       end</pre></li>
+<li><pre>104       </pre></li>
+<li> <pre class='covered'>108 1   &nbsp;function precompile(phrases, options)</pre></li>
+<li><pre>109       </pre></li>
+<li> <pre class='covered'>110 40  &nbsp;  local options = merge_tables(default_options, options)</pre></li>
+<li> <pre class='covered'>111 40  &nbsp;  local state      = {</pre></li>
+<li> <pre class='covered'>112 40  &nbsp;    buffer         = string_buffer(options),</pre></li>
+<li> <pre class='covered'>113 40  &nbsp;    options        = options,</pre></li>
+<li> <pre class='covered'>114 40  &nbsp;    endings        = endstack(),</pre></li>
+<li> <pre class='covered'>115 40  &nbsp;    curr_phrase    = {},</pre></li>
+<li> <pre class='covered'>116 40  &nbsp;    next_phrase    = {},</pre></li>
+<li> <pre class='covered'>117 40  &nbsp;    prev_phrase    = {},</pre></li>
+<li> <pre class='covered'>118 40  &nbsp;    space_sequence = nil</pre></li>
+<li><pre>119         }</pre></li>
+<li><pre>120       </pre></li>
+<li> <pre class='covered'>121 40  &nbsp;  function state:indent_level()</pre></li>
+<li> <pre class='covered'>122 6   &nbsp;    if not self.space_sequence then</pre></li>
+<li> <pre class='covered'>123 4   &nbsp;      return 0</pre></li>
+<li><pre>124           else</pre></li>
+<li> <pre class='covered'>125 2   &nbsp;      return self.curr_phrase.space:len() / self.space_sequence:len()</pre></li>
+<li><pre>126           end</pre></li>
+<li><pre>127         end</pre></li>
+<li><pre>128       </pre></li>
+<li> <pre class='covered'>129 40  &nbsp;  function state:indent_diff()</pre></li>
+<li> <pre class='covered'>130 42  &nbsp;    if not self.space_sequence then return 0 end</pre></li>
+<li> <pre class='covered'>131 2   &nbsp;    return self:indent_level() - self.prev_phrase.space:len()  / self.space_sequence:len()</pre></li>
+<li><pre>132         end</pre></li>
+<li><pre>133       </pre></li>
+<li> <pre class='covered'>134 40  &nbsp;  function state:indents()</pre></li>
+<li> <pre class='covered'>135 41  &nbsp;    return self.options.indent:rep(self.endings:indent_level())</pre></li>
+<li><pre>136         end</pre></li>
+<li><pre>137       </pre></li>
+<li> <pre class='covered'>138 40  &nbsp;  function state:close_tags()</pre></li>
+<li> <pre class='covered'>141 42  &nbsp;    if self:indent_diff() &lt; 0 then</pre></li>
+<li> <pre class='uncovered'>142 0   &nbsp;      local i = self:indent_diff()</pre></li>
+<li> <pre class='uncovered'>143 0   &nbsp;      repeat</pre></li>
+<li> <pre class='uncovered'>144 0   &nbsp;        local ending = self.endings:pop()</pre></li>
+<li> <pre class='uncovered'>145 0   &nbsp;        if ending:match "^&lt;" then</pre></li>
+<li> <pre class='uncovered'>146 0   &nbsp;          self.buffer:string(self:indents() .. ending, {newline = true})</pre></li>
+<li><pre>147               else</pre></li>
+<li> <pre class='uncovered'>148 0   &nbsp;          self.buffer:code(ending)</pre></li>
+<li><pre>149               end</pre></li>
+<li> <pre class='uncovered'>150 0   &nbsp;        i = i + 1</pre></li>
+<li> <pre class='uncovered'>151 0   &nbsp;      until i == 0</pre></li>
+<li><pre>152           end</pre></li>
+<li><pre>153         end</pre></li>
+<li><pre>154       </pre></li>
+<li><pre>155       </pre></li>
+<li> <pre class='uncovered'>156 0   &nbsp;  local function detect_whitespace_format()</pre></li>
+<li> <pre class='covered'>157 48  &nbsp;    if state.space_sequence then return end</pre></li>
+<li> <pre class='covered'>158 48  &nbsp;    if string.len(state.curr_phrase.space or '') &gt; 0 and not state.space_sequence then</pre></li>
+<li> <pre class='covered'>159 2   &nbsp;      state.space_sequence = state.curr_phrase.space</pre></li>
+<li> <pre class='covered'>160 2   &nbsp;      log("debug", string.format("Setting '%s' as leading whitespace sequence", state.space_sequence))</pre></li>
+<li><pre>161           end</pre></li>
+<li><pre>162         end</pre></li>
+<li><pre>163       </pre></li>
+<li> <pre class='uncovered'>164 0   &nbsp;  local function validate_whitespace()</pre></li>
+<li> <pre class='covered'>165 48  &nbsp;    if not state.space_sequence then return end</pre></li>
+<li> <pre class='covered'>166 2   &nbsp;    if state.curr_phrase.space == "" then return end</pre></li>
+<li> <pre class='covered'>167 2   &nbsp;    local prev_space = ''</pre></li>
+<li> <pre class='covered'>168 2   &nbsp;    if state.prev_phrase then prev_space = state.prev_phrase.space end</pre></li>
+<li> <pre class='covered'>169 2   &nbsp;    if state.curr_phrase.space:len() &lt;= prev_space:len() then return end</pre></li>
+<li> <pre class='covered'>170 2   &nbsp;    if state.curr_phrase.space == (prev_space .. state.space_sequence) then return end</pre></li>
+<li> <pre class='uncovered'>171 0   &nbsp;    do_error(state.curr_phrase.chunk,</pre></li>
+<li> <pre class='uncovered'>172 0   &nbsp;      string.format(</pre></li>
+<li> <pre class='uncovered'>173 0   &nbsp;        "bad indentation, current line = %d, previous = %d",</pre></li>
+<li> <pre class='uncovered'>174 0   &nbsp;        state.curr_phrase.space:len(),</pre></li>
+<li> <pre class='uncovered'>175 0   &nbsp;        prev_space:len()</pre></li>
+<li> <pre class='uncovered'>176 0   &nbsp;      )</pre></li>
+<li> <pre class='uncovered'>177 0   &nbsp;    )</pre></li>
+<li><pre>178         end</pre></li>
+<li><pre>179       </pre></li>
+<li> <pre class='uncovered'>180 0   &nbsp;  local function handle_current_phrase()</pre></li>
+<li> <pre class='covered'>181 48  &nbsp;    if state.curr_phrase.operator == "header" then</pre></li>
+<li> <pre class='covered'>182 4   &nbsp;      haml.headers.header_for(state)</pre></li>
+<li> <pre class='covered'>183 44  &nbsp;    elseif state.curr_phrase.operator == "filter" then</pre></li>
+<li> <pre class='covered'>184 4   &nbsp;      haml.filter.filter_for(state)</pre></li>
+<li> <pre class='covered'>185 40  &nbsp;    elseif state.curr_phrase.operator == "silent_comment" then</pre></li>
+<li> <pre class='covered'>186 2   &nbsp;      state:close_tags()</pre></li>
+<li> <pre class='covered'>187 38  &nbsp;    elseif state.curr_phrase.tag then</pre></li>
+<li> <pre class='covered'>188 35  &nbsp;      haml.tags.tag_for(state)</pre></li>
+<li> <pre class='covered'>189 3   &nbsp;    elseif state.curr_phrase.code then</pre></li>
+<li> <pre class='covered'>190 2   &nbsp;      haml.code.code_for(state)</pre></li>
+<li> <pre class='covered'>191 1   &nbsp;    elseif state.curr_phrase.unparsed then</pre></li>
+<li> <pre class='covered'>192 1   &nbsp;      state:close_tags()</pre></li>
+<li> <pre class='covered'>193 1   &nbsp;      state.buffer:string(state:indents() .. state.curr_phrase.unparsed, {newline = true})</pre></li>
+<li><pre>194           end</pre></li>
+<li><pre>195         end</pre></li>
+<li><pre>196       </pre></li>
+<li> <pre class='covered'>198 88  &nbsp;  for index, phrase in ipairs(phrases) do</pre></li>
+<li> <pre class='covered'>199 48  &nbsp;    state.next_phrase = phrases[index + 1]</pre></li>
+<li> <pre class='covered'>200 48  &nbsp;    state.prev_phrase = phrases[index - 1]</pre></li>
+<li> <pre class='covered'>201 48  &nbsp;    state.curr_phrase = phrase</pre></li>
+<li> <pre class='covered'>202 48  &nbsp;    detect_whitespace_format()</pre></li>
+<li> <pre class='covered'>203 48  &nbsp;    validate_whitespace()</pre></li>
+<li> <pre class='covered'>204 48  &nbsp;    handle_current_phrase()</pre></li>
+<li><pre>205         end</pre></li>
+<li><pre>206       </pre></li>
+<li> <pre class='covered'>208 42  &nbsp;  while state.endings:size() &gt; 0 do</pre></li>
+<li> <pre class='covered'>209 2   &nbsp;    local ending = state.endings:pop()</pre></li>
+<li> <pre class='covered'>210 2   &nbsp;    if ending:match "^&lt;" then</pre></li>
+<li> <pre class='covered'>211 1   &nbsp;      state.buffer:string(state:indents() .. ending, {newline = true})</pre></li>
+<li><pre>212           else</pre></li>
+<li> <pre class='covered'>213 1   &nbsp;      state.buffer:code(ending)</pre></li>
+<li><pre>214           end</pre></li>
+<li><pre>215         end</pre></li>
+<li><pre>216       </pre></li>
+<li> <pre class='covered'>217 40  &nbsp;  return state.buffer:cat()</pre></li>
+<li><pre>218       </pre></li>
+<li><pre>219       end</pre></li>
+</ul>
+</div>
+<h2>haml/tags.lua</h2>
+<div class='file'><ul>
+<li> <pre class='covered'>1   1   &nbsp;module("haml.tags", package.seeall)</pre></li>
+<li><pre>2         </pre></li>
+<li> <pre class='covered'>4   1   &nbsp;auto_closing_tags = {</pre></li>
+<li> <pre class='covered'>5   1   &nbsp;  area  = true,</pre></li>
+<li> <pre class='covered'>6   1   &nbsp;  base  = true,</pre></li>
+<li> <pre class='covered'>7   1   &nbsp;  br    = true,</pre></li>
+<li> <pre class='covered'>8   1   &nbsp;  col   = true,</pre></li>
+<li> <pre class='covered'>9   1   &nbsp;  hr    = true,</pre></li>
+<li> <pre class='covered'>10  1   &nbsp;  img   = true,</pre></li>
+<li> <pre class='covered'>11  1   &nbsp;  input = true,</pre></li>
+<li> <pre class='covered'>12  1   &nbsp;  link  = true,</pre></li>
+<li> <pre class='covered'>13  1   &nbsp;  meta  = true,</pre></li>
+<li> <pre class='covered'>14  1   &nbsp;  param = true</pre></li>
+<li><pre>15        }</pre></li>
+<li><pre>16        </pre></li>
+<li> <pre class='covered'>17  1   &nbsp;function serialize_table(t)</pre></li>
+<li> <pre class='covered'>18  25  &nbsp;  local buffer = {}</pre></li>
+<li><pre>19        </pre></li>
+<li> <pre class='uncovered'>20  0   &nbsp;  local function kv(k, v)</pre></li>
+<li> <pre class='covered'>21  32  &nbsp;    if type(k) == "number" then</pre></li>
+<li> <pre class='covered'>22  10  &nbsp;      return string.format('%s, ', v)</pre></li>
+<li><pre>23            else</pre></li>
+<li> <pre class='covered'>24  22  &nbsp;      return string.format('["%s"] = %s, ', k, v)</pre></li>
+<li><pre>25            end</pre></li>
+<li><pre>26          end</pre></li>
+<li><pre>27        </pre></li>
+<li> <pre class='covered'>28  25  &nbsp;  table.insert(buffer, "{")</pre></li>
+<li> <pre class='covered'>29  57  &nbsp;  for k, v in pairs(t) do</pre></li>
+<li> <pre class='covered'>30  32  &nbsp;    if type(v) == "table" then</pre></li>
+<li> <pre class='covered'>31  5   &nbsp;      table.insert(buffer, kv(k, serialize_table(v)))</pre></li>
+<li><pre>32            else</pre></li>
+<li> <pre class='covered'>33  27  &nbsp;      table.insert(buffer, kv(k, v))</pre></li>
+<li><pre>34            end</pre></li>
+<li><pre>35          end</pre></li>
+<li> <pre class='covered'>36  25  &nbsp;  table.insert(buffer, "}")</pre></li>
+<li> <pre class='covered'>37  25  &nbsp;  return table.concat(buffer, "")</pre></li>
+<li><pre>38        end</pre></li>
+<li><pre>39        </pre></li>
+<li><pre>40        </pre></li>
+<li> <pre class='uncovered'>42  0   &nbsp;local function format_attributes(...)</pre></li>
+<li> <pre class='covered'>48  20  &nbsp;  return 'print(render_attributes(' .. serialize_table(join_tables(...)) .. '))'</pre></li>
+<li><pre>49        end</pre></li>
+<li><pre>50        </pre></li>
+<li> <pre class='uncovered'>52  0   &nbsp;local function should_auto_close(state)</pre></li>
+<li> <pre class='covered'>53  35  &nbsp;  return state.options.format == 'xhtml' and</pre></li>
+<li> <pre class='covered'>54  35  &nbsp;    auto_closing_tags[state.curr_phrase.tag] and</pre></li>
+<li> <pre class='covered'>55  1   &nbsp;    state.options.auto_close and</pre></li>
+<li> <pre class='covered'>56  35  &nbsp;    not state.curr_phrase.inline_content</pre></li>
+<li><pre>57        end</pre></li>
+<li><pre>58        </pre></li>
+<li> <pre class='uncovered'>59  0   &nbsp;local function should_close_inline(state)</pre></li>
+<li> <pre class='covered'>60  34  &nbsp;  return state.curr_phrase.inline_content or</pre></li>
+<li> <pre class='covered'>61  32  &nbsp;    state.curr_phrase.inline_code or</pre></li>
+<li> <pre class='covered'>62  30  &nbsp;    not state.next_phrase or</pre></li>
+<li> <pre class='covered'>63  34  &nbsp;    state.next_phrase.space == state.curr_phrase.space</pre></li>
+<li><pre>64        end</pre></li>
+<li><pre>65        </pre></li>
+<li> <pre class='covered'>67  1   &nbsp;function tag_for(state)</pre></li>
+<li><pre>68        </pre></li>
+<li> <pre class='covered'>69  35  &nbsp;  local c = state.curr_phrase</pre></li>
+<li><pre>70        </pre></li>
+<li> <pre class='covered'>72  35  &nbsp;  state:close_tags()</pre></li>
+<li><pre>73        </pre></li>
+<li> <pre class='covered'>75  35  &nbsp;  state.buffer:string(state:indents() .. '&lt;' .. c.tag)</pre></li>
+<li><pre>76        </pre></li>
+<li> <pre class='covered'>78  35  &nbsp;  if c.attributes or c.css then</pre></li>
+<li> <pre class='covered'>79  20  &nbsp;    state.buffer:code(format_attributes(c.css or {}, unpack(c.attributes or {})))</pre></li>
+<li><pre>80          end</pre></li>
+<li><pre>81        </pre></li>
+<li> <pre class='covered'>83  35  &nbsp;  if  should_auto_close(state) then</pre></li>
+<li> <pre class='covered'>84  1   &nbsp;    state.buffer:string('/&gt;')</pre></li>
+<li><pre>85          else</pre></li>
+<li> <pre class='covered'>86  34  &nbsp;    state.buffer:string('&gt;')</pre></li>
+<li> <pre class='covered'>87  34  &nbsp;    state.endings:push(string.format("&lt;/%s&gt;", c.tag))</pre></li>
+<li> <pre class='covered'>88  34  &nbsp;    if should_close_inline(state) then</pre></li>
+<li> <pre class='covered'>89  33  &nbsp;      if c.inline_content then</pre></li>
+<li> <pre class='covered'>90  2   &nbsp;        state.buffer:string(strip(c.inline_content))</pre></li>
+<li> <pre class='covered'>91  31  &nbsp;      elseif c.inline_code then</pre></li>
+<li> <pre class='covered'>92  2   &nbsp;        state.buffer:code('print(' .. c.inline_code .. ')')</pre></li>
+<li><pre>93              end</pre></li>
+<li> <pre class='covered'>94  33  &nbsp;      state.buffer:string(state.endings:pop())</pre></li>
+<li><pre>95            end</pre></li>
+<li><pre>96          end</pre></li>
+<li> <pre class='covered'>97  35  &nbsp;  state.buffer:newline()</pre></li>
+<li><pre>98        end</pre></li>
+</ul>
+</div>
+</div>
+</body>
+</html>
+  
