@@ -8,8 +8,12 @@ end
 
 function change_indents(str, len, options)
   local output = str:gsub("^" .. options.space, options.space:rep(len))
-  output = output:gsub(options.newline .. options.space, options.newline .. options.space:rep(len))
+  output = output:gsub(options.newline .. '[' .. options.space  ..']?', options.newline .. options.space:rep(len))
   return output
+end
+
+local function lua_filter(state)
+  state.buffer:code(state.curr_phrase.content)
 end
 
 local function preserve_filter(state)
@@ -54,6 +58,26 @@ local function javascript_filter(state)
   state.buffer:newline()
 end
 
+local function cdata_filter(state)
+  local content = state.curr_phrase.content
+  local options = state.options
+  local buffer = {}
+  table.insert(buffer, state:indents() .. "<![CDATA[")
+  table.insert(buffer, change_indents(content:gsub(options.newline .. '*$', ''), 2, options))
+  table.insert(buffer, state:indents() .. "]]>")
+  local output = table.concat(buffer, options.newline)
+  state.buffer:string(output, {long = true, interpolate = true})
+  state.buffer:newline()
+end
+
+local function markdown_filter(state)
+  require "markdown"
+  local output = state.curr_phrase.content:gsub("^"..state:indents(1), "")
+  output = markdown(output:gsub(state.options.newline .. state:indents(1), state.options.newline))
+  state.buffer:string(change_indents(output, state:indent_level(), state.options):gsub("[%s]*$", ""), {long = true, interpolate = true})
+  state.buffer:newline()
+end
+
 local function plain_filter(state)
   local output = change_indents(
     state.curr_phrase.content,
@@ -65,10 +89,13 @@ local function plain_filter(state)
 end
 
 filters = {
-  escaped = escaped_filter,
+  cdata      = cdata_filter,
+  escaped    = escaped_filter,
   javascript = javascript_filter,
-  plain = plain_filter,
-  preserve = preserve_filter,
+  lua        = lua_filter,
+  markdown   = markdown_filter,
+  plain      = plain_filter,
+  preserve   = preserve_filter,
 }
 
 function filter_for(state)

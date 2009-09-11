@@ -77,6 +77,7 @@ tests.filters = {
   {":escaped\n  <'&\">", "&lt;&#039;&amp;&quot;&gt;"},
   {":preserve\n  hello\n\n%p", "hello&#x000A;\n<p></p>"},
   {":plain\n  hello\n\n%p", "hello\n\n<p></p>"},
+  {":markdown\n  # a", "<h1>a</h1>"},
   {":javascript\n  a();\n%p", "<script type='text/javascript'>\n  //<![CDATA[\n    a();\n  //]]>\n</script>\n<p></p>"}
 }
 
