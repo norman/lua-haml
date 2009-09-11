@@ -27,7 +27,7 @@ The following features of Ruby's Haml are working in Lua Haml:
 * Running Lua
 * Lua blocks
 * Whitespace preservation (via filter)
-* Filters: plain, javascript, preserve, custom
+* Filters: plain, javascript, preserve, escaped, custom
 
 ### To do ###
 
@@ -44,7 +44,7 @@ The following feautes of Ruby's Haml are not yet working in Lua Haml:
 * Whitespace preservation (implicit)
 * Escaping HTML
 * Unescaping HTML
-* Filters: cdata, escaped, lua, markdown
+* Filters: cdata, lua, markdown
 * Multiline content
 * Helpers
 

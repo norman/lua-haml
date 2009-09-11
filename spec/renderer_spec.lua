@@ -68,11 +68,13 @@ tests["inline comments"] = {
 }
 
 tests.script = {
+  {'%p="hello"', '<p>hello</p>'},
   {"- a = 'b'\n%p=a", "<p>b</p>"},
   {"- for k,v in pairs({a = 'a'}) do\n  %p(class=k)=v", "<p class='a'>a</p>"}
 }
 
 tests.filters = {
+  {":escaped\n  <'&\">", "&lt;&#039;&amp;&quot;&gt;"},
   {":preserve\n  hello\n\n%p", "hello&#x000A;\n<p></p>"},
   {":plain\n  hello\n\n%p", "hello\n\n<p></p>"},
   {":javascript\n  a();\n%p", "<script type='text/javascript'>\n  //<![CDATA[\n    a();\n  //]]>\n</script>\n<p></p>"}

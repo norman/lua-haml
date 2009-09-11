@@ -17,7 +17,14 @@ default_options = {
   format     = 'xhtml',
   indent     = "  ",
   newline    = "\n",
-  space      = "  "
+  space      = "  ",
+  html_escapes = {
+    ["'"] = '&#039;',
+    ['"'] = '&quot;',
+    ['&'] = '&amp;',
+    ['<'] = '&lt;',
+    ['>'] = '&gt;'
+  }
 }
 
 --- A simple string buffer object.
@@ -131,8 +138,9 @@ function precompile(phrases, options)
     return self:indent_level() - self.prev_phrase.space:len()  / self.space_sequence:len()
   end
 
-  function state:indents()
-    return self.options.indent:rep(self.endings:indent_level())
+  function state:indents(n)
+    local l = self.endings:indent_level()
+    return self.options.indent:rep(n and n + l or l)
   end
 
   function state:close_tags()
