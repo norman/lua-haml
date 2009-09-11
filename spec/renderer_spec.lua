@@ -71,13 +71,13 @@ tests.script = {
 }
 
 tests.filters = {
-  {":preserve\n  hello\n\n%p", "  hello&#x0A;\n<p></p>"},
-  {":plain\n  hello\n\n%p", "  hello\n\n<p></p>"},
-  {":javascript\n  a();\n%p", "<script type='text/javascript'>\n  // <![CDATA[\na();\n  // ]]>\n</script>\n<p></p>"}
+  {":preserve\n  hello\n\n%p", "hello&#x000A;\n<p></p>"},
+  {":plain\n  hello\n\n%p", "hello\n\n<p></p>"},
+  {":javascript\n  a();\n%p", "<script type='text/javascript'>\n  //<![CDATA[\n    a();\n  //]]>\n</script>\n<p></p>"}
 }
 
 tests.interpolation = {
-  {":preserve\n  #{hello}\n\n%p", "  world&#x0A;\n<p></p>"},
+  {":plain\n  #{hello} interpolated: #{hello}", "world interpolated: world"}
 }
 
 

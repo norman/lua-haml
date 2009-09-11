@@ -12,11 +12,12 @@ require "haml.tags"
 -- @field space The string value to use for spaces. Defaults to " ".
 -- TODO allow an option for tag auto-closing
 default_options = {
-  format     = 'xhtml',
+  auto_close = true,
   encoding   = 'utf-8',
-  newline    = "\n",
+  format     = 'xhtml',
   indent     = "  ",
-  auto_close = true
+  newline    = "\n",
+  space      = "  "
 }
 
 --- A simple string buffer object.

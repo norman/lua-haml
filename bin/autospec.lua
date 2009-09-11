@@ -1,7 +1,7 @@
 #!/usr/bin/env lua
 require 'luarocks.require'
 require 'lfs'
-require 'std'
+require 'telescope'
 
 local watchfiles = {
   "haml.lua",
@@ -12,10 +12,7 @@ local watchfiles = {
   "haml/renderer.lua",
   "haml/tags.lua",
   "haml/code.lua",
-  "haml/filter.lua"
-}
-
-local specs = {
+  "haml/filter.lua",
   "spec/parser_spec.lua",
   "spec/renderer_spec.lua",
   "spec/precompiler_spec.lua"
@@ -36,10 +33,10 @@ while(true) do
     timestamps[file] = attr.modification
   end
   if run_specs then
-    os.execute("bin/spec")
+    result = os.execute("tsc spec/*_spec.lua")
+    local image = result == 0 and "pass" or "fail"
+    os.execute(string.format("echo '%s' | growlnotify --image ~/.autotest_images/%s.png", image:upper(), image))
     run_specs = false
   end
   os.execute("sleep 1")
 end
-
-print(timestamps)

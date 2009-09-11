@@ -23,6 +23,7 @@ The following features of Ruby's Haml are working in Lua Haml:
 * Doctypes and XML prologs
 * Haml comments
 * Code evaluation
+* Ruby-style string interpolation ("#{var}")
 * Running Lua
 * Lua blocks
 * Whitespace preservation (via filter)
@@ -41,7 +42,6 @@ The following feautes of Ruby's Haml are not yet working in Lua Haml:
 * HTML comments
 * Conditional comments
 * Whitespace preservation (implicit)
-* Code interpolation
 * Escaping HTML
 * Unescaping HTML
 * Filters: cdata, escaped, lua, markdown

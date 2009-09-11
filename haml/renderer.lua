@@ -18,12 +18,15 @@ local function render_attributes(attr)
 end
 
 local function interpolate(str)
-  env = getfenv()
-  print(str:gsub("([^\\])#{(.-)}", function(a, b)
-    local func = loadstring("return " .. b)
-    setfenv(func, env)
-    return a .. assert(func)()
-  end))
+  -- match position, then "#" followed by balanced "{}"
+  return str:gsub('()#(%b{})', function(a, b)
+    -- if the character before the match is backslash, then don't interpolate
+    if str:sub(a-1, a-1) == "\\" then return b end
+    -- load stuff between braces, and prepend "return" so that "#{var}" can be printed
+    local func = loadstring("return " .. b:sub(2, b:len()-1))
+    setfenv(func, getfenv())
+    return assert(func)()
+  end)
 end
 
 function render(precompiled, locals)

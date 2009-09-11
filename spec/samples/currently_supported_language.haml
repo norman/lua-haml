@@ -18,7 +18,7 @@
       If you're viewing the output and wondering what's so interesting, then
       you should probably be looking at the Haml source instead.
     #content
-      - local greetings = {en = "hello world!", es = "¡hola mundo!", pt = "olá mundo!"}
+      - greetings = {en = "hello world!", es = "¡hola mundo!", pt = "olá mundo!"}
       %ul#greetings.multilingual
         - for lang, greeting in pairs(greetings) do
           %li.greeting(class=lang)= greeting
@@ -27,7 +27,7 @@
     #stuff
       This is nested tag content.
     :javascript
-      var greeting_en = "hello world!";
+      var greeting_en = "#{greetings.en}";
     #more_stuff
       %textarea(cols="100" rows="17")
         :preserve

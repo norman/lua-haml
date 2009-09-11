@@ -1,48 +1,42 @@
 module("haml.filter", package.seeall)
 
-function shorten_space(str, options)
-  local output = str:gsub("^" .. "  ", "")
-  output = output:gsub(options.newline .. "  ", options.newline)
+local function change_indents(str, len, options)
+  local output = str:gsub("^" .. options.space, options.space:rep(len))
+  output = output:gsub(options.newline .. options.space, options.newline .. options.space:rep(len))
   return output
 end
 
-function preserve_filter(content, options, indents, indent_level)
-  local output = content:gsub("\n", '&#x0A;')
-  output = output:gsub("\r", '&#x0D;')
-  output = output:gsub(options.newline .. "  ", options.newline)
+local function preserve_filter(content, options, indents, indent_level)
+  local output = change_indents(content, indent_level - 1, options)
+  output = output:gsub("\n", '&#x000A;'):gsub("\r", '&#x000D;')
   return output
 end
 
-function javascript_filter(content, options, indents, indent_level)
+local function javascript_filter(content, options, indents, indent_level)
   local buffer = {}
-  table.insert(buffer, "<script type='text/javascript'>")
+  table.insert(buffer, options.space:rep(indent_level) .. "<script type='text/javascript'>")
+  table.insert(buffer, change_indents(content:gsub(options.newline .. '*$', ''), 2, options))
+  table.insert(buffer, options.space:rep(indent_level) .. "</script>")
   if options.format == "xhtml" then
-    table.insert(buffer, "  // <![CDATA[")
+    table.insert(buffer, 2, options.space:rep(indent_level + 1) .. "//<![CDATA[")
+    table.insert(buffer, #buffer, options.space:rep(indent_level + 1) .. "//]]>")
   end
-  table.insert(buffer, shorten_space(content, options))
-  if options.format == "xhtml" then
-    table.insert(buffer, "  // ]]>")
-  end
-  table.insert(buffer, "</script>")
   local output = table.concat(buffer, options.newline)
-  output = output:gsub("%s*$", "")
-  output = output:gsub(options.newline, options.newline .. indents)
-  output = output:gsub("^", indents)
   return output
 end
 
-function plain_filter(content, options, indents, indent_level)
-  return shorten_space(content, options)
+local function plain_filter(content, options, indents, indent_level)
+  return change_indents(content, indent_level - 1, options)
 end
 
 filters = {
   javascript = javascript_filter,
   plain = plain_filter,
   preserve = preserve_filter,
-  test = function() return nil end
 }
 
 function filter_for(state)
+  state:close_tags()
   local func
   if filters[state.curr_phrase.filter] then
     func = filters[state.curr_phrase.filter]
