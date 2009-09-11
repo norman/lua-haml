@@ -1,7 +1,7 @@
 package = "luahaml"
-version = "0.0.3-0"
+version = "scm-1"
 source = {
-   url = "http://github.com/norman/lua-haml/tarball/REL_0_0_3",
+   url = "git://github.com/norman/lua-haml.git",
 }
 description = {
    summary = "An implementation of the Haml markup language for Lua.",
@@ -27,6 +27,7 @@ build = {
       ["haml.tags"]        = "haml/tags.lua",
       ["haml.headers"]     = "haml/headers.lua",
       ["haml.code"]        = "haml/code.lua"
+      ["haml.filter"]      = "haml/filter.lua"
     },
     bin = {
       ["luahaml"] = "bin/luahaml"
