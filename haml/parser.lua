@@ -88,28 +88,24 @@ local function flatten_ids_and_classes(t)
   return out
 end
 
-local filtered_block = P{
-  "filter",
-  open = operators.filter * Cg((P(1) - eol)^0, "filter") * eol,
-  filtered = (Cmt(Cb("space"),
-    function(s, i, a)
-      local buffer = {}
-      local num_spaces = tostring(a or ""):len()
-      local start = s:sub(i)
-      for _, line in ipairs(psplit(start, "\n")) do
-        if lpeg.match(P" "^(num_spaces + 1), line) then
-          table.insert(buffer, line)
-        elseif line == "" then
-          table.insert(buffer, line)
-        else
-          break
-        end
-      end
-      local match = table.concat(buffer, "\n")
-      return i + match:len(), match
-    end)),
-  filter = V"open" * Cg(V"filtered", "content")
-}
+local nested_content = Cg((Cmt(Cb("space"), function(subject, index, spaces)
+  local buffer = {}
+  local num_spaces = tostring(spaces or ""):len()
+  local start = subject:sub(index)
+  for _, line in ipairs(psplit(start, "\n")) do
+    if lpeg.match(P" "^(num_spaces + 1), line) then
+      table.insert(buffer, line)
+    elseif line == "" then
+      table.insert(buffer, line)
+    else
+      break
+    end
+  end
+  local match = table.concat(buffer, "\n")
+  return index + match:len(), match
+end)), "content")
+
+local filtered_block = operators.filter * Cg((P(1) - eol)^0, "filter") * eol * nested_content
 
 local haml_tag = P{
   "haml_tag";
@@ -143,7 +139,7 @@ local haml_element = chunk_capture * leading_whitespace * (
   -- Doctype or prolog
   (header) +
   -- Silent comment
-  (operators.silent_comment) * inline_whitespace^0 * Cg(unparsed^0, "comment") +
+  (operators.silent_comment) * inline_whitespace^0 * Cg(unparsed^0, "comment") * nested_content +
   -- Code
   (operators.silent_script + operators.script) * inline_whitespace^1 * Cg(unparsed^0, "code") +
   -- Markup comment
