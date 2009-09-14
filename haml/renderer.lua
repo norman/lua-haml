@@ -2,7 +2,7 @@ module("haml.renderer", package.seeall)
 
 local function partial(options, buffer)
   return function(file, locals)
-    return haml.render_file(string.format("_%s.haml", file), {}, locals):gsub(
+    return haml.render_file(string.format("%s.haml", file), {}, locals):gsub(
       "\n", "\n" .. buffer[#buffer])
   end
 end
