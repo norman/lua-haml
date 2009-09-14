@@ -3,6 +3,13 @@ function log(level, v)
   -- io.stderr:write(string.format("%s: %s\n", level, v))
 end
 
+function psplit(s, sep)
+  sep = lpeg.P(sep)
+  local elem = lpeg.C((1 - sep)^0)
+  local p = lpeg.Ct(elem * (sep * elem)^0)
+  return lpeg.match(p, s)
+end
+
 function do_error(chunk, message, ...)
   error(string.format("Haml error: " .. message, ...) .. " (around line " .. chunk .. ")")
 end

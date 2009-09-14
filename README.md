@@ -28,6 +28,8 @@ The following features of Ruby's Haml are working in Lua Haml:
 * Lua blocks
 * Whitespace preservation (via filter)
 * Filters: plain, javascript, preserve, escaped, lua, markdown, custom
+* Partial templates. Luahaml provides a simple default partial implementation,
+	which can be overrided by frameworks as they see fit.
 
 ### To do ###
 

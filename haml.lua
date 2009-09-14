@@ -9,6 +9,28 @@ require "haml.precompiler"
 require "haml.renderer"
 require "haml.ext"
 
+--- Default Haml options.
+-- @field format The output format. Can be xhtml, html4 or html5. Defaults to xhtml.
+-- @field encoding The output encoding. Defaults to utf-8.
+-- @field newline The string value to use for newlines. Defaults to "\n".
+-- @field space The string value to use for spaces. Defaults to " ".
+-- TODO allow an option for tag auto-closing
+default_options = {
+  auto_close = true,
+  encoding   = 'utf-8',
+  format     = 'xhtml',
+  indent     = "  ",
+  newline    = "\n",
+  space      = "  ",
+  html_escapes = {
+    ["'"] = '&#039;',
+    ['"'] = '&quot;',
+    ['&'] = '&amp;',
+    ['<'] = '&lt;',
+    ['>'] = '&gt;'
+  }
+}
+
 --- Render a Haml string.
 -- @param haml_string The Haml string
 -- @param options Options for the precompiler
@@ -16,7 +38,7 @@ require "haml.ext"
 function render(haml_string, options, locals)
   local phrases = haml.parser.tokenize(haml_string)
   local template = precompiler.precompile(phrases, options)
-  return haml.renderer.render(template, locals)
+  return haml.renderer.render(template, options, locals)
 end
 
 --- Render a Haml file.

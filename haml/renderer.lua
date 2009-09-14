@@ -1,5 +1,12 @@
 module("haml.renderer", package.seeall)
 
+local function partial(options, buffer)
+  return function(file, locals)
+    return haml.render_file(string.format("_%s.haml", file), {}, locals):gsub(
+      "\n", "\n" .. buffer[#buffer])
+  end
+end
+
 local function render_attributes(attr)
   local buffer = {""}
   for k, v in sorted_pairs(attr) do
@@ -29,23 +36,27 @@ local function interpolate(str)
   end)
 end
 
-function render(precompiled, locals)
+function render(precompiled, options, locals)
   local buffer = {}
-  local locals = locals or {}
-  local env = getfenv()
+  local options = merge_tables(options, haml.precompiler.default_options)
+  local env = {}
+   for k, v in pairs(_G) do
+     env[k] = v
+   end
   -- override the default print function to add lines to a buffer
   env.print = function(str)
-    table.insert(__buffer, str)
+    table.insert(buffer, str)
   end
   env.render_attributes = render_attributes
   env.interpolate = interpolate
+  env.partial = partial(options, buffer)
   -- assign local variables to the env
-  for k, v in pairs(locals) do
+  for k, v in pairs(locals or {}) do
     env[k] = v
   end
-  env.__buffer = buffer
   local func = loadstring(precompiled)
   setfenv(func, env)
+  setfenv(interpolate, env)
   func()
   return table.concat(buffer, ""):gsub("[%s]*$", "")
 end

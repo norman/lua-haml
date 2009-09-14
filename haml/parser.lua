@@ -88,13 +88,6 @@ local function flatten_ids_and_classes(t)
   return out
 end
 
-local function psplit(s, sep)
-  sep = P(sep)
-  local elem = C((1 - sep)^0)
-  local p = Ct(elem * (sep * elem)^0)
-  return lpeg.match(p, s)
-end
-
 local filtered_block = P{
   "filter",
   open = operators.filter * Cg((P(1) - eol)^0, "filter") * eol,

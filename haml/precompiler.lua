@@ -5,28 +5,6 @@ require "haml.filter"
 require "haml.headers"
 require "haml.tags"
 
---- Default precompiler options.
--- @field format The output format. Can be xhtml, html4 or html5. Defaults to xhtml.
--- @field encoding The output encoding. Defaults to utf-8.
--- @field newline The string value to use for newlines. Defaults to "\n".
--- @field space The string value to use for spaces. Defaults to " ".
--- TODO allow an option for tag auto-closing
-default_options = {
-  auto_close = true,
-  encoding   = 'utf-8',
-  format     = 'xhtml',
-  indent     = "  ",
-  newline    = "\n",
-  space      = "  ",
-  html_escapes = {
-    ["'"] = '&#039;',
-    ['"'] = '&quot;',
-    ['&'] = '&amp;',
-    ['<'] = '&lt;',
-    ['>'] = '&gt;'
-  }
-}
-
 --- A simple string buffer object.
 -- This is used by the precompiler to hold the generated (X)HTML markup.
 -- @param options Possible values are "newline" and "space". They default to "\n" and " ".
@@ -52,8 +30,7 @@ local function string_buffer(options)
   -- @param value The string to add.
   -- @param opts A table of optiions:
   -- <ul>
-  -- <li><tt>add_newline</tt> If true, then append a newline to the buffer after the value.</li>
-  -- <li><tt>long</tt> If true, then insert a Lua long string.</li>
+  -- <li><tt>newline</tt> If true, then append a newline to the buffer after the value.</li>
   -- <li><tt>interpolate</tt> If true, then allow Ruby-style string interpolation.</li>
   -- </ul>
   function string_buffer:string(value, opts)
@@ -114,7 +91,7 @@ end
 -- @param options Precompiler options.
 function precompile(phrases, options)
 
-  local options = merge_tables(default_options, options)
+  local options = merge_tables(haml.default_options, options)
   local state      = {
     buffer         = string_buffer(options),
     options        = options,
