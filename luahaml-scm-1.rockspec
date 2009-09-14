@@ -24,8 +24,8 @@ build = {
       ["haml.parser"]      = "haml/parser.lua",
       ["haml.precompiler"] = "haml/precompiler.lua",
       ["haml.renderer"]    = "haml/renderer.lua",
-      ["haml.tags"]        = "haml/tags.lua",
-      ["haml.headers"]     = "haml/headers.lua",
+      ["haml.tag"]         = "haml/tag.lua",
+      ["haml.header"]      = "haml/header.lua",
       ["haml.code"]        = "haml/code.lua"
       ["haml.filter"]      = "haml/filter.lua"
     },

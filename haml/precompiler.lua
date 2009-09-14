@@ -2,8 +2,8 @@
 module("haml.precompiler", package.seeall)
 require "haml.code"
 require "haml.filter"
-require "haml.headers"
-require "haml.tags"
+require "haml.header"
+require "haml.tag"
 
 --- A simple string buffer object.
 -- This is used by the precompiler to hold the generated (X)HTML markup.
@@ -164,7 +164,7 @@ function precompile(phrases, options)
 
   local function handle_current_phrase()
     if state.curr_phrase.operator == "header" then
-      haml.headers.header_for(state)
+      haml.header.header_for(state)
     elseif state.curr_phrase.operator == "filter" then
       haml.filter.filter_for(state)
     elseif state.curr_phrase.operator == "silent_comment" then

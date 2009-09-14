@@ -6,11 +6,11 @@ require 'telescope'
 local watchfiles = {
   "haml.lua",
   "haml/ext.lua",
-  "haml/headers.lua",
+  "haml/header.lua",
   "haml/parser.lua",
   "haml/precompiler.lua",
   "haml/renderer.lua",
-  "haml/tags.lua",
+  "haml/tag.lua",
   "haml/code.lua",
   "haml/filter.lua",
   "spec/parser_spec.lua",

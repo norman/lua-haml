@@ -1,4 +1,4 @@
-module("haml.headers", package.seeall)
+module("haml.header", package.seeall)
 
 --- The XHTML doctypes; default is 1.0 Transitional.
 xhtml_doctypes = {
