@@ -1,6 +1,7 @@
 --- Haml precompiler
 module("haml.precompiler", package.seeall)
 require "haml.code"
+require "haml.comment"
 require "haml.filter"
 require "haml.header"
 require "haml.tag"
@@ -8,22 +9,16 @@ require "haml.tag"
 --- A simple string buffer object.
 -- This is used by the precompiler to hold the generated (X)HTML markup.
 -- @param options Possible values are "newline" and "space". They default to "\n" and " ".
-local function string_buffer(options)
+local function string_buffer(adapter)
 
-  local options = merge_tables(options, { newline = '"\n"', space   = " " })
   local string_buffer = { buffer = {} }
 
   function string_buffer:code(value)
-    table.insert(self.buffer, value)
-  end
-
-  function string_buffer:space(length)
-    if length == 0 then return end
-    table.insert(self.buffer, options.space:rep(length))
+    table.insert(self.buffer, adapter.code(value))
   end
 
   function string_buffer:newline()
-    table.insert(self.buffer, "print \"\\n\"")
+    table.insert(self.buffer, adapter.newline())
   end
 
   --- Add a string to the buffer, wrapped in a print() statement.
@@ -34,17 +29,14 @@ local function string_buffer(options)
   -- <li><tt>interpolate</tt> If true, then allow Ruby-style string interpolation.</li>
   -- </ul>
   function string_buffer:string(value, opts)
-    local opts                    = opts or {}
-    local code                    = "print(%s)"
-    local str                     = "[=[%s]=]"
-    if opts.interpolate then code = "print(interpolate(%s))" end
-    table.insert(self.buffer, code:format(str:format(value)))
+    local opts = opts or {}
+    table.insert(self.buffer, adapter.string(value, opts))
     if opts.newline then self:newline() end
   end
 
   function string_buffer:cat()
     -- strip trailing newlines
-    if self.buffer[#self.buffer] == 'print "\\n"' then
+    if self.buffer[#self.buffer] == adapter:newline() then
       table.remove(self.buffer)
     end
     return strip(table.concat(self.buffer, "\n"))
@@ -92,8 +84,10 @@ end
 function precompile(phrases, options)
 
   local options = merge_tables(haml.default_options, options)
-  local state      = {
-    buffer         = string_buffer(options),
+  local adapter = require(string.format("haml.%s_adapter", options.adapter)).get_adapter(options)
+  local state = {
+    adapter        = adapter,
+    buffer         = string_buffer(adapter, options),
     options        = options,
     endings        = endstack(),
     curr_phrase    = {},
@@ -169,6 +163,10 @@ function precompile(phrases, options)
       haml.filter.filter_for(state)
     elseif state.curr_phrase.operator == "silent_comment" then
       state:close_tags()
+    elseif state.curr_phrase.operator == "markup_comment" then
+      haml.comment.comment_for(state)
+    elseif state.curr_phrase.operator == "conditional_comment" then
+      haml.comment.comment_for(state)
     elseif state.curr_phrase.tag then
       haml.tags.tag_for(state)
     elseif state.curr_phrase.code then

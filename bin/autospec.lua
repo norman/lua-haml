@@ -5,6 +5,7 @@ require 'telescope'
 
 local watchfiles = {
   "haml.lua",
+  "haml/comment.lua",
   "haml/ext.lua",
   "haml/header.lua",
   "haml/parser.lua",
@@ -24,19 +25,24 @@ for _, file in pairs(watchfiles) do
 end
 
 while(true) do
-  local run_specs = false
-  for _, file in pairs(watchfiles) do
-    local attr = lfs.attributes(file)
-    if attr.modification > timestamps[file] then
-      run_specs = true
+  pcall(function()
+    local run_specs = false
+    for _, file in pairs(watchfiles) do
+      local attr = lfs.attributes(file)
+      if attr.modification > timestamps[file] then
+        run_specs = true
+      end
+      timestamps[file] = attr.modification
     end
-    timestamps[file] = attr.modification
-  end
-  if run_specs then
-    result = os.execute("tsc spec/*_spec.lua")
-    local image = result == 0 and "pass" or "fail"
-    os.execute(string.format("echo '%s' | growlnotify --image ~/.autotest_images/%s.png", image:upper(), image))
-    run_specs = false
-  end
-  os.execute("sleep 1")
+    if run_specs then
+      local f = assert(io.popen("tsc spec/*_spec.lua", 'r'))
+      local s = assert(f:read('*a'))
+      print(s)
+      f:close()
+      local image = (s:match("0 fail") and s:match("0 err")) and "pass" or "fail"
+      os.execute(string.format("echo '%s' | growlnotify --name Telescope --image ~/.autotest_images/%s.png", s:gsub("\n.*", ""), image))
+      run_specs = false
+    end
+    os.execute("sleep 1")
+  end)
 end

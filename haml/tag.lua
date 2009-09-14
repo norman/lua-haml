@@ -14,40 +14,6 @@ auto_closing_tags = {
   param = true
 }
 
-function serialize_table(t)
-  local buffer = {}
-
-  local function kv(k, v)
-    if type(k) == "number" then
-      return string.format('%s, ', v)
-    else
-      return string.format('["%s"] = %s, ', k, v)
-    end
-  end
-
-  table.insert(buffer, "{")
-  for k, v in pairs(t) do
-    if type(v) == "table" then
-      table.insert(buffer, kv(k, serialize_table(v)))
-    else
-      table.insert(buffer, kv(k, v))
-    end
-  end
-  table.insert(buffer, "}")
-  return table.concat(buffer, "")
-end
-
-
---- Format tables into tag attributes.
-local function format_attributes(...)
-  -- local buffer = {}
-  -- for k, v in pairs(join_tables(...)) do
-    -- TODO abstract away Lua-specific precompiler output into an adatper to allow for other languages
-    -- table.insert(buffer, string.format('["%s"] = %s', k, v))
-  -- end
-  return 'print(render_attributes(' .. serialize_table(join_tables(...)) .. '))'
-end
-
 --- Whether we should auto close the tag for the current precompiler state.
 local function should_auto_close(state)
   return state.options.format == 'xhtml' and
@@ -76,7 +42,7 @@ function tag_for(state)
 
   -- add any attributes
   if c.attributes or c.css then
-    state.buffer:code(format_attributes(c.css or {}, unpack(c.attributes or {})))
+    state.buffer:code(state.adapter.format_attributes(c.css or {}, unpack(c.attributes or {})))
   end
 
   -- complete the opening tag

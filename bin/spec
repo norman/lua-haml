@@ -1,1 +1,0 @@
-exec tsc spec/*_spec.lua

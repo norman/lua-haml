@@ -1,18 +1,6 @@
 module("haml.filter", package.seeall)
 
-function escape_html(str, escapes)
-  return str:gsub("([\"'&<>])", function(a)
-    return escapes[a]
-  end)
-end
-
-function change_indents(str, len, options)
-  local output = str:gsub("^" .. options.space, options.space:rep(len))
-  output = output:gsub(options.newline .. '[' .. options.space  ..']?', options.newline .. options.space:rep(len))
-  return output
-end
-
-local function lua_filter(state)
+local function code_filter(state)
   state.buffer:code(state.curr_phrase.content)
 end
 
@@ -29,14 +17,14 @@ local function preserve_filter(state)
 end
 
 local function escaped_filter(state)
-  local output = change_indents(
+  local output = strip(change_indents(
     escape_html(
       state.curr_phrase.content,
       state.options.html_escapes
     ),
     state:indent_level() - 1,
     state.options
-  ):gsub("[%s]*$", "")
+  ))
   state.buffer:string(output, {long = true, interpolate = true})
   state.buffer:newline()
 end
@@ -74,13 +62,13 @@ local function markdown_filter(state)
   require "markdown"
   local output = state.curr_phrase.content:gsub("^"..state:indents(1), "")
   output = markdown(output:gsub(state.options.newline .. state:indents(1), state.options.newline))
-  state.buffer:string(change_indents(output, state:indent_level(), state.options):gsub("[%s]*$", ""), {long = true, interpolate = true})
+  state.buffer:string(change_indents(strip(output), state:indent_level(), state.options), {long = true, interpolate = true})
   state.buffer:newline()
 end
 
 local function plain_filter(state)
   local output = change_indents(
-    state.curr_phrase.content,
+    state.curr_phrase.content:gsub("[%s]*$", ""),
     state:indent_level() - 1,
     state.options
   )
@@ -92,10 +80,10 @@ filters = {
   cdata      = cdata_filter,
   escaped    = escaped_filter,
   javascript = javascript_filter,
-  lua        = lua_filter,
+  lua        = code_filter,
   markdown   = markdown_filter,
   plain      = plain_filter,
-  preserve   = preserve_filter,
+  preserve   = preserve_filter
 }
 
 function filter_for(state)

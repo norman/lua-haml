@@ -4,7 +4,6 @@ module("haml.parser", package.seeall)
 -- Lua Haml's parser uses the Lua Parsing Expression Grammar. For more
 -- information see: http://www.inf.puc-rio.br/~roberto/lpeg/lpeg.html
 require "lpeg"
-require "haml.ext"
 
 local P, S, R, C, Cg, Ct, Cb, Cmt, V = lpeg.P, lpeg.S, lpeg.R, lpeg.C, lpeg.Cg, lpeg.Ct, lpeg.Cb, lpeg.Cmt, lpeg.V
 
@@ -19,14 +18,15 @@ local doublequoted_string = P('"' * ((1 - S '"\r\n\f\\') + (P'\\' * 1))^0 * '"')
 local quoted_string       = singlequoted_string + doublequoted_string
 
 local operator_symbols = {
-  escape         = "\\",
-  filter         = ":",
-  header         = "!!!",
-  markup_comment = "/",
-  script         = "=",
-  silent_comment = P"-#" + "--",
-  silent_script  = "-",
-  tag            = "%"
+  conditional_comment = "/[",
+  escape              = "\\",
+  filter              = ":",
+  header              = "!!!",
+  markup_comment      = "/",
+  script              = "=",
+  silent_comment      = P"-#" + "--",
+  silent_script       = "-",
+  tag                 = "%"
 }
 
 -- This builds a table of capture patterns that return the operator name rather
@@ -105,8 +105,6 @@ local nested_content = Cg((Cmt(Cb("space"), function(subject, index, spaces)
   return index + match:len(), match
 end)), "content")
 
-local filtered_block = operators.filter * Cg((P(1) - eol)^0, "filter") * eol * nested_content
-
 local haml_tag = P{
   "haml_tag";
   alnum        = R("az", "AZ", "09"),
@@ -142,10 +140,12 @@ local haml_element = chunk_capture * leading_whitespace * (
   (operators.silent_comment) * inline_whitespace^0 * Cg(unparsed^0, "comment") * nested_content +
   -- Code
   (operators.silent_script + operators.script) * inline_whitespace^1 * Cg(unparsed^0, "code") +
+  -- IE conditional comments
+  (operators.conditional_comment * Cg((P(1) - "]")^1, "condition")) * "]" +
   -- Markup comment
-  (operators.markup_comment * unparsed^0) +
-  -- Unparsed filtered block
-  (filtered_block) +
+  (operators.markup_comment * inline_whitespace^0 * unparsed^0 * eol^0 * nested_content) +
+  -- Filtered block
+  (operators.filter * Cg((P(1) - eol)^0, "filter") * eol * nested_content) +
   -- Escaped
   (operators.escape * unparsed^0) +
   -- Unparsed content

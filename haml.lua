@@ -4,10 +4,10 @@
 -- and the <a href="http://haml-lang.com/docs/yardoc/HAML_REFERENCE.md.html">Haml language reference</a>.
 -- </p>
 module("haml", package.seeall)
+require "haml.ext"
 require "haml.parser"
 require "haml.precompiler"
 require "haml.renderer"
-require "haml.ext"
 
 --- Default Haml options.
 -- @field format The output format. Can be xhtml, html4 or html5. Defaults to xhtml.
@@ -16,6 +16,7 @@ require "haml.ext"
 -- @field space The string value to use for spaces. Defaults to " ".
 -- TODO allow an option for tag auto-closing
 default_options = {
+  adapter    = "lua",
   auto_close = true,
   encoding   = 'utf-8',
   format     = 'xhtml',

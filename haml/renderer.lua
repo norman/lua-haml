@@ -1,12 +1,5 @@
 module("haml.renderer", package.seeall)
 
-local function partial(options, buffer)
-  return function(file, locals)
-    return haml.render_file(string.format("%s.haml", file), {}, locals):gsub(
-      "\n", "\n" .. buffer[#buffer])
-  end
-end
-
 local function render_attributes(attr)
   local buffer = {""}
   for k, v in sorted_pairs(attr) do
@@ -36,9 +29,18 @@ local function interpolate(str)
   end)
 end
 
+local function partial(options, buffer)
+  return function(file, locals)
+    return haml.render_file(string.format("%s.haml", file), options, locals):gsub(
+      -- if we're in a partial, by definition the last entry added to the buffer
+      -- will be the current spaces
+      "\n", "\n" .. buffer[#buffer])
+  end
+end
+
 function render(precompiled, options, locals)
   local buffer = {}
-  local options = merge_tables(options, haml.precompiler.default_options)
+  local options = merge_tables(options, haml.default_options)
   local env = {}
    for k, v in pairs(_G) do
      env[k] = v
@@ -58,5 +60,5 @@ function render(precompiled, options, locals)
   setfenv(func, env)
   setfenv(interpolate, env)
   func()
-  return table.concat(buffer, ""):gsub("[%s]*$", "")
+  return strip(table.concat(buffer, ""))
 end

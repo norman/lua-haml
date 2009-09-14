@@ -140,6 +140,46 @@ describe("The LuaHaml parser", function()
       assert_equal(output[1].comment, "a")
     end)
 
+    it("Should parse nested content as part of the comment", function()
+      local output = tokenize("-#\n  a")
+      assert_equal(output[1].content, "\n  a")
+    end)
+
+  end)
+
+  describe("When handling markup comments", function()
+
+    it("should parse / as the start of a markup comment", function()
+      local output = tokenize("/ a")
+      assert_equal("markup_comment", output[1].operator)
+    end)
+
+    it("should parse inline markup comments", function()
+      local output = tokenize("/ a")
+      assert_equal("a", output[1].unparsed)
+    end)
+
+    it("should parse nested markup comments", function()
+      local output = tokenize("/\n  a")
+      assert_equal("  a", output[1].content)
+    end)
+
+    it("should parse both inline and nested markup comments", function()
+      local output = tokenize("/a\n  b")
+      assert_equal("a", output[1].unparsed)
+      assert_equal("  b", output[1].content)
+    end)
+
+  end)
+
+  describe("When handling conditional comments", function()
+
+    it("should parse /[ as the start of a conditional comment", function()
+      local output = tokenize("/[if IE]")
+      assert_equal("conditional_comment", output[1].operator)
+      assert_equal("if IE", output[1].condition)
+    end)
+
   end)
 
   describe("When handling header instructions('!!!')", function()

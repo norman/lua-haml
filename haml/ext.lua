@@ -3,6 +3,18 @@ function log(level, v)
   -- io.stderr:write(string.format("%s: %s\n", level, v))
 end
 
+function escape_html(str, escapes)
+  return str:gsub("([\"'&<>])", function(a)
+    return escapes[a]
+  end)
+end
+
+function change_indents(str, len, options)
+  local output = str:gsub("^" .. options.space, options.space:rep(len))
+  output = output:gsub(options.newline .. options.space, options.newline .. options.space:rep(len))
+  return output
+end
+
 function psplit(s, sep)
   sep = lpeg.P(sep)
   local elem = lpeg.C((1 - sep)^0)
@@ -32,16 +44,10 @@ function print(...)
     if type(v) == "table" then
       table.insert(toprint, render_table(v))
     else
-      table.insert(toprint, v)
+      table.insert(toprint, tostring(v))
     end
   end
   _print(unpack(toprint))
-end
-
--- strip quotes from a string
-function dequote(str)
-  local s = str:gsub("['\"]", "")
-  return s
 end
 
 --- Like pairs() but iterates over sorted table keys.

@@ -76,7 +76,7 @@ tests.script = {
 tests.filters = {
   {":escaped\n  <'&\">", "&lt;&#039;&amp;&quot;&gt;"},
   {":preserve\n  hello\n\n%p", "hello&#x000A;\n<p></p>"},
-  {":plain\n  hello\n\n%p", "hello\n\n<p></p>"},
+  {":plain\n  hello\n\n%p", "hello\n<p></p>"},
   {":markdown\n  # a", "<h1>a</h1>"},
   {":javascript\n  a();\n%p", "<script type='text/javascript'>\n  //<![CDATA[\n    a();\n  //]]>\n</script>\n<p></p>"}
 }
@@ -85,6 +85,19 @@ tests.interpolation = {
   {":plain\n  #{hello} interpolated: #{hello}", "world interpolated: world"}
 }
 
+tests["silent comments"] = {
+  {"-# nothing\n%p", "<p></p>"},
+  {"-# nothing\n  nested\n%p", "<p></p>"},
+}
+
+tests["markup comments"] = {
+  {"/ comment", "<!-- comment -->"},
+  {"/\n  comment\n  comment2", "<!--\n  comment\n  comment2\n-->"},
+}
+
+tests["conditional comments"] = {
+  {"/[if IE]\n  %p a", "<!--[if IE]>\n  <p>a</p>\n<![endif]-->"}
+}
 
 describe("The LuaHaml Renderer", function()
   for context, set in pairs(tests) do
