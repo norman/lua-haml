@@ -12,7 +12,7 @@ local function preserve_filter(state)
       "\n", '&#x000A;'):gsub(
       "\r", '&#x000D;'
   )
-  state.buffer:string(output, {long = true, interpolate = true})
+  state.buffer:string(output, {interpolate = true})
   state.buffer:newline()
 end
 

@@ -18,14 +18,31 @@ local function render_attributes(attr)
 end
 
 local function interpolate(str)
+  -- io.stderr:write(str, "\n", "---", "\n")
+
   -- match position, then "#" followed by balanced "{}"
-  return str:gsub('()#(%b{})', function(a, b)
+  return str:gsub('([\\]*)#()(%b{})', function(a, b, c)
+
+    local function interp()
+      -- load stuff between braces, and prepend "return" so that "#{var}" can be printed
+      local func = loadstring("return " .. c:sub(2, c:len()-1))
+      setfenv(func, getfenv())
+      return assert(func)()
+    end
+
     -- if the character before the match is backslash, then don't interpolate
-    if str:sub(a-1, a-1) == "\\" then return b end
-    -- load stuff between braces, and prepend "return" so that "#{var}" can be printed
-    local func = loadstring("return " .. b:sub(2, b:len()-1))
-    setfenv(func, getfenv())
-    return assert(func)()
+    if a:match "\\" then
+      if a:len() == 1 then
+        return '#' .. c
+      elseif a:len() % 2 == 0 then
+        return a:sub(1, a:len() / 2) .. interp()
+      else
+        -- io.stderr:write("'"..tostring(a).."'", tostring(b), tostring(c), "\n")
+        local prefix = a:len() == 1 and "" or a:sub(0, a:len() / 2)
+        return prefix .. '#' .. c
+      end
+    end
+    return interp()
   end)
 end
 

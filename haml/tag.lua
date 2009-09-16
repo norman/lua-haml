@@ -53,9 +53,9 @@ function tag_for(state)
     state.endings:push(string.format("</%s>", c.tag))
     if should_close_inline(state) then
       if c.inline_content then
-        state.buffer:string(strip(c.inline_content))
+        state.buffer:string(strip(c.inline_content), {interpolate = true})
       elseif c.inline_code then
-        state.buffer:code('print(' .. c.inline_code .. ')')
+        state.buffer:code('print(interpolate(' .. c.inline_code .. '))')
       end
       state.buffer:string(state.endings:pop())
     end

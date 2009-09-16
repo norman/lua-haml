@@ -117,7 +117,7 @@ local haml_tag = P{
   implict_tag  = Cg(-S(1) * #V"css" / function() return default_tag end, "tag"),
   haml_tag     = (V"explicit_tag" + V"implict_tag") * Cg(Ct(V"css") / flatten_ids_and_classes, "css")^0
 }
-local inline_code = operators.script * inline_whitespace^0 * Cg(unparsed^0, "inline_code")
+local inline_code = operators.script * inline_whitespace^0 * Cg(unparsed^0 / function(a) return a:gsub("\\", "\\\\") end, "inline_code")
 local inline_content = inline_whitespace^0 * Cg(unparsed, "inline_content")
 local tag_modifiers = (modifiers.self_closing + (modifiers.inner_whitespace + modifiers.outer_whitespace))
 

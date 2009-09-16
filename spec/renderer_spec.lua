@@ -82,6 +82,10 @@ tests.filters = {
 }
 
 tests.interpolation = {
+  {'%p= "#{hello}"', "<p>world</p>"},
+  {'%p #{hello}', "<p>world</p>"},
+  {'%p \\#{hello}', "<p>#{hello}</p>"},
+  {'%p \\\\#{hello}', "<p>\\world</p>"},
   {":plain\n  #{hello} interpolated: #{hello}", "world interpolated: world"}
 }
 
