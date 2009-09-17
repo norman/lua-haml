@@ -47,7 +47,7 @@ function tag_for(state)
 
   -- complete the opening tag
   if  should_auto_close(state) then
-    state.buffer:string('/>')
+    state.buffer:string(' />')
   else
     state.buffer:string('>')
     state.endings:push(string.format("</%s>", c.tag))

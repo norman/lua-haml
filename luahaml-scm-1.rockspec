@@ -26,8 +26,10 @@ build = {
       ["haml.renderer"]    = "haml/renderer.lua",
       ["haml.tag"]         = "haml/tag.lua",
       ["haml.header"]      = "haml/header.lua",
-      ["haml.code"]        = "haml/code.lua"
-      ["haml.filter"]      = "haml/filter.lua"
+      ["haml.code"]        = "haml/code.lua",
+      ["haml.filter"]      = "haml/filter.lua",
+      ["haml.comment"]     = "haml/comment.lua",
+      ["haml.lua_adapter"] = "haml/lua_adapter.lua"
     },
     bin = {
       ["luahaml"] = "bin/luahaml"
