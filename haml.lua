@@ -14,7 +14,6 @@ require "haml.renderer"
 -- @field encoding The output encoding. Defaults to utf-8.
 -- @field newline The string value to use for newlines. Defaults to "\n".
 -- @field space The string value to use for spaces. Defaults to " ".
--- TODO allow an option for tag auto-closing
 default_options = {
   adapter    = "lua",
   auto_close = true,

@@ -16,7 +16,8 @@ local watchfiles = {
   "haml/filter.lua",
   "spec/parser_spec.lua",
   "spec/renderer_spec.lua",
-  "spec/precompiler_spec.lua"
+  "spec/precompiler_spec.lua",
+  "spec/haml-spec/tests.json"
 }
 
 local timestamps = {}

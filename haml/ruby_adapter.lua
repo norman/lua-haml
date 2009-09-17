@@ -1,16 +1,16 @@
-module("haml.lua_adapter", package.seeall)
+module("haml.ruby_adapter", package.seeall)
 
-local function serialize_table(t, opts)
+function serialize_table(t, opts)
   local buffer = {}
   local opts = opts or {}
 
   local function kv(k, v)
     if type(k) == "number" then
-      return string.format('%s, ', v)
+      return string.format('%s => %s, ', k, v)
     elseif type(k) == "string" and opts.interpolate then
-      return string.format('["%s"] = interpolate(%s), ', k, v)
+      return string.format(':"%s" => interpolate(%s), ', k, v)
     else
-      return string.format('["%s"] = %s, ', k, v)
+      return string.format(':"%s" => %s, ', k, v)
     end
   end
 
@@ -26,7 +26,6 @@ local function serialize_table(t, opts)
   return table.concat(buffer, "")
 end
 
-
 function get_adapter(options)
 
   local adapter = {}
@@ -40,10 +39,10 @@ function get_adapter(options)
   end
 
   function adapter.string(value, opts)
-    local code                    = "print(%s)"
-    local str                     = "[=[%s]=]"
-    if opts.interpolate then code = "print(interpolate(%s))" end
-    return code:format(str:format(value))
+    local code                    = "print %s"
+    local str                     = '"%s"'
+    if opts.interpolate then code = "print %s" end
+    return code:format(str:format(value:gsub('"', '\\"')))
   end
 
   --- Format tables into tag attributes.
@@ -52,5 +51,4 @@ function get_adapter(options)
   end
 
   return adapter
-
 end

@@ -18,15 +18,20 @@ local function render_attributes(attr)
 end
 
 local function interpolate(str)
-  -- io.stderr:write(str, "\n", "---", "\n")
-
+  if type(str) ~= "string" then return str end
   -- match position, then "#" followed by balanced "{}"
   return str:gsub('([\\]*)#()(%b{})', function(a, b, c)
 
     local function interp()
       -- load stuff between braces, and prepend "return" so that "#{var}" can be printed
-      local func = loadstring("return " .. c:sub(2, c:len()-1))
-      setfenv(func, getfenv())
+      local code = c:sub(2, c:len()-1)
+      local env = getfenv()
+      -- avoid doing an eval if we're simply returning a value that's in scope
+      if env[code] then
+        return env[code]
+      end
+      local func = loadstring("return " .. code)
+      setfenv(func, env)
       return assert(func)()
     end
 
@@ -37,7 +42,6 @@ local function interpolate(str)
       elseif a:len() % 2 == 0 then
         return a:sub(1, a:len() / 2) .. interp()
       else
-        -- io.stderr:write("'"..tostring(a).."'", tostring(b), tostring(c), "\n")
         local prefix = a:len() == 1 and "" or a:sub(0, a:len() / 2)
         return prefix .. '#' .. c
       end

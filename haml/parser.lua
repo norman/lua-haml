@@ -56,7 +56,7 @@ local modifiers = {
 }
 
 -- Markup attributes
-function parse_attributes(a)
+function parse_html_style_attributes(a)
   local name   = C((R("az", "AZ", "09") + S"-:_")^1 )
   local value  = C(quoted_string + name)
   local sep    = (P" " + eol)^1
@@ -65,8 +65,21 @@ function parse_attributes(a)
   local list   = S("(") * lpeg.Cf(lpeg.Ct("") * pair^0, rawset) * S(")")
   return lpeg.match(list, a) or error(string.format("Could not parse attributes '%s'", a))
 end
-local html_style_attributes = P{"(" * ((quoted_string + (P(1) - S"()")) + V(1))^0 * ")"}
-local any_attributes   = html_style_attributes / parse_attributes
+
+function parse_ruby_style_attributes(a)
+  local name   = (R("az", "AZ", "09") + P"_")^1
+  local key    = (P":" * C(name)) + (P":"^0 * C(quoted_string)) / function(a) local a = a:gsub('[\'"]', ""); return a end
+  local value  = C(quoted_string + name)
+  local sep    = inline_whitespace^0 * P"," * (P" " + eol)^0
+  local assign = P'=>'
+  local pair   = lpeg.Cg(key * inline_whitespace^0 * assign * inline_whitespace^0 * value) * sep^-1
+  local list   = S("{") * inline_whitespace^0 * lpeg.Cf(lpeg.Ct("") * pair^0, rawset) * inline_whitespace^0 * S("}")
+  return lpeg.match(list, a) or error(string.format("Could not parse attributes '%s'", a))
+end
+
+local html_style_attributes = P{"(" * ((quoted_string + (P(1) - S"()")) + V(1))^0 * ")"} / parse_html_style_attributes
+local ruby_style_attributes = P{"{" * ((quoted_string + (P(1) - S"{}")) + V(1))^0 * "}"} / parse_ruby_style_attributes
+local any_attributes   = html_style_attributes + ruby_style_attributes
 local attributes       = Cg(Ct((any_attributes * any_attributes^0)) / ext.flatten, "attributes")
 
 -- Haml HTML elements

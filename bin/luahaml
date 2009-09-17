@@ -16,12 +16,13 @@ Description:
 
 Options:
 
-  -s, --stdin          Read from standard input
-  -i, --inline         Read input from the command line
-  -p, --parse          Show the parser's output for debugging
-  -c, --precompile     Show the precompiler's output for debugging
-  -v, --version        Show the LuaHaml version
-  -?, -h, --help       Show this message
+  -s,     --stdin          Read from standard input
+  -i,     --inline         Read input from the command line
+  -p,     --parse          Show the parser's output for debugging
+  -c,     --precompile     Show the precompiler's output for debugging
+  -v,     --version        Show the LuaHaml version
+          --ruby           Use experimental Ruby adapter
+  -?,-h,  --help           Show this message
 
 Examples:
 
@@ -93,6 +94,8 @@ for i, v in ipairs(arg) do
   elseif v == '--copyright' then
     show_license()
     os.exit()
+  elseif v == "--ruby" then
+    haml.default_options.adapter = "ruby"
   elseif string.match(v, "^-[a-z0-9%-]") then
     print(string.format('Invalid argument "%s"', v))
     show_usage()
