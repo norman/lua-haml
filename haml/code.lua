@@ -1,16 +1,13 @@
 module("haml.code", package.seeall)
 
-local function ending_for(code)
-  if code:match "do%s*$" or code:match "then%s*$" then
-    return "end"
-  end
-  return nil
+local function ending_for(state)
+  return state.adapter.ending_for(state.curr_phrase.code)
 end
 
 function code_for(state)
   if state.curr_phrase.operator == "silent_script" then
     state.buffer:code(state.curr_phrase.code)
-    local ending = ending_for(state.curr_phrase.code)
+    local ending = ending_for(state)
     if ending then
       state.endings:push(ending)
     end

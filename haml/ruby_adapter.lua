@@ -50,5 +50,9 @@ function get_adapter(options)
     return 'print(render_attributes(' .. serialize_table(ext.join_tables(...), {interpolate = true}) .. '))'
   end
 
+  function adapter.ending_for(code)
+    if code:match("|.*|") then return "end" end
+  end
+
   return adapter
 end

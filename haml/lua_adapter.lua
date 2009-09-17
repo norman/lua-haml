@@ -51,6 +51,13 @@ function get_adapter(options)
     return 'print(render_attributes(' .. serialize_table(ext.join_tables(...), {interpolate = true}) .. '))'
   end
 
+  function adapter.ending_for(code)
+    if code:match "do%s*$" or code:match "then%s*$" then
+      return "end"
+    end
+    return nil
+  end
+
   return adapter
 
 end

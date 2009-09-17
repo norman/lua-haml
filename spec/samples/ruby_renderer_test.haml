@@ -1,0 +1,56 @@
+- title = "Lua Haml: Currently Supported Language"
+!!! XML
+!!!
+%html(xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en")
+  %head
+    %title= title
+    %meta(http-equiv="Content-Type" content="text/html; charset=utf-8")
+    %style(type="text/css")
+      :plain
+        body { background-color: #fff }
+        h1 { font-size: 25px; }
+        textarea { font-family: monaco, fixed; font-size: 14px; }
+  %body
+    %h1= title
+    %p
+      This file demonstrates every implemented feature of Lua Haml.
+    %p
+      If you're viewing the output and wondering what's so interesting, then
+      you should probably be looking at the Haml source instead.
+    #content
+      - greetings = {:en => "hello world!", :de => "hallo welt!"}
+      %ul#greetings.multilingual
+        - greetings.each do |lang, greeting|
+          %li.greeting(class=lang)= greeting
+    #escaped_content
+      \#this content is escaped
+    #stuff
+      This is nested tag content.
+    :javascript
+      var greeting_en = "#{greetings[:en]}";
+    %p "#{greetings[:en]}"
+    #more_stuff
+      %textarea(cols="100" rows="17")
+        :preserve
+                ___           ___           ___           ___
+               /\__\         /\  \         /\__\         /\__\
+              /:/  /        /::\  \       /::|  |       /:/  /
+             /:/__/        /:/\:\  \     /:|:|  |      /:/  /
+            /::\  \ ___   /::\~\:\  \   /:/|:|__|__   /:/  /
+           /:/\:\  /\__\ /:/\:\ \:\__\ /:/ |::::\__\ /:/__/
+           \/__\:\/:/  / \/__\:\/:/  / \/__/~~/:/  / \:\  \
+                \::/  /       \::/  /        /:/  /   \:\  \
+                /:/  /        /:/  /        /:/  /     \:\  \
+               /:/  /        /:/  /        /:/  /       \:\__\
+               \/__/         \/__/         \/__/         \/__/
+
+               Many
+                             thanks
+                     to
+                                          http://www.network-science.de/ascii
+  #more_stuff
+    :plain
+      <p>
+        <a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10-blue"
+          alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
+      </p>
