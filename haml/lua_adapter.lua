@@ -45,7 +45,7 @@ function get_adapter(options)
 
   --- Format tables into tag attributes.
   function adapter.format_attributes(...)
-    return 'print(render_attributes(' .. serialize_table(join_tables(...)) .. '))'
+    return 'print(render_attributes(' .. serialize_table(ext.join_tables(...)) .. '))'
   end
 
   return adapter

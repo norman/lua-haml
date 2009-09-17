@@ -16,7 +16,7 @@ function comment_for(state)
     end
 
   elseif state.curr_phrase.operator == "conditional_comment" then
-    state.buffer:string(state:indents() .. string.format("<!--[%s]>", strip(state.curr_phrase.condition)), {newline = true})
+    state.buffer:string(state:indents() .. string.format("<!--[%s]>", ext.strip(state.curr_phrase.condition)), {newline = true})
     state.endings:push("<![endif]-->")
   end
 

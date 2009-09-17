@@ -39,7 +39,7 @@ local function string_buffer(adapter)
     if self.buffer[#self.buffer] == adapter:newline() then
       table.remove(self.buffer)
     end
-    return strip(table.concat(self.buffer, "\n"))
+    return ext.strip(table.concat(self.buffer, "\n"))
   end
 
   return string_buffer
@@ -83,7 +83,7 @@ end
 -- @param options Precompiler options.
 function precompile(phrases, options)
 
-  local options = merge_tables(haml.default_options, options)
+  local options = ext.merge_tables(haml.default_options, options)
   local adapter = require(string.format("haml.%s_adapter", options.adapter)).get_adapter(options)
   local state = {
     adapter        = adapter,
@@ -136,7 +136,7 @@ function precompile(phrases, options)
     if state.space_sequence then return end
     if string.len(state.curr_phrase.space or '') > 0 and not state.space_sequence then
       state.space_sequence = state.curr_phrase.space
-      log("debug", string.format("Setting '%s' as leading whitespace sequence", state.space_sequence))
+      ext.log("debug", string.format("Setting '%s' as leading whitespace sequence", state.space_sequence))
     end
   end
 

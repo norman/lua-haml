@@ -2,7 +2,7 @@ module("haml.renderer", package.seeall)
 
 local function render_attributes(attr)
   local buffer = {""}
-  for k, v in sorted_pairs(attr) do
+  for k, v in ext.sorted_pairs(attr) do
     if type(v) == "table" then
       if k == "class" then
         table.sort(v)
@@ -57,7 +57,7 @@ end
 
 function render(precompiled, options, locals)
   local buffer = {}
-  local options = merge_tables(options, haml.default_options)
+  local options = ext.merge_tables(options, haml.default_options)
   local env = {}
    for k, v in pairs(_G) do
      env[k] = v
@@ -77,5 +77,5 @@ function render(precompiled, options, locals)
   setfenv(func, env)
   setfenv(interpolate, env)
   func()
-  return strip(table.concat(buffer, ""))
+  return ext.strip(table.concat(buffer, ""))
 end

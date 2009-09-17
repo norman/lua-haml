@@ -1,3 +1,5 @@
+module("haml.ext", package.seeall)
+
 -- Remove this before releasing
 function log(level, v)
   -- io.stderr:write(string.format("%s: %s\n", level, v))

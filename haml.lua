@@ -3,8 +3,8 @@
 -- For more information on Haml, please see <a href="http://haml-lang.com">The Haml website</a>
 -- and the <a href="http://haml-lang.com/docs/yardoc/HAML_REFERENCE.md.html">Haml language reference</a>.
 -- </p>
+ext = require "haml.ext"
 module("haml", package.seeall)
-require "haml.ext"
 require "haml.parser"
 require "haml.precompiler"
 require "haml.renderer"

@@ -5,7 +5,7 @@ local function code_filter(state)
 end
 
 local function preserve_filter(state)
-  local output = change_indents(
+  local output = ext.change_indents(
     state.curr_phrase.content,
     state:indent_level() - 1,
     state.options):gsub(
@@ -17,8 +17,8 @@ local function preserve_filter(state)
 end
 
 local function escaped_filter(state)
-  local output = strip(change_indents(
-    escape_html(
+  local output = ext.strip(ext.change_indents(
+    ext.escape_html(
       state.curr_phrase.content,
       state.options.html_escapes
     ),
@@ -35,7 +35,7 @@ local function javascript_filter(state)
   local indent_level = state:indent_level()
   local buffer = {}
   table.insert(buffer, state:indents() .. "<script type='text/javascript'>")
-  table.insert(buffer, change_indents(content:gsub(options.newline .. '*$', ''), 2, options))
+  table.insert(buffer, ext.change_indents(content:gsub(options.newline .. '*$', ''), 2, options))
   table.insert(buffer, state:indents() .. "</script>")
   if options.format == "xhtml" then
     table.insert(buffer, 2, state:indents(1) .. "//<![CDATA[")
@@ -51,7 +51,7 @@ local function cdata_filter(state)
   local options = state.options
   local buffer = {}
   table.insert(buffer, state:indents() .. "<![CDATA[")
-  table.insert(buffer, change_indents(content:gsub(options.newline .. '*$', ''), 2, options))
+  table.insert(buffer, ext.change_indents(content:gsub(options.newline .. '*$', ''), 2, options))
   table.insert(buffer, state:indents() .. "]]>")
   local output = table.concat(buffer, options.newline)
   state.buffer:string(output, {long = true, interpolate = true})
@@ -62,12 +62,12 @@ local function markdown_filter(state)
   require "markdown"
   local output = state.curr_phrase.content:gsub("^"..state:indents(1), "")
   output = markdown(output:gsub(state.options.newline .. state:indents(1), state.options.newline))
-  state.buffer:string(change_indents(strip(output), state:indent_level(), state.options), {long = true, interpolate = true})
+  state.buffer:string(ext.change_indents(ext.strip(output), state:indent_level(), state.options), {long = true, interpolate = true})
   state.buffer:newline()
 end
 
 local function plain_filter(state)
-  local output = change_indents(
+  local output = ext.change_indents(
     state.curr_phrase.content:gsub("[%s]*$", ""),
     state:indent_level() - 1,
     state.options

@@ -67,7 +67,7 @@ function parse_attributes(a)
 end
 local html_style_attributes = P{"(" * ((quoted_string + (P(1) - S"()")) + V(1))^0 * ")"}
 local any_attributes   = html_style_attributes / parse_attributes
-local attributes       = Cg(Ct((any_attributes * any_attributes^0)) / flatten, "attributes")
+local attributes       = Cg(Ct((any_attributes * any_attributes^0)) / ext.flatten, "attributes")
 
 -- Haml HTML elements
 -- Character sequences for CSS and XML/HTML elements. Note that many invalid
@@ -92,7 +92,7 @@ local nested_content = Cg((Cmt(Cb("space"), function(subject, index, spaces)
   local buffer = {}
   local num_spaces = tostring(spaces or ""):len()
   local start = subject:sub(index)
-  for _, line in ipairs(psplit(start, "\n")) do
+  for _, line in ipairs(ext.psplit(start, "\n")) do
     if lpeg.match(P" "^(num_spaces + 1), line) then
       table.insert(buffer, line)
     elseif line == "" then
@@ -125,7 +125,7 @@ local format_chunk = (function()
   local line = 0
   return function(chunk)
     line = line + 1
-    return string.format("%d: %s", line, strip(chunk))
+    return string.format("%d: %s", line, ext.strip(chunk))
   end
 end)()
 local chunk_capture = #Cg((P(1) - eol)^1 / format_chunk, "chunk")

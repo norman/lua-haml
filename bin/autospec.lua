@@ -35,7 +35,7 @@ while(true) do
       timestamps[file] = attr.modification
     end
     if run_specs then
-      local f = assert(io.popen("tsc spec/*_spec.lua", 'r'))
+      local f = assert(io.popen("tsc `find . -name '*_spec.lua'`", 'r'))
       local s = assert(f:read('*a'))
       print(s)
       f:close()
