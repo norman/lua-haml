@@ -31,25 +31,10 @@ end
 function render_table(t)
   local buffer = {}
   for k, v in pairs(t) do
-    if type(v) == "table" then
-      v = render_table(v)
-    end
-    table.insert(buffer, string.format("%s=%s", k, v))
+    if type(v) == "table" then v = render_table(v) end
+    table.insert(buffer, string.format("%s=%s", tostring(k), tostring(v)))
   end
   return "{" .. table.concat(buffer, ' ') .. "}"
-end
-
-_print = print
-function print(...)
-  local toprint = {}
-  for _, v in ipairs({...}) do
-    if type(v) == "table" then
-      table.insert(toprint, render_table(v))
-    else
-      table.insert(toprint, tostring(v))
-    end
-  end
-  _print(unpack(toprint))
 end
 
 --- Like pairs() but iterates over sorted table keys.
