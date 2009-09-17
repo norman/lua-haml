@@ -47,7 +47,7 @@ end
 local function run_parser(haml_string)
   local phrases = haml.parser.tokenize(haml_string)
   for _, t in pairs(phrases) do
-    print(t)
+    print(ext.render_table(t))
   end
 end
 
