@@ -40,10 +40,9 @@ function get_adapter(options)
   end
 
   function adapter.string(value, opts)
-    local code                    = "print(%s)"
-    local str                     = "[=[%s]=]"
+    local code = "print(%s)"
     if opts.interpolate then code = "print(interpolate(%s))" end
-    return code:format(str:format(value))
+    return code:format(string.format("%q", value))
   end
 
   --- Format tables into tag attributes.
