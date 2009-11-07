@@ -63,9 +63,7 @@ function render(precompiled, options, locals)
   local buffer = {}
   local options = ext.merge_tables(options, haml.default_options)
   local env = {}
-   for k, v in pairs(_G) do
-     env[k] = v
-   end
+  setmetatable(env, {__index = _G})
   -- override the default print function to add lines to a buffer
   env.print = function(str)
     table.insert(buffer, str)

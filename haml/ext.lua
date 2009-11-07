@@ -114,7 +114,5 @@ end
 
 --- Strip leading and trailing space from a string.
 function strip(str)
-  -- assign to local because gsub returns two values and we only want one.
-  local s = str:gsub("^[%s]*", ""):gsub("[%s]*$", "")
-  return s
+  return (str:gsub("^[%s]*", ""):gsub("[%s]*$", ""))
 end
