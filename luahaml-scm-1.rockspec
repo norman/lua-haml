@@ -12,7 +12,8 @@ description = {
    homepage = "http://github.com/norman/lua-haml"
 }
 dependencies = {
-   "lua >= 5.1"
+   "lua >= 5.1",
+   "lpeg"
 }
 
 build = {
