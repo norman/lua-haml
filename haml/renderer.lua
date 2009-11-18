@@ -1,6 +1,6 @@
 module("haml.renderer", package.seeall)
 
-local function render_attributes(attr)
+function render_attributes(attr)
   local buffer = {""}
   for k, v in ext.sorted_pairs(attr) do
     if type(v) == "table" then
@@ -17,7 +17,7 @@ local function render_attributes(attr)
   return table.concat(buffer, " ")
 end
 
-local function interpolate(str)
+function interpolate(str)
   if type(str) ~= "string" then return str end
   -- match position, then "#" followed by balanced "{}"
   return str:gsub('([\\]*)#()(%b{})', function(a, b, c)
@@ -50,8 +50,10 @@ local function interpolate(str)
   end)
 end
 
-local function partial(options, buffer)
+local function partial(options, buffer, env)
   return function(file, locals)
+    local locals = locals or {}
+    setmetatable(locals, {__index = env})
     return haml.render_file(string.format("%s.haml", file), options, locals):gsub(
       -- if we're in a partial, by definition the last entry added to the buffer
       -- will be the current spaces
@@ -61,23 +63,18 @@ end
 
 function render(precompiled, options, locals)
   local buffer = {}
+  local locals = locals or {}
   local options = ext.merge_tables(options, haml.default_options)
   local env = {}
-  setmetatable(env, {__index = _G})
-  -- override the default print function to add lines to a buffer
+  setmetatable(env, {__index = function(t, key)
+    return locals[key] or _M[key] or _G[key]
+  end})
   env.print = function(str)
     table.insert(buffer, str)
   end
-  env.render_attributes = render_attributes
-  env.interpolate = interpolate
-  env.partial = partial(options, buffer)
-  -- assign local variables to the env
-  for k, v in pairs(locals or {}) do
-    env[k] = v
-  end
+  env.partial = partial(options, buffer, env)
   local func = loadstring(precompiled)
   setfenv(func, env)
-  setfenv(interpolate, env)
   func()
   return ext.strip(table.concat(buffer, ""))
 end
