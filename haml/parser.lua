@@ -57,7 +57,7 @@ local modifiers = {
 
 -- Markup attributes
 function parse_html_style_attributes(a)
-  local name   = C((R("az", "AZ", "09") + S"-:_")^1 )
+  local name   = C((R("az", "AZ", "09") + S".-:_")^1 )
   local value  = C(quoted_string + name)
   local sep    = (P" " + eol)^1
   local assign = P'='
