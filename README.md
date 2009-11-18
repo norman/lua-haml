@@ -1,14 +1,21 @@
-# Lua Haml #
+# Lua Haml
 
-## About ##
+## About
 
-Lua Haml is an in-progress implementation of the [Haml](http://haml-lang.com) markup language for Lua.
+Lua Haml is an implementation of the [Haml](http://haml-lang.com) markup
+language for Lua. Though it is implemented in Lua, its design makes it easily
+adaptable to almost any language, and it includes an experimental renderer
+for Haml for Ruby. Lua Haml is "just Haml," with no extending of the original
+language.
 
-A Haml language reference can be found [here](http://haml-lang.com/docs/yardoc/HAML_REFERENCE.md.html).
+A Haml language reference can be found
+[here](http://haml-lang.com/docs/yardoc/HAML_REFERENCE.md.html).
 
-Lua Haml currently supports the main features of Ruby's Haml, and can be used for real work. However, many of the finer details of the language, some of them important, are still being implemented.
+Lua Haml currently supports the main features of Ruby's Haml, and can be used
+for real work. However, many of the finer details of the language, some of them
+important, are still being implemented.
 
-### Working features ###
+### Working features
 
 The following features of Ruby's Haml are working in Lua Haml:
 
@@ -29,62 +36,94 @@ The following features of Ruby's Haml are working in Lua Haml:
 * Lua blocks
 * Whitespace preservation (via filter)
 * Filters: plain, javascript, preserve, escaped, lua, markdown, custom
-* Partial templates. Luahaml provides a simple default partial implementation,
-	which can be overrided by frameworks as they see fit.
+* Partial templates. Lua Haml provides a simple default partial implementation,
+	which can be overridden by frameworks as they see fit.
 * HTML comments
 * Conditional comments
 
-### To do ###
+### To do
 
-The following feautes of Ruby's Haml are not yet working in Lua Haml:
+The following features of Ruby's Haml are not yet working in Lua Haml:
 
 * Options: escape\_html, suppress\_eval, attr\_wrapper, preserve
 * Attribute methods
 * Boolean attributes
 * Whitespace removal
-* Object reference
 * Whitespace preservation (implicit)
 * Escaping HTML
 * Unescaping HTML
 * Multiline content
 * Helpers
 
-To see an example of what you can do with the currently supported features, view the "currently supported language" template in the spec directory.
+The following features will likely not be implemented in Lua Haml:
 
-I probably won't implement Sass for a while yet, possibly never. However if I do implement it, it will definitely be as a separate project.
+* Object reference
 
-### Project goals ###
+To see an example of what you can do with the currently supported features, view
+the "currently supported language" template in the spec directory.
 
-* Support the same Haml language as Ruby Haml with no unecessary changes. Lua Haml should just be Haml, with no embracing and extending.
-* Allow some tiny changes to make Haml more comfortable for Lua; i.e., "--" for comments in addition to "#", and Lua tables as attributes.
-* Include a cache for compiled templates.
-* Help with and contribute to other Haml implementations.
-* Since Lua is designed to be embeddded, develop with an architecture that allows for reasonably easy support for using Haml with other languages (Ruby, PHP, Perl, Python, etc.).
+I probably won't implement [Sass](http://sass-lang.com/) for a while yet,
+possibly never. However if I do implement it, it will definitely be as a
+separate project.
 
-## Playing around with it ##
+## Getting it
 
-The command line utility in `bin/luahaml` can be used to exercise most of the functionality of Luahaml. To get it running, you need to install Luahaml's dependencies, which are:
+Install using LuaRocks:
 
-* Lua 5.1
-* Luarocks
-* LPeg
+    luarocks install luahaml --from=http://luarocks.org/repositories/rocks-cvs/
 
-## Author ##
+Don't be put off by the "CVS" in the URL, this will install the latest Lua Haml
+from the stable branch on Github.
+
+
+## Hacking it
+
+The [Github repository](http://github.com/norman/lua-haml) is located at:
+
+    git://github.com/norman/lua-haml.git
+
+To run the specs, you should also install Telescope:
+
+    luarocks install telescope --from=http://luarocks.org/repositories/rocks-cvs/
+
+You can then run them using the ./bin/spec script in the repository.
+
+## Bug reports
+
+Please report them on the [Github issue tracker](http://github.com/norman/lua-haml/issues).
+
+## Author
 
 [Norman Clarke](mailto://norman@njclarke.com)
 
-## Attributions ##
+## Attributions
 
-Some of the sample files in test/samples were taken from [Ruby's Haml](http://github.com/nex3/haml/).
+Some of the sample files in test/samples were taken from [Ruby's
+Haml](http://github.com/nex3/haml/).
 
-## License ##
+## Thanks
+
+To Hampton Caitlin and Nathan Weizenbaum for their work on the original Haml.
+
+## License
 
 The MIT License
 
 Copyright (c) 2009 Norman Clarke
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS
+OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
