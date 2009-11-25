@@ -33,6 +33,8 @@ Examples:
 
 ]]
 
+local haml_options = {format = "xhtml"}
+
 local function read_file()
   local file = arg[#arg]
   local fh = assert(io.open(file))
@@ -53,11 +55,11 @@ local function run_parser(haml_string)
 end
 
 local function run_precompiler(haml_string)
-  print(haml.precompiler.precompile(haml.parser.tokenize(haml_string)))
+  print(haml.precompiler.precompile(haml.parser.tokenize(haml_string), haml_options))
 end
 
 local function render(haml_string)
-  local output = haml.render(haml_string)
+  local output = haml.render(haml_string, haml_options)
   print(output)
 end
 
