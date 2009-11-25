@@ -61,6 +61,13 @@ local function partial(options, buffer, env)
   end
 end
 
+function yield(buffer)
+  return function(content)
+    return ext.strip(content:gsub("\n", "\n" .. buffer[#buffer]))
+  end
+end
+
+
 function render(precompiled, options, locals)
   local buffer = {}
   local locals = locals or {}
@@ -73,6 +80,7 @@ function render(precompiled, options, locals)
     table.insert(buffer, str)
   end
   env.partial = partial(options, buffer, env)
+  env.yield = yield(buffer)
   local func = loadstring(precompiled)
   setfenv(func, env)
   func()
