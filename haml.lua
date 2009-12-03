@@ -15,13 +15,14 @@ require "haml.renderer"
 -- @field newline The string value to use for newlines. Defaults to "\n".
 -- @field space The string value to use for spaces. Defaults to " ".
 default_options = {
-  adapter    = "lua",
-  auto_close = true,
-  encoding   = 'utf-8',
-  format     = 'xhtml',
-  indent     = "  ",
-  newline    = "\n",
-  space      = "  ",
+  adapter     = "lua",
+  auto_close  = true,
+  escape_html = false,
+  encoding    = 'utf-8',
+  format      = 'xhtml',
+  indent      = "  ",
+  newline     = "\n",
+  space       = "  ",
   html_escapes = {
     ["'"] = '&#039;',
     ['"'] = '&quot;',

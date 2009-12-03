@@ -36,6 +36,8 @@ for k, v in pairs(operator_symbols) do
   operators[k] = Cg(P(v) / function() return k end, "operator")
 end
 
+local script_modifier = Cg(S"&!", "script_modifier")
+
 -- (X)HTML Doctype or XML prolog
 local header =  {
   "header";
@@ -151,8 +153,8 @@ local haml_element = chunk_capture * leading_whitespace * (
   (header) +
   -- Silent comment
   (operators.silent_comment) * inline_whitespace^0 * Cg(unparsed^0, "comment") * nested_content +
-  -- Code
-  (operators.silent_script + operators.script) * inline_whitespace^1 * Cg(unparsed^0, "code") +
+  -- Script
+  (operators.silent_script + (script_modifier^0 * operators.script)) * inline_whitespace^1 * Cg(unparsed^0, "code") +
   -- IE conditional comments
   (operators.conditional_comment * Cg((P(1) - "]")^1, "condition")) * "]" +
   -- Markup comment

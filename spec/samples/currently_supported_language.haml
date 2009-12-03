@@ -22,6 +22,10 @@
       %ul#greetings.multilingual
         - for lang, greeting in pairs(greetings) do
           %li.greeting(class=lang)= greeting
+    %p
+      &= "<'\"escaped & escaped\"'>"
+      != "<'\"NOT escaped & escaped\"'>"
+      = "<'\"MAYBE escaped & escaped\"'>"
     #escaped_content
       \#this content is escaped
     #stuff

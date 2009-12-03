@@ -19,7 +19,7 @@ important, are still being implemented.
 
 The following features of Ruby's Haml are working in Lua Haml:
 
-* Options: format, autoclose, encoding
+* Options: escape\_html, format, autoclose, encoding
 * Plain text
 * Escapes
 * HTML elements
@@ -40,18 +40,18 @@ The following features of Ruby's Haml are working in Lua Haml:
 	which can be overridden by frameworks as they see fit.
 * HTML comments
 * Conditional comments
+* Escaping HTML
+* Unescaping HTML
 
 ### To do
 
 The following features of Ruby's Haml are not yet working in Lua Haml:
 
-* Options: escape\_html, suppress\_eval, attr\_wrapper, preserve
+* Options: suppress\_eval, attr\_wrapper, preserve
 * Attribute methods
 * Boolean attributes
 * Whitespace removal
 * Whitespace preservation (implicit)
-* Escaping HTML
-* Unescaping HTML
 * Multiline content
 * Helpers
 
