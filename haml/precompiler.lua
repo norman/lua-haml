@@ -66,6 +66,10 @@ function endstack()
     return ending
   end
 
+  function stack:last()
+    return self.endings[#self.endings]
+  end
+
   function stack:indent_level()
     return self.indents
   end
@@ -114,13 +118,20 @@ function precompile(phrases, options)
     return self.options.indent:rep(n and n + l or l)
   end
 
-  function state:close_tags()
+  -- You can pass in a function to check the last end tag and return
+  -- after a certain level. For example, you can use it to close all
+  -- open HTML tags and then bail when we reach an "end". This is useful
+  -- for closing tags around "else" and "elseif".
+  function state:close_tags(func)
+    -- local func = func or function() return false end
     -- if the current indent level is less than the previous phrase's, close
     -- endings from the ending stack
     if self:indent_diff() < 0 then
       local i = self:indent_diff()
       repeat
+        if func and func(self.endings:last()) then return end
         local ending = self.endings:pop()
+        if not ending then return end
         if ending:match "^<" then
           self.buffer:string(self:indents() .. ending, {newline = true})
         else

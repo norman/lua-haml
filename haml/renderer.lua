@@ -87,7 +87,7 @@ function render(precompiled, options, locals)
   env.partial = partial(options, buffer, env)
   env.interpolate = interpolate(env)
   env.escape_html = ext.escape_html
-  local func = loadstring(precompiled)
+  local func = assert(loadstring(precompiled))
   setfenv(func, env)
   func()
   return ext.strip(table.concat(buffer, ""))

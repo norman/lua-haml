@@ -15,6 +15,11 @@ local function should_escape(state)
 end
 
 function code_for(state)
+  if state.curr_phrase.code == "else" then
+    state:close_tags(function(e) return e == "end" end)
+  else
+    state:close_tags()
+  end
   if state.curr_phrase.operator == "silent_script" then
     state.buffer:code(state.curr_phrase.code)
     local ending = ending_for(state)
