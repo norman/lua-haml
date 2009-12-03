@@ -17,37 +17,41 @@ function render_attributes(attr)
   return table.concat(buffer, " ")
 end
 
-function interpolate(str)
-  if type(str) ~= "string" then return str end
-  -- match position, then "#" followed by balanced "{}"
-  return str:gsub('([\\]*)#()(%b{})', function(a, b, c)
+function interpolate(env)
+  local function f(str)
+    if type(str) ~= "string" then return str end
+    -- match position, then "#" followed by balanced "{}"
+    return str:gsub('([\\]*)#()(%b{})', function(a, b, c)
 
-    local function interp()
-      -- load stuff between braces, and prepend "return" so that "#{var}" can be printed
-      local code = c:sub(2, c:len()-1)
-      local env = getfenv()
-      -- avoid doing an eval if we're simply returning a value that's in scope
-      if env[code] then
-        return env[code]
+      local function interp()
+        -- load stuff between braces, and prepend "return" so that "#{var}" can be printed
+        local code = c:sub(2, c:len()-1)
+        local env = getfenv()
+        -- avoid doing an eval if we're simply returning a value that's in scope
+        if env[code] then
+          return env[code]
+        end
+        local func = loadstring("return " .. code)
+        setfenv(func, env)
+        return assert(func)()
       end
-      local func = loadstring("return " .. code)
-      setfenv(func, env)
-      return assert(func)()
-    end
 
-    -- if the character before the match is backslash, then don't interpolate
-    if a:match "\\" then
-      if a:len() == 1 then
-        return '#' .. c
-      elseif a:len() % 2 == 0 then
-        return a:sub(1, a:len() / 2) .. interp()
-      else
-        local prefix = a:len() == 1 and "" or a:sub(0, a:len() / 2)
-        return prefix .. '#' .. c
+      -- if the character before the match is backslash, then don't interpolate
+      if a:match "\\" then
+        if a:len() == 1 then
+          return '#' .. c
+        elseif a:len() % 2 == 0 then
+          return a:sub(1, a:len() / 2) .. interp()
+        else
+          local prefix = a:len() == 1 and "" or a:sub(0, a:len() / 2)
+          return prefix .. '#' .. c
+        end
       end
-    end
-    return interp()
-  end)
+      return interp()
+    end)
+  end
+  setfenv(f, env)
+  return f
 end
 
 local function partial(options, buffer, env)
@@ -79,8 +83,9 @@ function render(precompiled, options, locals)
   env.print = function(str)
     table.insert(buffer, str)
   end
-  env.partial = partial(options, buffer, env)
   env.yield = yield(buffer)
+  env.partial = partial(options, buffer, env)
+  env.interpolate = interpolate(env)
   local func = loadstring(precompiled)
   setfenv(func, env)
   func()
