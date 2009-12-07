@@ -1,23 +1,31 @@
 module("haml.renderer", package.seeall)
 
-function render_attributes(attr)
-  local buffer = {""}
-  for k, v in ext.sorted_pairs(attr) do
-    if type(v) == "table" then
-      if k == "class" then
-        table.sort(v)
-        table.insert(buffer, string.format("%s='%s'", k, table.concat(v, ' ')))
-      elseif k == "id" then
-        table.insert(buffer, string.format("%s='%s'", k, table.concat(v, '_')))
+local function render_attributes(options)
+  return function(attr)
+    local buffer = {""}
+    for k, v in ext.sorted_pairs(attr) do
+      if type(v) == "table" then
+        if k == "class" then
+          table.sort(v)
+          table.insert(buffer, string.format("%s='%s'", k, table.concat(v, ' ')))
+        elseif k == "id" then
+          table.insert(buffer, string.format("%s='%s'", k, table.concat(v, '_')))
+        end
+      elseif type(v) == "boolean" then
+        if options.format == "xhtml" then
+          table.insert(buffer, string.format("%s='%s'", k, k))
+        else
+          table.insert(buffer, k)
+        end
+      else
+        table.insert(buffer, string.format("%s='%s'", k, tostring(v)))
       end
-    else
-      table.insert(buffer, string.format("%s='%s'", k, v))
     end
+    return table.concat(buffer, " ")
   end
-  return table.concat(buffer, " ")
 end
 
-function interpolate(env)
+local function interpolate(env)
   local function f(str)
     if type(str) ~= "string" then return str end
     -- match position, then "#" followed by balanced "{}"
@@ -65,7 +73,7 @@ local function partial(options, buffer, env)
   end
 end
 
-function yield(buffer)
+local function yield(buffer)
   return function(content)
     return ext.strip(content:gsub("\n", "\n" .. buffer[#buffer]))
   end
@@ -75,7 +83,7 @@ end
 function render(precompiled, options, locals)
   local buffer = {}
   local locals = locals or {}
-  local options = ext.merge_tables(options, haml.default_options)
+  local options = ext.merge_tables(haml.default_options, options)
   local env = {}
   setmetatable(env, {__index = function(t, key)
     return locals[key] or _M[key] or _G[key]
@@ -87,6 +95,7 @@ function render(precompiled, options, locals)
   env.partial = partial(options, buffer, env)
   env.interpolate = interpolate(env)
   env.escape_html = ext.escape_html
+  env.render_attributes = render_attributes(options)
   local func = assert(loadstring(precompiled))
   setfenv(func, env)
   func()

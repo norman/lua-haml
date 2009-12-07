@@ -42,6 +42,7 @@ The following features of Ruby's Haml are working in Lua Haml:
 * Conditional comments
 * Escaping HTML
 * Unescaping HTML
+* Boolean attributes
 
 ### To do
 
@@ -49,7 +50,6 @@ The following features of Ruby's Haml are not yet working in Lua Haml:
 
 * Options: suppress\_eval, attr\_wrapper, preserve
 * Attribute methods
-* Boolean attributes
 * Whitespace removal
 * Whitespace preservation (implicit)
 * Multiline content
