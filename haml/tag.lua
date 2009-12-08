@@ -26,7 +26,7 @@ local function should_close_inline(state)
   return state.curr_phrase.inline_content or
     state.curr_phrase.inline_code or
     not state.next_phrase or
-    state.next_phrase.space == state.curr_phrase.space
+    state.next_phrase.space <= state.curr_phrase.space
 end
 
 -- Precompile an (X)HTML tag for the current precompiler state.

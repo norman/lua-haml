@@ -16,7 +16,7 @@ end
 
 function code_for(state)
   if state.curr_phrase.code == "else" then
-    state:close_tags(function(e) return not tostring(e):match("^</") end)
+    state:close_tags(function(e) return not tostring(e):match("^<") end)
   else
     state:close_tags()
   end
