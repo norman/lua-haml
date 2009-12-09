@@ -21,7 +21,7 @@ local function string_buffer(adapter)
     table.insert(self.buffer, adapter.newline())
   end
 
-  --- Add a string to the buffer, wrapped in a print() statement.
+  --- Add a string to the buffer, wrapped in a buffer() statement.
   -- @param value The string to add.
   -- @param opts A table of optiions:
   -- <ul>

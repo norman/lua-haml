@@ -59,7 +59,7 @@ function tag_for(state)
       if c.inline_content then
         state.buffer:string(ext.strip(c.inline_content), {interpolate = true})
       elseif c.inline_code then
-        state.buffer:code('print(interpolate(' .. c.inline_code .. '))')
+        state.buffer:code('buffer(interpolate(' .. c.inline_code .. '))')
       end
       state.buffer:string(state.endings:pop())
     end

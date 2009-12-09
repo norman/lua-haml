@@ -29,9 +29,9 @@ function code_for(state)
   elseif state.curr_phrase.operator == "script" then
     state.buffer:string(state.options.indent:rep(state.endings:indent_level()))
     if should_escape(state) then
-      state.buffer:code(string.format('print(escape_html(%s))', state.curr_phrase.code))
+      state.buffer:code(string.format('buffer(escape_html(%s))', state.curr_phrase.code))
     else
-      state.buffer:code(string.format('print(%s)', state.curr_phrase.code))
+      state.buffer:code(string.format('buffer(%s)', state.curr_phrase.code))
     end
     state.buffer:newline()
   end

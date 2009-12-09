@@ -32,7 +32,7 @@ function get_adapter(options)
   local adapter = {}
 
   function adapter.newline()
-    return 'print "\\n"'
+    return 'buffer "\\n"'
   end
 
   function adapter.code(value)
@@ -40,14 +40,14 @@ function get_adapter(options)
   end
 
   function adapter.string(value, opts)
-    local code = "print(%s)"
-    if opts.interpolate then code = "print(interpolate(%s))" end
+    local code = "buffer(%s)"
+    if opts.interpolate then code = "buffer(interpolate(%s))" end
     return code:format(string.format("%q", value))
   end
 
   --- Format tables into tag attributes.
   function adapter.format_attributes(...)
-    return 'print(render_attributes(' .. serialize_table(ext.join_tables(...), {interpolate = true}) .. '))'
+    return 'buffer(render_attributes(' .. serialize_table(ext.join_tables(...), {interpolate = true}) .. '))'
   end
 
   function adapter.ending_for(code)

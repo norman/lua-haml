@@ -62,42 +62,42 @@ local function interpolate(env)
   return f
 end
 
-local function partial(options, buffer, env)
+local function partial(options, __buffer, env)
   return function(file, locals)
     local locals = locals or {}
     setmetatable(locals, {__index = env})
     return haml.render_file(string.format("%s.haml", file), options, locals):gsub(
       -- if we're in a partial, by definition the last entry added to the buffer
       -- will be the current spaces
-      "\n", "\n" .. buffer[#buffer])
+      "\n", "\n" .. __buffer[#__buffer])
   end
 end
 
-local function yield(buffer)
+local function yield(__buffer)
   return function(content)
-    return ext.strip(content:gsub("\n", "\n" .. buffer[#buffer]))
+    return ext.strip(content:gsub("\n", "\n" .. __buffer[#__buffer]))
   end
 end
 
 
 function render(precompiled, options, locals)
-  local buffer = {}
+  local __buffer = {}
   local locals = locals or {}
   local options = ext.merge_tables(haml.default_options, options)
   local env = {}
   setmetatable(env, {__index = function(t, key)
     return locals[key] or _M[key] or _G[key]
   end})
-  env.print = function(str)
-    table.insert(buffer, str)
+  env.buffer = function(str)
+    table.insert(__buffer, str)
   end
-  env.yield = yield(buffer)
-  env.partial = partial(options, buffer, env)
+  env.yield = yield(__buffer)
+  env.partial = partial(options, __buffer, env)
   env.interpolate = interpolate(env)
   env.escape_html = ext.escape_html
   env.render_attributes = render_attributes(options)
   local func = assert(loadstring(precompiled))
   setfenv(func, env)
   func()
-  return ext.strip(table.concat(buffer, ""))
+  return ext.strip(table.concat(__buffer, ""))
 end
