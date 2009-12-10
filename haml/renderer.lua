@@ -81,6 +81,8 @@ end
 
 
 function render(precompiled, options, locals)
+  local current_line = 0
+  local current_file = "<unknown>"
   local __buffer = {}
   local locals = locals or {}
   local options = ext.merge_tables(haml.default_options, options)
@@ -96,8 +98,14 @@ function render(precompiled, options, locals)
   env.interpolate = interpolate(env)
   env.escape_html = ext.escape_html
   env.render_attributes = render_attributes(options)
+  env.at = function(line) current_line = line end
+  env.file = function(file) current_file = file end
   local func = assert(loadstring(precompiled))
   setfenv(func, env)
-  func()
+  local succeeded, err = pcall(func)
+  if not succeeded then
+    error(string.format("\nError in %s at line %d:", current_file, current_line) ..
+      err:gsub('%[.*:', ''))
+  end
   return ext.strip(table.concat(__buffer, ""))
 end

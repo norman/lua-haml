@@ -5,9 +5,9 @@ local function ending_for(state)
 end
 
 local function should_escape(state)
-  if state.curr_phrase.script_modifier == "!" then
+  if state.curr_phrase.operator == "unescaped_script" then
     return false
-  elseif state.curr_phrase.script_modifier == "&" then
+  elseif state.curr_phrase.operator == "escaped_script" then
     return true
   else
     return state.options.escape_html
@@ -26,7 +26,7 @@ function code_for(state)
     if ending then
       state.endings:push(ending)
     end
-  elseif state.curr_phrase.operator == "script" then
+  else
     state.buffer:string(state.options.indent:rep(state.endings:indent_level()))
     if should_escape(state) then
       state.buffer:code(string.format('buffer(escape_html(%s))', state.curr_phrase.code))

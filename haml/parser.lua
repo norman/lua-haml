@@ -1,12 +1,15 @@
 --- Haml parser
 module("haml.parser", package.seeall)
-
--- Lua Haml's parser uses the Lua Parsing Expression Grammar. For more
--- information see: http://www.inf.puc-rio.br/~roberto/lpeg/lpeg.html
 require "lpeg"
 
-local P, S, R, C, Cg, Ct, Cb, Cmt, V = lpeg.P, lpeg.S, lpeg.R, lpeg.C, lpeg.Cg, lpeg.Ct, lpeg.Cb, lpeg.Cmt, lpeg.V
+-- import lpeg feature functions into current module
+for k, v in pairs(lpeg) do
+  if string.len(k) <= 3 then
+    _M[k] = v
+  end
+end
 
+local alnum               = R("az", "AZ", "09")
 local leading_whitespace  = Cg(S" \t"^0, "space")
 local inline_whitespace   = S" \t"
 local eol                 = P"\n" + "\r\n" + "\r"
@@ -18,37 +21,41 @@ local doublequoted_string = P('"' * ((1 - S '"\r\n\f\\') + (P'\\' * 1))^0 * '"')
 local quoted_string       = singlequoted_string + doublequoted_string
 
 local operator_symbols = {
-  conditional_comment = "/[",
-  escape              = "\\",
-  filter              = ":",
-  header              = "!!!",
-  markup_comment      = "/",
-  script              = "=",
+  conditional_comment = P"/[",
+  escape              = P"\\",
+  filter              = P":",
+  header              = P"!!!",
+  markup_comment      = P"/",
+  script              = P"=",
   silent_comment      = P"-#" + "--",
-  silent_script       = "-",
-  tag                 = "%"
+  silent_script       = P"-",
+  tag                 = P"%",
+  escaped_script      = P"&=",
+  unescaped_script    = P"!="
 }
 
 -- This builds a table of capture patterns that return the operator name rather
 -- than the literal operator string.
 local operators = {}
 for k, v in pairs(operator_symbols) do
-  operators[k] = Cg(P(v) / function() return k end, "operator")
+  operators[k] = Cg(v / function() return k end, "operator")
 end
 
-local script_modifier = Cg(S"&!", "script_modifier")
+local script_operator = P(
+  operators.silent_script +
+  operators.script +
+  operators.escaped_script +
+  operators.unescaped_script
+)
 
 -- (X)HTML Doctype or XML prolog
-local header =  {
-  "header";
-  prolog             = Cg(P"XML" + P"xml" / string.upper, "prolog"),
-  charset            = Cg((R("az", "AZ", "09") + S"-")^1, "charset"),
-  version            = Cg(P"1.1" + "1.0", "version"),
-  doctype            = Cg((R("az", "AZ")^1 + "5") / string.upper, "doctype"),
-  prolog_and_charset = (V"prolog" * (inline_whitespace^1 * V"charset"^1)^0),
-  doctype_or_version = V"doctype" + V"version",
-  header             = operators.header * (inline_whitespace * (V"prolog_and_charset" + V"doctype_or_version"))^0
-}
+local  prolog             = Cg(P"XML" + P"xml" / string.upper, "prolog")
+local  charset            = Cg((R("az", "AZ", "09") + S"-")^1, "charset")
+local  version            = Cg(P"1.1" + "1.0", "version")
+local  doctype            = Cg((R("az", "AZ")^1 + "5") / string.upper, "doctype")
+local  prolog_and_charset = (prolog * (inline_whitespace^1 * charset^1)^0)
+local  doctype_or_version = doctype + version
+local header = operators.header * (inline_whitespace * (prolog_and_charset + doctype_or_version))^0
 
 -- Modifiers that follow Haml markup tags
 local modifiers = {
@@ -59,7 +66,7 @@ local modifiers = {
 
 -- Markup attributes
 function parse_html_style_attributes(a)
-  local name   = C((R("az", "AZ", "09") + S".-:_")^1 )
+  local name   = C((alnum + S".-:_")^1 )
   local value  = C(quoted_string + name)
   local sep    = (P" " + eol)^1
   local assign = P'='
@@ -69,7 +76,7 @@ function parse_html_style_attributes(a)
 end
 
 function parse_ruby_style_attributes(a)
-  local name   = (R("az", "AZ", "09") + P"_")^1
+  local name   = (alnum + P"_")^1
   local key    = (P":" * C(name)) + (P":"^0 * C(quoted_string)) / function(a) local a = a:gsub('[\'"]', ""); return a end
   local value  = C(quoted_string + name)
   local sep    = inline_whitespace^0 * P"," * (P" " + eol)^0
@@ -120,18 +127,14 @@ local nested_content = Cg((Cmt(Cb("space"), function(subject, index, spaces)
   return index + match:len(), match
 end)), "content")
 
-local haml_tag = P{
-  "haml_tag";
-  alnum        = R("az", "AZ", "09"),
-  css_name     = S"-_" + V"alnum"^1,
-  class        = P"." * Ct(Cg(V"css_name"^1, "class")),
-  id           = P"#" * Ct(Cg(V"css_name"^1, "id")),
-  css          = (V"class" + V"id") * V"css"^0,
-  html_name    = R("az", "AZ", "09") + S":-_",
-  explicit_tag = "%" * Cg(V"html_name"^1, "tag"),
-  implict_tag  = Cg(-S(1) * #V"css" / function() return default_tag end, "tag"),
-  haml_tag     = (V"explicit_tag" + V"implict_tag") * Cg(Ct(V"css") / flatten_ids_and_classes, "css")^0
-}
+local  css_name     = S"-_" + alnum^1
+local  class        = P"." * Ct(Cg(css_name^1, "class"))
+local  id           = P"#" * Ct(Cg(css_name^1, "id"))
+local  css          = P{(class + id) * V(1)^0}
+local  html_name    = R("az", "AZ", "09") + S":-_"
+local  explicit_tag = "%" * Cg(html_name^1, "tag")
+local  implict_tag  = Cg(-S(1) * #css / function() return default_tag end, "tag")
+local  haml_tag     = (explicit_tag + implict_tag) * Cg(Ct(css) / flatten_ids_and_classes, "css")^0
 local inline_code = operators.script * inline_whitespace^0 * Cg(unparsed^0 / function(a) return a:gsub("\\", "\\\\") end, "inline_code")
 local inline_content = inline_whitespace^0 * Cg(unparsed, "inline_content")
 local tag_modifiers = (modifiers.self_closing + (modifiers.inner_whitespace + modifiers.outer_whitespace))
@@ -140,7 +143,7 @@ local format_chunk = (function()
   local line = 0
   return function(chunk)
     line = line + 1
-    return string.format("%d: %s", line, ext.strip(chunk))
+    return {line, ext.strip(chunk)}
   end
 end)()
 local chunk_capture = #Cg((P(1) - eol)^1 / format_chunk, "chunk")
@@ -154,7 +157,7 @@ local haml_element = chunk_capture * leading_whitespace * (
   -- Silent comment
   (operators.silent_comment) * inline_whitespace^0 * Cg(unparsed^0, "comment") * nested_content +
   -- Script
-  (operators.silent_script + (script_modifier^0 * operators.script)) * inline_whitespace^1 * Cg(unparsed^0, "code") +
+  (script_operator) * inline_whitespace^1 * Cg(unparsed^0, "code") +
   -- IE conditional comments
   (operators.conditional_comment * Cg((P(1) - "]")^1, "condition")) * "]" +
   -- Markup comment

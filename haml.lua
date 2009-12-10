@@ -38,7 +38,8 @@ default_options = {
 -- @param locals Local variable values to set for the rendered template
 function render(haml_string, options, locals)
   local phrases = haml.parser.tokenize(haml_string)
-  local template = precompiler.precompile(phrases, options)
+  local precompiler = Precompiler.new(options)
+  local template = precompiler:precompile(phrases)
   return haml.renderer.render(template, options, locals)
 end
 
@@ -50,5 +51,6 @@ function render_file(file, options, locals)
   local fh = assert(io.open(file))
   local haml_string = fh:read '*a'
   fh:close()
+  options.file = file
   return render(haml_string, options, locals)
 end

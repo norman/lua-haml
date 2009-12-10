@@ -37,6 +37,7 @@ local haml_options = {format = "xhtml"}
 
 local function read_file()
   local file = arg[#arg]
+  haml_options.file = file
   local fh = assert(io.open(file))
   local input = fh:read '*a'
   fh:close()
@@ -55,7 +56,8 @@ local function run_parser(haml_string)
 end
 
 local function run_precompiler(haml_string)
-  print(haml.precompiler.precompile(haml.parser.tokenize(haml_string), haml_options))
+  local p = Precompiler.new(haml_options)
+  print(p:precompile(haml.parser.tokenize(haml_string)))
 end
 
 local function render(haml_string)
