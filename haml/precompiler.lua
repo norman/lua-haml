@@ -1,5 +1,5 @@
 --- Haml precompiler
-module("Precompiler", package.seeall)
+module("haml.precompiler", package.seeall)
 require "haml.code"
 require "haml.comment"
 require "haml.filter"
@@ -16,16 +16,16 @@ function new(options)
     options = options,
     adapter = require(string.format("haml.%s_adapter", options.adapter)).get_adapter(options)
   }
-  setmetatable(p, {__index = Precompiler})
+  setmetatable(p, {__index = _M})
   return p
 end
 
 --- Precompile Haml into Lua code.
 -- @param phrases A table of parsed phrases produced by the parser.
-function Precompiler:precompile(phrases)
+function haml.precompiler:precompile(phrases)
 
-  self.buffer = StringBuffer.new(self.adapter)
-  self.endings = EndStack.new()
+  self.buffer = haml.string_buffer.new(self.adapter)
+  self.endings = haml.end_stack.new()
   self.curr_phrase = {}
   self.next_phrase = {}
   self.prev_phrase = {}
@@ -51,7 +51,7 @@ function Precompiler:precompile(phrases)
 
 end
 
-function Precompiler:__close_open_tags()
+function haml.precompiler:__close_open_tags()
   while self.endings:size() > 0 do
     local ending = self.endings:pop()
     if ending:match "^<" then
@@ -62,7 +62,7 @@ function Precompiler:__close_open_tags()
   end
 end
 
-function Precompiler:indent_level()
+function haml.precompiler:indent_level()
   if not self.space_sequence then
     return 0
   else
@@ -70,12 +70,12 @@ function Precompiler:indent_level()
   end
 end
 
-function Precompiler:indent_diff()
+function haml.precompiler:indent_diff()
   if not self.space_sequence then return 0 end
   return self:indent_level() - self.prev_phrase.space:len()  / self.space_sequence:len()
 end
 
-function Precompiler:indents(n)
+function haml.precompiler:indents(n)
   local l = self.endings:indent_level()
   return self.options.indent:rep(n and n + l or l)
 end
@@ -84,7 +84,7 @@ end
 -- after a certain level. For example, you can use it to close all
 -- open HTML tags and then bail when we reach an "end". This is useful
 -- for closing tags around "else" and "elseif".
-function Precompiler:close_tags(func)
+function haml.precompiler:close_tags(func)
   -- local func = func or function() return false end
   -- if the current indent level is less than the previous phrase's, close
   -- endings from the ending stack
@@ -105,14 +105,14 @@ function Precompiler:close_tags(func)
 end
 
 
-function Precompiler:__detect_whitespace_format()
+function haml.precompiler:__detect_whitespace_format()
   if self.space_sequence then return end
   if string.len(self.curr_phrase.space or '') > 0 and not self.space_sequence then
     self.space_sequence = self.curr_phrase.space
   end
 end
 
-function Precompiler:__validate_whitespace()
+function haml.precompiler:__validate_whitespace()
   if not self.space_sequence then return end
   if self.curr_phrase.space == "" then return end
   local prev_space = ''
@@ -122,7 +122,7 @@ function Precompiler:__validate_whitespace()
   ext.do_error(self.curr_phrase.chunk[2], "bad indentation")
 end
 
-function Precompiler:__handle_current_phrase()
+function haml.precompiler:__handle_current_phrase()
   if self.curr_phrase.operator == "header" then
     haml.header.header_for(self)
   elseif self.curr_phrase.operator == "filter" then

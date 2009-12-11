@@ -56,7 +56,7 @@ local function run_parser(haml_string)
 end
 
 local function run_precompiler(haml_string)
-  local p = Precompiler.new(haml_options)
+  local p = haml.precompiler.new(haml_options)
   print(p:precompile(haml.parser.tokenize(haml_string)))
 end
 

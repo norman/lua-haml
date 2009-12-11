@@ -6,7 +6,7 @@ describe("The LuaHaml Precompiler:", function()
 
     local es
     before(function()
-      es = EndStack.new()
+      es = haml.end_stack.new()
     end)
 
     it("should have an initial indent level of 0", function()

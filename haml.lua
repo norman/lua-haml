@@ -38,7 +38,7 @@ default_options = {
 -- @param locals Local variable values to set for the rendered template
 function render(haml_string, options, locals)
   local phrases = haml.parser.tokenize(haml_string)
-  local precompiler = Precompiler.new(options)
+  local precompiler = haml.precompiler.new(options)
   local template = precompiler:precompile(phrases)
   return haml.renderer.render(template, options, locals)
 end
