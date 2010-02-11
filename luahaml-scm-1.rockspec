@@ -21,16 +21,17 @@ build = {
   install = {
     lua = {
       "haml.lua",
-      ["haml.ext"]         = "haml/ext.lua",
-      ["haml.parser"]      = "haml/parser.lua",
-      ["haml.precompiler"] = "haml/precompiler.lua",
-      ["haml.renderer"]    = "haml/renderer.lua",
-      ["haml.tag"]         = "haml/tag.lua",
-      ["haml.header"]      = "haml/header.lua",
-      ["haml.code"]        = "haml/code.lua",
-      ["haml.filter"]      = "haml/filter.lua",
-      ["haml.comment"]     = "haml/comment.lua",
-      ["haml.lua_adapter"] = "haml/lua_adapter.lua"
+      ["haml.ext"]           = "haml/ext.lua",
+      ["haml.parser"]        = "haml/parser.lua",
+      ["haml.precompiler"]   = "haml/precompiler.lua",
+      ["haml.renderer"]      = "haml/renderer.lua",
+      ["haml.tag"]           = "haml/tag.lua",
+      ["haml.header"]        = "haml/header.lua",
+      ["haml.code"]          = "haml/code.lua",
+      ["haml.filter"]        = "haml/filter.lua",
+      ["haml.comment"]       = "haml/comment.lua",
+      ["haml.lua_adapter"]   = "haml/lua_adapter.lua",
+      ["haml.string_buffer"] = "haml/string_buffer.lua"
     },
     bin = {
       ["luahaml"] = "bin/luahaml"
