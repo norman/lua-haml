@@ -31,7 +31,8 @@ build = {
       ["haml.filter"]        = "haml/filter.lua",
       ["haml.comment"]       = "haml/comment.lua",
       ["haml.lua_adapter"]   = "haml/lua_adapter.lua",
-      ["haml.string_buffer"] = "haml/string_buffer.lua"
+      ["haml.string_buffer"] = "haml/string_buffer.lua",
+      ["haml.end_stack"]     = "haml/end_stack.lua"
     },
     bin = {
       ["luahaml"] = "bin/luahaml"
