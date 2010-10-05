@@ -16,8 +16,8 @@ Description:
 
 Options:
 
-  -s,     --stdin          Read from standard input
-  -i,     --inline         Read input from the command line
+  -s,     --stdin          Read from standard input, outputting processed Haml
+  -i,     --inline         Like -s, but read input from command line
   -p,     --parse          Show the parser's output for debugging
   -c,     --precompile     Show the precompiler's output for debugging
   -v,     --version        Show the LuaHaml version
@@ -28,8 +28,12 @@ Examples:
 
   Render a template:
   # luahaml my_template.haml > my_template.haml
-  Read input from the command line and show the parser's output
-  # luahaml -l -i '%p'
+
+  Read input from the command line and render
+  # luahaml -i '%p'
+
+  Read input from the command line and show the parser info
+  # luahaml -p -i '%p'
 
 ]]
 
@@ -76,7 +80,10 @@ end
 local exec_func = render
 local input_func = read_file
 
-if #arg == 0 then show_usage() end
+if #arg == 0 then
+  show_usage()
+  os.exit()
+end
 
 for i, v in ipairs(arg) do
   if v == '-c' or v == '--precompile' then
