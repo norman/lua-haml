@@ -50,7 +50,7 @@ function render_table(t)
   local buffer = {}
   for k, v in pairs(t) do
     if type(v) == "table" then v = render_table(v) end
-    insert(buffer, string.format("%s=%s", tostring(k), tostring(v)))
+    insert(buffer, ("%s=%s"):format(tostring(k), tostring(v)))
   end
   return "{" .. concat(buffer, ' ') .. "}"
 end

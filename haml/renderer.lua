@@ -23,10 +23,15 @@ local function interpolate_value(str, locals)
   -- avoid doing an eval if we're simply returning a value that's in scope
   if locals[code] then return locals[code] end
   local func = loadstring("return " .. code)
+  local env = getfenv()
+  setmetatable(env, {__index = function(table, key)
+    return locals[key] or _G[key]
+  end})
+  setfenv(func, env)
   return assert(func)()
 end
 
---- Do Ruby-style string interpolation.
+--- Does Ruby-style string interpolation.
 -- e.g.: "#{var}" will be interpreted to the value of `var`.
 function methods:interp(str)
   if type(str) ~= "string" then return str end
@@ -88,10 +93,18 @@ function methods:make_yield_func()
 end
 
 function methods:render(precompiled)
-  local func  = assert(loadstring(precompiled))
-  local env   = getfenv()
+  -- Reset state
+  self.buffer       = {}
+  self.current_line = 0
+  self.current_file = "<unknown>"
+
+  -- Load the precompiled code
+  local func = assert(loadstring(precompiled))
+  local env  = getfenv()
+
   -- the renderer object itself
-  env.r       = self
+  env.r = self
+
   -- set up DSL helper functions
   env.yield   = self:make_yield_func()
   env.partial = self:make_partial_func()
@@ -100,6 +113,9 @@ function methods:render(precompiled)
   for k, v in pairs(self.locals) do
     env[k] = v
   end
+
+  -- also make locals available directly for interpolation
+  env.locals = self.locals
 
   -- allow access to globals
   setmetatable(env, {__index = _G})
@@ -117,11 +133,8 @@ end
 
 function new(options, locals)
   local renderer = {
-    buffer       = {},
-    current_file = "<unknown>",
-    current_line = 0,
-    locals       = locals or {},
-    options      = ext.merge_tables(default_haml_options, options)
+    locals  = locals or {},
+    options = ext.merge_tables(default_haml_options, options)
   }
   return setmetatable(renderer, {__index = methods})
 end

@@ -1,2 +1,0 @@
-#!/bin/sh
-./bin/luahaml --ruby -c $1 | ./bin/ruby_renderer.rb

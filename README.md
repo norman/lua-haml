@@ -3,17 +3,14 @@
 ## About
 
 Lua Haml is an implementation of the [Haml](http://haml-lang.com) markup
-language for Lua. Though it is implemented in Lua, its design makes it easily
-adaptable to almost any language, and it includes an experimental renderer
-for Haml for Ruby. Lua Haml is "just Haml," with no extending of the original
-language.
+language for Lua.
 
 A Haml language reference can be found
 [here](http://haml-lang.com/docs/yardoc/HAML_REFERENCE.md.html).
 
 Lua Haml currently supports the main features of Ruby's Haml, and can be used
-for real work. However, many of the finer details of the language, some of them
-important, are still being implemented.
+for real work. However, some of the finer details of the language remain
+unimplemented.
 
 ### Working features
 
@@ -50,21 +47,17 @@ The following features of Ruby's Haml are not yet working in Lua Haml:
 
 * Options: suppress\_eval, attr\_wrapper, preserve
 * Attribute methods
-* Whitespace removal
+* Whitespace manipulation
 * Whitespace preservation (implicit)
 * Multiline content
-* Helpers
 
 The following features will likely not be implemented in Lua Haml:
 
 * Object reference
+* Helpers
 
 To see an example of what you can do with the currently supported features, view
 the "currently supported language" template in the spec directory.
-
-I probably won't implement [Sass](http://sass-lang.com/) for a while yet,
-possibly never. However if I do implement it, it will definitely be as a
-separate project.
 
 ## Getting it
 
@@ -86,7 +79,9 @@ To run the specs, you should also install Telescope:
 
     luarocks install telescope --from=http://luarocks.org/repositories/rocks-cvs/
 
-You can then run them using the ./bin/spec script in the repository.
+You can then run them using [Tlua](http://github.com/norman/tlua), or do
+
+    tsc `find . -name '*_spec.lua'`
 
 ## Bug reports
 
@@ -103,13 +98,14 @@ Haml](http://github.com/nex3/haml/).
 
 ## Thanks
 
-To Hampton Caitlin and Nathan Weizenbaum for their work on the original Haml.
+To Hampton Caitlin, Nathan Weizenbaum and Chris Eppstein for their work on the
+original Haml.
 
 ## License
 
 The MIT License
 
-Copyright (c) 2009 Norman Clarke
+Copyright (c) 2009-2010 Norman Clarke
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -123,7 +119,7 @@ copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS
-OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
