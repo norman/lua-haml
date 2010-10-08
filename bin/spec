@@ -1,2 +1,0 @@
-#!/bin/bash
-tsc `find . -name '*_spec.lua'`
