@@ -21,27 +21,29 @@ _G["default_haml_options"] = {
   }
 }
 
+local haml_parser      = require "haml.parser"
+local haml_precompiler = require "haml.precompiler"
+local haml_renderer    = require "haml.renderer"
+
+local assert = assert
+local open   = io.open
+
 --- An implementation of the Haml markup language for Lua.
 -- <p>
 -- For more information on Haml, please see <a href="http://haml-lang.com">The Haml website</a>
 -- and the <a href="http://haml-lang.com/docs/yardoc/HAML_REFERENCE.md.html">Haml language reference</a>.
 -- </p>
-
-module("haml", package.seeall)
-require "haml.parser"
-require "haml.precompiler"
-require "haml.renderer"
-
+module "haml"
 
 --- Render a Haml string.
 -- @param haml_string The Haml string
 -- @param options Options for the precompiler
 -- @param locals Local variable values to set for the rendered template
 function render(haml_string, options, locals)
-  local phrases = haml.parser.tokenize(haml_string)
-  local precompiler = haml.precompiler.new(options)
-  local template = precompiler:precompile(phrases)
-  local renderer = haml.renderer.new(options, locals)
+  local phrases     = haml_parser.tokenize(haml_string)
+  local precompiler = haml_precompiler.new(options)
+  local template    = precompiler:precompile(phrases)
+  local renderer    = haml_renderer.new(options, locals)
   return renderer:render(template)
 end
 
@@ -50,7 +52,7 @@ end
 -- @param options Options for the precompiler
 -- @param locals Local variable values to set for the rendered template
 function render_file(file, options, locals)
-  local fh = assert(io.open(file))
+  local fh = assert(open(file))
   local haml_string = fh:read '*a'
   fh:close()
   options.file = file
