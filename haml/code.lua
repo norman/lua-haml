@@ -15,11 +15,10 @@ local function should_escape(state)
 end
 
 function code_for(state)
-  if state.curr_phrase.code == "else" then
-    state:close_tags(function(e) return not tostring(e):match("^<") end)
-  else
+  if state.adapter.should_close(state.curr_phrase.code) then
     state:close_tags()
   end
+
   if state.curr_phrase.operator == "silent_script" then
     state.buffer:code(state.curr_phrase.code)
     local ending = ending_for(state)
@@ -29,9 +28,13 @@ function code_for(state)
   else
     state.buffer:string(state.options.indent:rep(state.endings:indent_level()))
     if should_escape(state) then
-      state.buffer:code(string.format('buffer(escape_html(%s))', state.curr_phrase.code))
+      state.buffer:code(
+        string.format('buffer(escape_html(%s))', state.curr_phrase.code)
+      )
     else
-      state.buffer:code(string.format('buffer(%s)', state.curr_phrase.code))
+      state.buffer:code(
+        string.format('buffer(%s)', state.curr_phrase.code)
+      )
     end
     state.buffer:newline()
   end
