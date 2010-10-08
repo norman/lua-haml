@@ -1,20 +1,9 @@
---- An implementation of the Haml markup language for Lua.
--- <p>
--- For more information on Haml, please see <a href="http://haml-lang.com">The Haml website</a>
--- and the <a href="http://haml-lang.com/docs/yardoc/HAML_REFERENCE.md.html">Haml language reference</a>.
--- </p>
-ext = require "haml.ext"
-module("haml", package.seeall)
-require "haml.parser"
-require "haml.precompiler"
-require "haml.renderer"
-
 --- Default Haml options.
 -- @field format The output format. Can be xhtml, html4 or html5. Defaults to xhtml.
 -- @field encoding The output encoding. Defaults to utf-8.
 -- @field newline The string value to use for newlines. Defaults to "\n".
 -- @field space The string value to use for spaces. Defaults to " ".
-default_options = {
+_G["default_haml_options"] = {
   adapter     = "lua",
   auto_close  = true,
   escape_html = false,
@@ -32,6 +21,18 @@ default_options = {
   }
 }
 
+--- An implementation of the Haml markup language for Lua.
+-- <p>
+-- For more information on Haml, please see <a href="http://haml-lang.com">The Haml website</a>
+-- and the <a href="http://haml-lang.com/docs/yardoc/HAML_REFERENCE.md.html">Haml language reference</a>.
+-- </p>
+
+module("haml", package.seeall)
+require "haml.parser"
+require "haml.precompiler"
+require "haml.renderer"
+
+
 --- Render a Haml string.
 -- @param haml_string The Haml string
 -- @param options Options for the precompiler
@@ -40,7 +41,8 @@ function render(haml_string, options, locals)
   local phrases = haml.parser.tokenize(haml_string)
   local precompiler = haml.precompiler.new(options)
   local template = precompiler:precompile(phrases)
-  return haml.renderer.render(template, options, locals)
+  local renderer = haml.renderer.new(options, locals)
+  return renderer:render(template)
 end
 
 --- Render a Haml file.

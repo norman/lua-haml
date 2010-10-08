@@ -28,9 +28,9 @@ function code_for(state)
   else
     state.buffer:string(state.options.indent:rep(state.endings:indent_level()))
     if should_escape(state) then
-      state.buffer:code(('buffer(escape_html(%s))'):format(state.curr_phrase.code))
+      state.buffer:code(('r:b(r:escape_html(%s))'):format(state.curr_phrase.code))
     else
-      state.buffer:code(('buffer(%s)'):format(state.curr_phrase.code))
+      state.buffer:code(('r:b(%s)'):format(state.curr_phrase.code))
     end
     state.buffer:newline()
   end

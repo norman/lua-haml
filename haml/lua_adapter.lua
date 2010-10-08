@@ -13,7 +13,7 @@ local function key_val(k, v, interpolate)
   if type(k) == "number" then
     return ('%s, '):format(v)
   elseif type(k) == "string" and interpolate then
-    return ('["%s"] = interpolate(%s), '):format(k, v)
+    return ('["%s"] = r:interp(%s), '):format(k, v)
   else
     return ('["%s"] = %s, '):format(k, v)
   end
@@ -42,7 +42,7 @@ function functions.should_close(code)
 end
 
 function functions.newline()
-  return 'buffer "\\n"'
+  return 'r:b "\\n"'
 end
 
 function functions.code(value)
@@ -50,14 +50,14 @@ function functions.code(value)
 end
 
 function functions.string(value, opts)
-  local code = "buffer(%s)"
-  if opts.interpolate then code = "buffer(interpolate(%s))" end
+  local code = "r:b(%s)"
+  if opts.interpolate then code = "r:b(r:interp(%s))" end
   return code:format(("%q"):format(value))
 end
 
 --- Format tables into tag attributes.
 function functions.format_attributes(...)
-  return 'buffer(render_attributes(' .. serialize_table(join_tables(...), {interpolate = true}) .. '))'
+  return 'r:b(r:attr(' .. serialize_table(join_tables(...), {interpolate = true}) .. '))'
 end
 
 function functions.ending_for(code)

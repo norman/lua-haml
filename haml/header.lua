@@ -52,7 +52,7 @@ end
 --- Returns an XML prolog or an X(HTML) doctype for the precompiler state.
 function header_for(state)
 
-  if state.next_phrase and (string.len(state.next_phrase.space) or 0) > 0 then
+  if state.next_phrase and (#(state.next_phrase.space) or 0) > 0 then
     do_error(state.curr_phrase.chunk, "you can not nest within a doctype declaration or XML prolog")
   end
 

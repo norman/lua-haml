@@ -29,7 +29,7 @@ function methods:precompile(phrases)
   self.space_sequence = nil
 
   if self.options.file then
-    self.buffer:code(("file(%q)"):format(self.options.file))
+    self.buffer:code(("r:f(%q)"):format(self.options.file))
   end
 
   for index, phrase in ipairs(phrases) do
@@ -38,7 +38,7 @@ function methods:precompile(phrases)
     self.curr_phrase = phrase
     self:__detect_whitespace_format()
     self:__validate_whitespace()
-    self.buffer:code(("at(%s)"):format(phrase.chunk[1]))
+    self.buffer:code(("r:at(%s)"):format(phrase.chunk[1]))
     self:__handle_current_phrase()
   end
 

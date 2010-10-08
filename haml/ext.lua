@@ -1,12 +1,15 @@
 local lpeg   = require "lpeg"
 
+local assert               = assert
 local concat               = table.concat
 local default_haml_options = _G["default_haml_options"]
 local insert               = table.insert
 local ipairs               = ipairs
+local loadstring           = loadstring
 local pairs                = pairs
 local select               = select
 local sort                 = table.sort
+local tostring             = tostring
 local type                 = type
 
 module "haml.ext"
@@ -130,4 +133,28 @@ end
 --- Strip leading and trailing space from a string.
 function strip(str)
   return (str:gsub("^[%s]*", ""):gsub("[%s]*$", ""))
+end
+
+function render_attributes(attributes, options)
+  local options = options or {}
+  local buffer = {""}
+  for k, v in sorted_pairs(attributes) do
+    if type(v) == "table" then
+      if k == "class" then
+        sort(v)
+        insert(buffer, ("%s='%s'"):format(k, concat(v, ' ')))
+      elseif k == "id" then
+        insert(buffer, ("%s='%s'"):format(k, concat(v, '_')))
+      end
+    elseif type(v) == "boolean" then
+      if options.format == "xhtml" then
+        insert(buffer, ("%s='%s'"):format(k, k))
+      else
+        insert(buffer, k)
+      end
+    else
+      insert(buffer, ("%s='%s'"):format(k, tostring(v)))
+    end
+  end
+  return concat(buffer, " ")
 end
