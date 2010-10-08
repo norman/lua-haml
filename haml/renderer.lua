@@ -1,3 +1,5 @@
+local ext = require "haml.ext"
+
 module("haml.renderer", package.seeall)
 
 local function render_attributes(options)
@@ -93,13 +95,14 @@ function render(precompiled, options, locals)
   env.buffer = function(str)
     table.insert(__buffer, str)
   end
-  env.yield = yield(__buffer)
-  env.partial = partial(options, __buffer, env)
-  env.interpolate = interpolate(env)
-  env.escape_html = ext.escape_html
+  env.yield             = yield(__buffer)
+  env.partial           = partial(options, __buffer, env)
+  env.interpolate       = interpolate(env)
+  env.escape_html       = ext.escape_html
   env.render_attributes = render_attributes(options)
-  env.at = function(line) current_line = line end
-  env.file = function(file) current_file = file end
+  env.at                = function(line) current_line = line end
+  env.file              = function(file) current_file = file end
+
   local func = assert(loadstring(precompiled))
   setfenv(func, env)
   local succeeded, err = pcall(func)

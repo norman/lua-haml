@@ -1,7 +1,9 @@
-module("haml.comment", package.seeall)
+local ext   = require "haml.ext"
+local strip = ext.strip
+
+module "haml.comment"
 
 function comment_for(state)
-
   state:close_tags()
 
   if state.curr_phrase.operator == "markup_comment" then
@@ -16,8 +18,7 @@ function comment_for(state)
     end
 
   elseif state.curr_phrase.operator == "conditional_comment" then
-    state.buffer:string(state:indents() .. string.format("<!--[%s]>", ext.strip(state.curr_phrase.condition)), {newline = true})
+    state.buffer:string(state:indents() .. ("<!--[%s]>"):format(strip(state.curr_phrase.condition)), {newline = true})
     state.endings:push("<![endif]-->")
   end
-
 end

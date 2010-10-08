@@ -1,9 +1,13 @@
-module("haml.end_stack", package.seeall)
+local insert       = table.insert
+local remove       = table.remove
+local setmetatable = setmetatable
+
+module "haml.end_stack"
 
 local methods = {}
 
 function methods:push(ending)
-  table.insert(self.endings, ending)
+  insert(self.endings, ending)
   if ending:match '^<' then
     self.indents = self.indents + 1
   end
@@ -11,7 +15,7 @@ end
 
 function methods:pop()
   if #self.endings == 0 then return nil end
-  local ending = table.remove(self.endings)
+  local ending = remove(self.endings)
   if ending:match '^<' then
     self.indents = self.indents - 1
   end

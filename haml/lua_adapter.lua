@@ -1,4 +1,13 @@
-module("haml.lua_adapter", package.seeall)
+local ext          = require "haml.ext"
+
+local concat       = table.concat
+local insert       = table.insert
+local join_tables  = ext.join_tables
+local pairs        = pairs
+local setmetatable = setmetatable
+local type         = type
+
+module "haml.lua_adapter"
 
 local function key_val(k, v, interpolate)
   if type(k) == "number" then
@@ -14,16 +23,16 @@ local function serialize_table(t, opts)
   local buffer = {}
   local opts   = opts or {}
 
-  table.insert(buffer, "{")
+  insert(buffer, "{")
   for k, v in pairs(t) do
     if type(v) == "table" then
-      table.insert(buffer, key_val(k, serialize_table(v, opts), opts.interpolate))
+      insert(buffer, key_val(k, serialize_table(v, opts), opts.interpolate))
     else
-      table.insert(buffer, key_val(k, v, opts.interpolate))
+      insert(buffer, key_val(k, v, opts.interpolate))
     end
   end
-  table.insert(buffer, "}")
-  return table.concat(buffer, "")
+  insert(buffer, "}")
+  return concat(buffer, "")
 end
 
 local functions = {}
@@ -43,12 +52,12 @@ end
 function functions.string(value, opts)
   local code = "buffer(%s)"
   if opts.interpolate then code = "buffer(interpolate(%s))" end
-  return code:format(string.format("%q", value))
+  return code:format(("%q"):format(value))
 end
 
 --- Format tables into tag attributes.
 function functions.format_attributes(...)
-  return 'buffer(render_attributes(' .. serialize_table(ext.join_tables(...), {interpolate = true}) .. '))'
+  return 'buffer(render_attributes(' .. serialize_table(join_tables(...), {interpolate = true}) .. '))'
 end
 
 function functions.ending_for(code)

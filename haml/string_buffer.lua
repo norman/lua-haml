@@ -1,4 +1,10 @@
-module("haml.string_buffer", package.seeall)
+local ext          = require "haml.ext"
+local concat       = table.concat
+local remove       = table.remove
+local setmetatable = setmetatable
+local strip        = ext.strip
+
+module "haml.string_buffer"
 
 local methods = {}
 
@@ -25,13 +31,13 @@ end
 
 function methods:chomp()
   if self.buffer[#self.buffer] == self.adapter:newline() then
-    table.remove(self.buffer)
+    remove(self.buffer)
   end
 end
 
 function methods:cat()
   self:chomp()
-  return ext.strip(table.concat(self.buffer, "\n"))
+  return strip(concat(self.buffer, "\n"))
 end
 
 function new(adapter)

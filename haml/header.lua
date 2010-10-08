@@ -1,4 +1,4 @@
-module("haml.header", package.seeall)
+module "haml.header"
 
 --- The HTML4 doctypes; default is 4.01 Transitional.
 html_doctypes = {
@@ -23,7 +23,7 @@ xhtml_doctypes = {
 local function prolog_for(state)
   if state.options.format:match("^html") then return nil end
   local charset = state.curr_phrase.charset or state.options.encoding
-  state.buffer:string(string.format("<?xml version='1.0' encoding='%s' ?>", charset), {newline = true})
+  state.buffer:string(("<?xml version='1.0' encoding='%s' ?>"):format(charset), {newline = true})
 end
 
 --- Returns an (X)HTML doctype for the precompiler state.

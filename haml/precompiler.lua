@@ -1,12 +1,19 @@
+local code                 = require "haml.code"
+local comment              = require "haml.comment"
+local end_stack            = require "haml.end_stack"
+local ext                  = require "haml.ext"
+local filter               = require "haml.filter"
+local header               = require "haml.header"
+local string_buffer        = require "haml.string_buffer"
+local tag                  = require "haml.tag"
+
+local default_haml_options = _G["default_haml_options"]
+local ipairs               = ipairs
+local require              = require
+local setmetatable         = setmetatable
+
 --- Haml precompiler
-module("haml.precompiler", package.seeall)
-require "haml.code"
-require "haml.comment"
-require "haml.filter"
-require "haml.header"
-require "haml.tag"
-require "haml.string_buffer"
-require "haml.end_stack"
+module "haml.precompiler"
 
 local methods = {}
 
@@ -14,15 +21,15 @@ local methods = {}
 -- @param phrases A table of parsed phrases produced by the parser.
 function methods:precompile(phrases)
 
-  self.buffer         = haml.string_buffer.new(self.adapter)
-  self.endings        = haml.end_stack.new()
+  self.buffer         = string_buffer.new(self.adapter)
+  self.endings        = end_stack.new()
   self.curr_phrase    = {}
   self.next_phrase    = {}
   self.prev_phrase    = {}
   self.space_sequence = nil
 
   if self.options.file then
-    self.buffer:code(string.format("file(%q)", self.options.file))
+    self.buffer:code(("file(%q)"):format(self.options.file))
   end
 
   for index, phrase in ipairs(phrases) do
@@ -31,7 +38,7 @@ function methods:precompile(phrases)
     self.curr_phrase = phrase
     self:__detect_whitespace_format()
     self:__validate_whitespace()
-    self.buffer:code(string.format("at(%s)", phrase.chunk[1]))
+    self.buffer:code(("at(%s)"):format(phrase.chunk[1]))
     self:__handle_current_phrase()
   end
 
@@ -93,10 +100,9 @@ function methods:close_tags(func)
   end
 end
 
-
 function methods:__detect_whitespace_format()
   if self.space_sequence then return end
-  if string.len(self.curr_phrase.space or '') > 0 and not self.space_sequence then
+  if #(self.curr_phrase.space or '') > 0 and not self.space_sequence then
     self.space_sequence = self.curr_phrase.space
   end
 end
@@ -113,19 +119,19 @@ end
 
 function methods:__handle_current_phrase()
   if self.curr_phrase.operator == "header" then
-    haml.header.header_for(self)
+    header.header_for(self)
   elseif self.curr_phrase.operator == "filter" then
-    haml.filter.filter_for(self)
+    filter.filter_for(self)
   elseif self.curr_phrase.operator == "silent_comment" then
     self:close_tags()
   elseif self.curr_phrase.operator == "markup_comment" then
-    haml.comment.comment_for(self)
+    comment.comment_for(self)
   elseif self.curr_phrase.operator == "conditional_comment" then
-    haml.comment.comment_for(self)
+    comment.comment_for(self)
   elseif self.curr_phrase.tag then
-    haml.tags.tag_for(self)
+    tag.tag_for(self)
   elseif self.curr_phrase.code then
-    haml.code.code_for(self)
+    code.code_for(self)
   elseif self.curr_phrase.unparsed then
     self:close_tags()
     self.buffer:string(self:indents() .. self.curr_phrase.unparsed, {newline = true})
@@ -135,10 +141,10 @@ end
 --- Create a new Haml precompiler
 -- @param options Precompiler options.
 function new(options)
-  options = ext.merge_tables(haml.default_options, options)
+  options = ext.merge_tables(default_haml_options, options)
   local precompiler = {
     options = options,
-    adapter = require(string.format("haml.%s_adapter", options.adapter)).get_adapter(options)
+    adapter = require(("haml.%s_adapter"):format(options.adapter)).get_adapter(options)
   }
   return setmetatable(precompiler, {__index = methods})
 end

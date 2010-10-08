@@ -1,4 +1,8 @@
-module("haml.tags", package.seeall)
+local ext    = require "haml.ext"
+local strip  = ext.strip
+local unpack = unpack
+
+module "haml.tag"
 
 --- These tags will be auto-closed if the output format is XHTML (the default).
 auto_closing_tags = {
@@ -54,10 +58,10 @@ function tag_for(state)
     end
   else
     state.buffer:string('>')
-    state.endings:push(string.format("</%s>", c.tag))
+    state.endings:push(("</%s>"):format(c.tag))
     if should_close_inline(state) then
       if c.inline_content then
-        state.buffer:string(ext.strip(c.inline_content), {interpolate = true})
+        state.buffer:string(strip(c.inline_content), {interpolate = true})
       elseif c.inline_code then
         state.buffer:code('buffer(interpolate(' .. c.inline_code .. '))')
       end

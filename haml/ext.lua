@@ -1,4 +1,15 @@
-module("haml.ext", package.seeall)
+local lpeg   = require "lpeg"
+
+local concat               = table.concat
+local default_haml_options = _G["default_haml_options"]
+local insert               = table.insert
+local ipairs               = ipairs
+local pairs                = pairs
+local select               = select
+local sort                 = table.sort
+local type                 = type
+
+module "haml.ext"
 
 -- Remove this before releasing
 function log(level, v)
@@ -6,12 +17,12 @@ function log(level, v)
 end
 
 function escape_html(str, escapes)
-  local escapes = escapes or haml.default_options.html_escapes
+  local escapes = escapes or default_haml_options.html_escapes
   local chars = {}
   for k, _ in pairs(escapes) do
-    table.insert(chars, k)
+    insert(chars, k)
   end
-  pattern = string.format("([%s])", table.concat(chars, ""))
+  pattern = ("([%s])"):format(concat(chars, ""))
   return (str:gsub(pattern, escapes))
 end
 
@@ -36,9 +47,9 @@ function render_table(t)
   local buffer = {}
   for k, v in pairs(t) do
     if type(v) == "table" then v = render_table(v) end
-    table.insert(buffer, string.format("%s=%s", tostring(k), tostring(v)))
+    insert(buffer, string.format("%s=%s", tostring(k), tostring(v)))
   end
-  return "{" .. table.concat(buffer, ' ') .. "}"
+  return "{" .. concat(buffer, ' ') .. "}"
 end
 
 --- Like pairs() but iterates over sorted table keys.
@@ -50,9 +61,9 @@ end
 function sorted_pairs(t, func)
   local keys = {}
   for key in pairs(t) do
-    table.insert(keys, key)
+    insert(keys, key)
   end
-  table.sort(keys, func)
+  sort(keys, func)
   local iterator, _, index = ipairs(keys)
   return function()
     local _, key = iterator(keys, index)
@@ -92,7 +103,7 @@ function join_tables(...)
       for k, v in pairs(t) do
         if out[k] then
           if type(out[k]) == "table" then
-            table.insert(out[k], v)
+            insert(out[k], v)
           else
             out[k] = {out[k], v}
           end
