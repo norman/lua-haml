@@ -8,27 +8,17 @@ require "haml.tag"
 require "haml.string_buffer"
 require "haml.end_stack"
 
---- Create a new Haml precompiler
--- @param options Precompiler options.
-function new(options)
-  options = ext.merge_tables(haml.default_options, options)
-  local p = {
-    options = options,
-    adapter = require(string.format("haml.%s_adapter", options.adapter)).get_adapter(options)
-  }
-  setmetatable(p, {__index = _M})
-  return p
-end
+local methods = {}
 
 --- Precompile Haml into Lua code.
 -- @param phrases A table of parsed phrases produced by the parser.
-function haml.precompiler:precompile(phrases)
+function methods:precompile(phrases)
 
-  self.buffer = haml.string_buffer.new(self.adapter)
-  self.endings = haml.end_stack.new()
-  self.curr_phrase = {}
-  self.next_phrase = {}
-  self.prev_phrase = {}
+  self.buffer         = haml.string_buffer.new(self.adapter)
+  self.endings        = haml.end_stack.new()
+  self.curr_phrase    = {}
+  self.next_phrase    = {}
+  self.prev_phrase    = {}
   self.space_sequence = nil
 
   if self.options.file then
@@ -48,10 +38,9 @@ function haml.precompiler:precompile(phrases)
   self:__close_open_tags()
 
   return self.buffer:cat()
-
 end
 
-function haml.precompiler:__close_open_tags()
+function methods:__close_open_tags()
   while self.endings:size() > 0 do
     local ending = self.endings:pop()
     if ending:match "^<" then
@@ -62,7 +51,7 @@ function haml.precompiler:__close_open_tags()
   end
 end
 
-function haml.precompiler:indent_level()
+function methods:indent_level()
   if not self.space_sequence then
     return 0
   else
@@ -70,12 +59,12 @@ function haml.precompiler:indent_level()
   end
 end
 
-function haml.precompiler:indent_diff()
+function methods:indent_diff()
   if not self.space_sequence then return 0 end
   return self:indent_level() - self.prev_phrase.space:len()  / self.space_sequence:len()
 end
 
-function haml.precompiler:indents(n)
+function methods:indents(n)
   local l = self.endings:indent_level()
   return self.options.indent:rep(n and n + l or l)
 end
@@ -84,7 +73,7 @@ end
 -- after a certain level. For example, you can use it to close all
 -- open HTML tags and then bail when we reach an "end". This is useful
 -- for closing tags around "else" and "elseif".
-function haml.precompiler:close_tags(func)
+function methods:close_tags(func)
   -- local func = func or function() return false end
   -- if the current indent level is less than the previous phrase's, close
   -- endings from the ending stack
@@ -105,14 +94,14 @@ function haml.precompiler:close_tags(func)
 end
 
 
-function haml.precompiler:__detect_whitespace_format()
+function methods:__detect_whitespace_format()
   if self.space_sequence then return end
   if string.len(self.curr_phrase.space or '') > 0 and not self.space_sequence then
     self.space_sequence = self.curr_phrase.space
   end
 end
 
-function haml.precompiler:__validate_whitespace()
+function methods:__validate_whitespace()
   if not self.space_sequence then return end
   if self.curr_phrase.space == "" then return end
   local prev_space = ''
@@ -122,7 +111,7 @@ function haml.precompiler:__validate_whitespace()
   ext.do_error(self.curr_phrase.chunk[2], "bad indentation")
 end
 
-function haml.precompiler:__handle_current_phrase()
+function methods:__handle_current_phrase()
   if self.curr_phrase.operator == "header" then
     haml.header.header_for(self)
   elseif self.curr_phrase.operator == "filter" then
@@ -141,4 +130,15 @@ function haml.precompiler:__handle_current_phrase()
     self:close_tags()
     self.buffer:string(self:indents() .. self.curr_phrase.unparsed, {newline = true})
   end
+end
+
+--- Create a new Haml precompiler
+-- @param options Precompiler options.
+function new(options)
+  options = ext.merge_tables(haml.default_options, options)
+  local precompiler = {
+    options = options,
+    adapter = require(string.format("haml.%s_adapter", options.adapter)).get_adapter(options)
+  }
+  return setmetatable(precompiler, {__index = methods})
 end

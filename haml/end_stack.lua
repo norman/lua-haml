@@ -1,23 +1,15 @@
 module("haml.end_stack", package.seeall)
 
-function new()
-  local es = {
-    endings = {},
-    indents = 0
-  }
-  setmetatable(es, {__index = _M})
-  return es
-end
+local methods = {}
 
-
-function haml.end_stack:push(ending)
+function methods:push(ending)
   table.insert(self.endings, ending)
   if ending:match '^<' then
     self.indents = self.indents + 1
   end
 end
 
-function haml.end_stack:pop()
+function methods:pop()
   if #self.endings == 0 then return nil end
   local ending = table.remove(self.endings)
   if ending:match '^<' then
@@ -26,14 +18,19 @@ function haml.end_stack:pop()
   return ending
 end
 
-function haml.end_stack:last()
+function methods:last()
   return self.endings[#self.endings]
 end
 
-function haml.end_stack:indent_level()
+function methods:indent_level()
   return self.indents
 end
 
-function haml.end_stack:size()
+function methods:size()
   return #self.endings
+end
+
+function new()
+  local endstack = {endings = {}, indents = 0}
+  return setmetatable(endstack, {__index = methods})
 end

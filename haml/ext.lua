@@ -6,12 +6,12 @@ function log(level, v)
 end
 
 function escape_html(str, escapes)
-	local escapes = escapes or haml.default_options.html_escapes
-	local chars = {}
-	for k, _ in pairs(escapes) do
-		table.insert(chars, k)
-	end
-	pattern = string.format("([%s])", table.concat(chars, ""))
+  local escapes = escapes or haml.default_options.html_escapes
+  local chars = {}
+  for k, _ in pairs(escapes) do
+    table.insert(chars, k)
+  end
+  pattern = string.format("([%s])", table.concat(chars, ""))
   return (str:gsub(pattern, escapes))
 end
 

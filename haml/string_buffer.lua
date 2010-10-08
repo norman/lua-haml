@@ -1,19 +1,12 @@
 module("haml.string_buffer", package.seeall)
 
-function new(adapter)
-  local sb = {
-    adapter = adapter,
-    buffer = {}
-  }
-  setmetatable(sb, {__index = _M})
-  return sb
-end
+local methods = {}
 
-function haml.string_buffer:code(value)
+function methods:code(value)
   self.buffer[#self.buffer + 1] = self.adapter.code(value)
 end
 
-function haml.string_buffer:newline()
+function methods:newline()
   self.buffer[#self.buffer + 1] = self.adapter.newline()
 end
 
@@ -24,19 +17,27 @@ end
 -- <li><tt>newline</tt> If true, then append a newline to the buffer after the value.</li>
 -- <li><tt>interpolate</tt> If true, then invoke string interpolation.</li>
 -- </ul>
-function haml.string_buffer:string(value, opts)
+function methods:string(value, opts)
   local opts = opts or {}
   self.buffer[#self.buffer + 1] = self.adapter.string(value, opts)
   if opts.newline then self:newline() end
 end
 
-function haml.string_buffer:chomp()
+function methods:chomp()
   if self.buffer[#self.buffer] == self.adapter:newline() then
     table.remove(self.buffer)
   end
 end
 
-function haml.string_buffer:cat()
+function methods:cat()
   self:chomp()
   return ext.strip(table.concat(self.buffer, "\n"))
+end
+
+function new(adapter)
+  local string_buffer = {
+    adapter = adapter,
+    buffer = {}
+  }
+  return setmetatable(string_buffer, {__index = methods})
 end
