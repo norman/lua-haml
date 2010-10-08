@@ -55,3 +55,4 @@ end
 
 tlua.task("spec", "Run specs", spec)
 tlua.task("autospec", "Run specs automatically as files are changed", autospec)
+tlua.default_task = "spec"
