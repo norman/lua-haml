@@ -17,7 +17,19 @@ describe("The LuaHaml Renderer", function()
   for _, t in ipairs(tests) do
     test(string.format("should render '%s' as '%s'", string.gsub(t[1], "\n", "\\n"),
         string.gsub(t[2], "\n", "\\n")), function()
-        assert_equal(haml.render(t[1], {}, locals), t[2])
+        assert_equal(t[2], haml.render(t[1], {}, locals))
     end)
   end
+
+  test("should call attribute value if a function", function()
+    local locals = {
+      get_id = function()
+        return "hello"
+      end
+    }
+    local code = "%p(id=get_id)"
+    local html = "<p id='hello'></p>"
+    assert_equal(html, haml.render(code, {}, locals))
+  end)
+
 end)

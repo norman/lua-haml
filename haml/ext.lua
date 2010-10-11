@@ -146,6 +146,8 @@ function render_attributes(attributes, options)
       elseif k == "id" then
         insert(buffer, ("%s='%s'"):format(k, concat(v, '_')))
       end
+    elseif type(v) == "function" then
+      insert(buffer, ("%s='%s'"):format(k, tostring(v())))
     elseif type(v) == "boolean" then
       if options.format == "xhtml" then
         insert(buffer, ("%s='%s'"):format(k, k))
