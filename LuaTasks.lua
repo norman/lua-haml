@@ -1,5 +1,10 @@
 local function spec()
-  os.execute("tsc `find . -name '*_spec.lua'`")
+  local params = tlua.get_params()
+  if params[1] == "-f" then
+    os.execute("tsc -f `find . -name '*_spec.lua'`")
+  else
+    os.execute("tsc `find . -name '*_spec.lua'`")
+  end
 end
 
 local function autospec()
