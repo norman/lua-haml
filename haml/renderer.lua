@@ -18,7 +18,7 @@ module "haml.renderer"
 local methods = {}
 
 local function interpolate_value(str, locals)
-  -- load stuff between braces, and prepend "return" so that "#{var}" can be printed
+  -- load stuff between braces
   local code = str:sub(2, str:len()-1)
   -- avoid doing an eval if we're simply returning a value that's in scope
   if locals[code] then return locals[code] end
@@ -32,7 +32,7 @@ local function interpolate_value(str, locals)
 end
 
 --- Does Ruby-style string interpolation.
--- e.g.: "#{var}" will be interpreted to the value of `var`.
+-- e.g.: in "hello #{var}!"
 function methods:interp(str)
   if type(str) ~= "string" then return str end
   -- match position, then "#" followed by balanced "{}"
@@ -58,7 +58,6 @@ end
 function methods:escape_html(...)
   return ext.escape_html(...)
 end
-
 
 function methods:attr(attr)
   return ext.render_attributes(attr, self.options)
@@ -100,6 +99,8 @@ function methods:render(precompiled)
 
   -- Load the precompiled code
   local func = assert(loadstring(precompiled))
+
+  -- Build environment for the template
   local env  = getfenv()
 
   -- the renderer object itself

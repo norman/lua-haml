@@ -40,6 +40,7 @@ The following features of Ruby's Haml are working in Lua Haml:
 * Escaping HTML
 * Unescaping HTML
 * Boolean attributes
+* Whitespace preservation (implicit for pre/textarea)
 
 ### To do
 
@@ -48,7 +49,6 @@ The following features of Ruby's Haml are not yet working in Lua Haml:
 * Options: suppress\_eval, attr\_wrapper, preserve
 * Attribute methods
 * Whitespace manipulation
-* Whitespace preservation (implicit)
 * Multiline content
 
 The following features will likely not be implemented in Lua Haml:

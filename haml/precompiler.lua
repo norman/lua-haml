@@ -27,6 +27,7 @@ function methods:precompile(phrases)
   self.next_phrase    = {}
   self.prev_phrase    = {}
   self.space_sequence = nil
+  self.indenting      = true
 
   if self.options.file then
     self.buffer:code(("r:f(%q)"):format(self.options.file))
@@ -47,17 +48,6 @@ function methods:precompile(phrases)
   return self.buffer:cat()
 end
 
-function methods:__close_open_tags()
-  while self.endings:size() > 0 do
-    local ending = self.endings:pop()
-    if ending:match "^<" then
-      self.buffer:string(self:indents() .. ending, {newline = true})
-    else
-      self.buffer:code(ending)
-    end
-  end
-end
-
 function methods:indent_level()
   if not self.space_sequence then
     return 0
@@ -72,6 +62,7 @@ function methods:indent_diff()
 end
 
 function methods:indents(n)
+  if self.indenting == false then return "" end
   local l = self.endings:indent_level()
   return self.options.indent:rep(n and n + l or l)
 end
@@ -88,15 +79,31 @@ function methods:close_tags(func)
     local i = self:indent_diff()
     repeat
       if func and func(self.endings:last()) then return end
-      local ending = self.endings:pop()
-      if not ending then return end
-      if ending:match "^<" then
-        self.buffer:string(self:indents() .. ending, {newline = true})
-      else
-        self.buffer:code(ending)
-      end
+        self:close_current()
       i = i + 1
     until i == 0
+  end
+end
+
+function methods:close_current()
+  local ending = self.endings:pop()
+  if not ending then return end
+  if ending:match "^<" then
+    -- support implicit whitespace preservation for pre and textare tags
+    local end_tag = ending:match("</(.*)>")
+    if tag.whitespace_preserving_tags[end_tag] then
+      self.buffer:rstrip()
+      self.indenting = true
+    end
+    self.buffer:string(self:indents() .. ending, {newline = true})
+  else
+    self.buffer:code(ending)
+  end
+end
+
+function methods:__close_open_tags()
+  while self.endings:size() > 0 do
+    self:close_current()
   end
 end
 
@@ -143,8 +150,8 @@ end
 function new(options)
   options = ext.merge_tables(default_haml_options, options)
   local precompiler = {
-    options = options,
-    adapter = require(("haml.%s_adapter"):format(options.adapter)).get_adapter(options)
+    options   = options,
+    adapter   = require(("haml.%s_adapter"):format(options.adapter)).get_adapter(options)
   }
   return setmetatable(precompiler, {__index = methods})
 end

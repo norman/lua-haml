@@ -35,6 +35,13 @@ function methods:chomp()
   end
 end
 
+function methods:rstrip()
+  self:chomp()
+  if self.buffer[#self.buffer - 1] == self.adapter:newline() then
+    remove(self.buffer, #self.buffer - 1)
+  end
+end
+
 function methods:cat()
   self:chomp()
   return strip(concat(self.buffer, "\n"))
