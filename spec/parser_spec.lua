@@ -65,7 +65,6 @@ describe("The LuaHaml parser", function()
       local output = tokenize("%p=a")
       assert_equal(output[1].inline_code, "a")
     end)
-
   end)
 
   describe("When handling Haml tags with portable-style attributes (a='b')", function()
@@ -96,18 +95,17 @@ describe("The LuaHaml parser", function()
       assert_equal(output[1].attributes[1].a, "'b)'")
     end)
 
-    -- it("should not parse attributes separated by spaces", function()
-    --   expect(tokenize, "%p(a = 'b')").should_error()
-    -- end)
+    it("should not parse attributes separated by spaces", function()
+      assert_error(function() tokenize("%p(a = 'b')") end)
+    end)
 
-    -- it("should not parse attributes separated by commas", function()
-    --   expect(tokenize, "%p(a='b', c='d')").should_error()
-    -- end)
+    it("should not parse attributes separated by commas", function()
+      assert_error(function() tokenize("%p(a='b', c='d')") end)
+    end)
 
-    -- it("should not parse quoted attribute keys", function()
-    --   expect(tokenize, "%p('a' = 'b')").should_error()
-    -- end)
-
+    it("should not parse quoted attribute keys", function()
+      assert_error(function() tokenize("%p('a' = 'b')") end)
+    end)
   end)
 
   describe("When handling silent script", function()
@@ -144,7 +142,6 @@ describe("The LuaHaml parser", function()
       local output = tokenize("-#\n  a")
       assert_equal(output[1].content, "\n  a")
     end)
-
   end)
 
   describe("When handling markup comments", function()
@@ -169,7 +166,6 @@ describe("The LuaHaml parser", function()
       assert_equal("a", output[1].unparsed)
       assert_equal("  b", output[1].content)
     end)
-
   end)
 
   describe("When handling conditional comments", function()
@@ -179,7 +175,6 @@ describe("The LuaHaml parser", function()
       assert_equal("conditional_comment", output[1].operator)
       assert_equal("if IE", output[1].condition)
     end)
-
   end)
 
   describe("When handling header instructions('!!!')", function()
@@ -215,7 +210,6 @@ describe("The LuaHaml parser", function()
       assert_equal(output[1].prolog, nil)
       assert_equal(output[1].version, nil)
     end)
-
   end)
 
   describe("When handling filtered blocks", function()
@@ -234,7 +228,5 @@ describe("The LuaHaml parser", function()
       assert_equal("javascript", output[1].filter)
       assert_equal("      alert('hello world!');", output[1].content)
     end)
-
   end)
-
 end)
