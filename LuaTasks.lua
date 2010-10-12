@@ -1,60 +1,71 @@
+local lfs       = require 'lfs'
+local path      = require 'pl.path'
+local dir       = require 'pl.dir'
+local telescope = require 'telescope'
+local socket    = require 'socket'
+
+local function sleep(n)
+  socket.select(nil, nil, n)
+end
+
+local function glob(pattern)
+  local files = {}
+  local my_dir = path.abspath(".")
+  for root, _, entries in dir.walk(my_dir) do
+    for _, entry in ipairs(dir.filter(entries, pattern)) do
+      files[path.abspath(path.join(root, entry))] = 0
+    end
+  end
+  return files
+end
+
+local function check_modified(files)
+  local return_value = false
+  for file, timestamp in pairs(files) do
+    local attr = lfs.attributes(file)
+    if attr.modification > timestamp then
+      files[file] = attr.modification
+      return_value = true
+    end
+  end
+  return return_value
+end
+
+local function run_tests(files, full_report)
+  local contexts = {}
+  for file, _ in pairs(files) do
+    telescope.load_contexts(file, contexts)
+  end
+  report_func         = full_report and telescope.test_report or telescope.summary_report
+  local results       = telescope.run(contexts)
+  local summary, data = report_func(contexts, results)
+  local errors        = telescope.error_report(contexts, results)
+  return data, summary, errors
+end
+
 local function spec()
   local params = tlua.get_params()
-  if params[1] == "-f" then
-    os.execute("tsc -f `find . -name '*_spec.lua'`")
-  else
-    os.execute("tsc `find . -name '*_spec.lua'`")
+  local data, summary, errors = run_tests(glob("*_spec.lua"), params[1] == "-f")
+  print(summary)
+  if errors then print(errors) end
+end
+
+local function test_and_notify(files, test_files)
+  if check_modified(files) then
+    local data, summary, errors = run_tests(test_files)
+    local image = data.errors + data.failed == 0 and "pass" or "fail"
+    os.execute(string.format("echo '%s' | growlnotify --name Telescope --image ~/.autotest_images/%s.png", summary, image))
+    print(summary)
+    if errors then print(errors) end
   end
 end
 
 local function autospec()
-  require 'luarocks.require'
-  require 'lfs'
-  require 'telescope'
-
-  local watchfiles = {
-    "haml.lua",
-    "haml/comment.lua",
-    "haml/ext.lua",
-    "haml/header.lua",
-    "haml/parser.lua",
-    "haml/precompiler.lua",
-    "haml/renderer.lua",
-    "haml/tag.lua",
-    "haml/code.lua",
-    "haml/filter.lua",
-    "spec/parser_spec.lua",
-    "spec/renderer_spec.lua",
-    "spec/precompiler_spec.lua",
-    "spec/haml-spec/tests.json"
-  }
-
-  local timestamps = {}
-  for _, file in pairs(watchfiles) do
-    timestamps[file] = 0
-  end
-
+  local files      = glob("*.lua")
+  local test_files = glob("*_spec.lua")
   while(true) do
-    pcall(function()
-      local run_specs = false
-      for _, file in pairs(watchfiles) do
-        local attr = lfs.attributes(file)
-        if attr.modification > timestamps[file] then
-          run_specs = true
-        end
-        timestamps[file] = attr.modification
-      end
-      if run_specs then
-        local f = assert(io.popen("tsc `find . -name '*_spec.lua'`", 'r'))
-        local s = assert(f:read('*a'))
-        print(s)
-        f:close()
-        local image = (s:match("0 fail") and s:match("0 err")) and "pass" or "fail"
-        os.execute(string.format("echo '%s' | growlnotify --name Telescope --image ~/.autotest_images/%s.png", s:gsub("\n.*", ""), image))
-        run_specs = false
-      end
-      os.execute("sleep 1")
-    end)
+    pcall(test_and_notify, files, test_files)
+    sleep(1)
   end
 end
 
