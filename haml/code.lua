@@ -26,12 +26,16 @@ function code_for(state)
       state.endings:push(ending)
     end
   else
-    state.buffer:string(state.options.indent:rep(state.endings:indent_level()))
+    if state.show_whitespace then
+      state.buffer:string(state.options.indent:rep(state.endings:indent_level()))
+    end
     if should_escape(state) then
       state.buffer:code(('r:b(r:escape_html(%s))'):format(state.curr_phrase.code))
     else
       state.buffer:code(('r:b(%s)'):format(state.curr_phrase.code))
     end
-    state.buffer:newline()
+    if state.show_whitespace then
+      state.buffer:newline()
+    end
   end
 end

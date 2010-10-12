@@ -46,6 +46,11 @@ function tag_for(state)
   -- close any open tags if need be
   state:close_tags()
 
+  -- set whitespace removal is modifier set
+  if c.inner_whitespace_modifier then
+    state.show_whitespace = false
+  end
+
   -- open the tag
   state.buffer:string(state:indents() .. '<' .. c.tag)
 
@@ -76,6 +81,8 @@ function tag_for(state)
   if whitespace_preserving_tags[c.tag] then
     state.indenting = false
   else
-    state.buffer:newline()
+    if state.show_whitespace then
+      state.buffer:newline()
+    end
   end
 end

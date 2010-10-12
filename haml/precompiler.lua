@@ -62,7 +62,9 @@ function methods:indent_diff()
 end
 
 function methods:indents(n)
-  if self.indenting == false then return "" end
+  if self.indenting == false or self.show_whitespace == false then
+    return ""
+  end
   local l = self.endings:indent_level()
   return self.options.indent:rep(n and n + l or l)
 end
@@ -72,9 +74,6 @@ end
 -- open HTML tags and then bail when we reach an "end". This is useful
 -- for closing tags around "else" and "elseif".
 function methods:close_tags(func)
-  -- local func = func or function() return false end
-  -- if the current indent level is less than the previous phrase's, close
-  -- endings from the ending stack
   if self:indent_diff() < 0 then
     local i = self:indent_diff()
     repeat
@@ -86,6 +85,12 @@ function methods:close_tags(func)
 end
 
 function methods:close_current()
+  if not self.show_whitespace then
+    self.buffer:rstrip()
+  end
+  -- reset some per-tag state settings for each chunk
+  self.show_whitespace = true
+
   local ending = self.endings:pop()
   if not ending then return end
   if ending:match "^<" then
@@ -150,8 +155,9 @@ end
 function new(options)
   options = ext.merge_tables(default_haml_options, options)
   local precompiler = {
-    options   = options,
-    adapter   = require(("haml.%s_adapter"):format(options.adapter)).get_adapter(options)
+    show_whitespace = true,
+    options         = options,
+    adapter         = require(("haml.%s_adapter"):format(options.adapter)).get_adapter(options)
   }
   return setmetatable(precompiler, {__index = methods})
 end
