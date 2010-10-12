@@ -2,6 +2,7 @@ local ext      = require "haml.ext"
 local lpeg     = require "lpeg"
 
 local concat   = table.concat
+local error    = error
 local insert   = table.insert
 local ipairs   = ipairs
 local match    = lpeg.match
