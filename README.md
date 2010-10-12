@@ -46,15 +46,21 @@ The following features of Ruby's Haml are working in Lua Haml:
 
 The following features of Ruby's Haml are not yet working in Lua Haml:
 
-* Options: suppress\_eval, attr\_wrapper, preserve
-* Attribute methods
+* Options: suppress\_eval, attr\_wrapper, preserve, encoding
 * Whitespace manipulation
 * Multiline content
 
-The following features will likely not be implemented in Lua Haml:
+The following features may eventually be implemented but are low priority:
 
-* Object reference
-* Helpers
+* Attribute methods - This feature significantly complicates the already
+  complicated task of parsing tag attributes. Also, it would have to be added to
+  Ruby-style attributes which are discouraged in Lua-Haml, or the creation of a
+  Lua-specific attribute format, which I don't want to add.
+* Helpers - Since Lua has functions as first-class values, you can add functions
+  to the locals table. In this case Lua the language provides something missing
+  from Ruby, so there's no real need to add anything specific to Lua-Haml.
+* Object reference - This feature is idiomatic to the Rails framework and
+  doesn't really apply to Lua.
 
 To see an example of what you can do with the currently supported features, view
 the "currently supported language" template in the spec directory.
