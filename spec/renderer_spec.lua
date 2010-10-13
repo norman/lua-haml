@@ -14,6 +14,7 @@ local tests = {
 
 
 describe("The LuaHaml Renderer", function()
+  local locals = {}
   for _, t in ipairs(tests) do
     test(string.format("should render '%s' as '%s'", string.gsub(t[1], "\n", "\\n"),
         string.gsub(t[2], "\n", "\\n")), function()
