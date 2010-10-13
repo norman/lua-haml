@@ -47,11 +47,12 @@ The following features of Ruby's Haml are working in Lua Haml:
 
 The following features of Ruby's Haml are not yet working in Lua Haml:
 
-* Options: suppress\_eval, attr\_wrapper, preserve, encoding
+* Options: suppress\_eval, attr\_wrapper
 * Whitespace removal around tags (`>`)
 * Multiline content
 
-The following features may eventually be implemented but are low priority:
+The following features of Ruby's Haml may eventually be implemented but are low
+priority:
 
 * Attribute methods - This feature significantly complicates the already
   complicated task of parsing tag attributes. Also, it would have to be added to
@@ -62,6 +63,11 @@ The following features may eventually be implemented but are low priority:
   from Ruby, so there's no real need to add anything specific to Lua-Haml.
 * Object reference - This feature is idiomatic to the Rails framework and
   doesn't really apply to Lua.
+* Ugly mode - Because of how Lua Haml is designed, there's no performance
+  penalty for outputting indented code. So there's no real reason to implement
+  this option.
+* Encoding comment declarations - This is Ruby 1.9 specific and not needed for
+  Lua.
 
 To see an example of what you can do with the currently supported features, view
 the "currently supported language" template in the spec directory.

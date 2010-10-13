@@ -1,17 +1,18 @@
 --- Default Haml options.
 -- @field format The output format. Can be xhtml, html4 or html5. Defaults to xhtml.
--- @field encoding The output encoding. Defaults to utf-8.
+-- @field encoding The output encoding. Defaults to utf-8. Note that this is merely informative; no recoding is done.
 -- @field newline The string value to use for newlines. Defaults to "\n".
 -- @field space The string value to use for spaces. Defaults to " ".
 _G["default_haml_options"] = {
-  adapter     = "lua",
-  auto_close  = true,
-  escape_html = false,
-  encoding    = 'utf-8',
-  format      = 'xhtml',
-  indent      = "  ",
-  newline     = "\n",
-  space       = "  ",
+  adapter      = "lua",
+  auto_close   = true,
+  escape_html  = false,
+  encoding     = "utf-8",
+  format       = "xhtml",
+  indent       = "  ",
+  newline      = "\n",
+  preserve     = {pre = true, textarea = true},
+  space        = "  ",
   html_escapes = {
     ["'"] = '&#039;',
     ['"'] = '&quot;',

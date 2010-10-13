@@ -96,7 +96,7 @@ function methods:close_current()
   if ending:match "^<" then
     -- support implicit whitespace preservation for pre and textare tags
     local end_tag = ending:match("</(.*)>")
-    if tag.whitespace_preserving_tags[end_tag] then
+    if self.options.preserve[end_tag] then
       self.buffer:rstrip()
       self.indenting = true
     end

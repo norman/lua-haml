@@ -18,11 +18,6 @@ auto_closing_tags = {
   param = true
 }
 
-whitespace_preserving_tags = {
-  pre      = true,
-  textarea = true
-}
-
 --- Whether we should auto close the tag for the current precompiler state.
 local function should_auto_close(state)
   return
@@ -78,7 +73,7 @@ function tag_for(state)
       state.buffer:string(state.endings:pop())
     end
   end
-  if whitespace_preserving_tags[c.tag] then
+  if state.options.preserve[c.tag] then
     state.indenting = false
   else
     if state.show_whitespace then
