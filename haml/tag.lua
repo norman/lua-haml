@@ -47,6 +47,12 @@ function tag_for(state)
     state.buffer.suppress_whitespace = true
   end
 
+  -- Blow away preceding whitespace when we get this modifier attached
+  -- to a tag.
+  if c.outer_whitespace_modifier then
+    state.buffer:rstrip()
+  end
+
   -- open the tag
   state.buffer:string(state:indents() .. '<' .. c.tag)
 
@@ -64,14 +70,26 @@ function tag_for(state)
     end
   else
     state.buffer:string('>')
-    state.endings:push(("</%s>"):format(c.tag))
+
+    local ending = ("</%s>"):format(c.tag)
+    if c.outer_whitespace_modifier then
+      state.endings:push(ending, function(state)
+        state.buffer:rstrip()
+      end)
+    else
+      state.endings:push(ending)
+    end
+
     if should_close_inline(state) then
       if c.inline_content then
         state.buffer:string(strip(c.inline_content), {interpolate = true})
       elseif c.inline_code then
         state.buffer:code('r:b(r:interp(' .. c.inline_code .. '))')
       end
-      state.buffer:string(state.endings:pop())
+      if c.outer_whitespace_modifier then
+        state.buffer.suppress_whitespace = true
+      end
+      state.buffer:string((state.endings:pop()))
     end
   end
   state.buffer:newline()

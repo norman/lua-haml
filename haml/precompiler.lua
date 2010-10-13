@@ -11,6 +11,7 @@ local default_haml_options = _G["default_haml_options"]
 local ipairs               = ipairs
 local require              = require
 local setmetatable         = setmetatable
+local type                 = type
 
 --- Haml precompiler
 module "haml.precompiler"
@@ -87,13 +88,15 @@ function methods:close_current()
     self.buffer.suppress_whitespace = false
   end
 
-  local ending = self.endings:pop()
+  local ending, callback = self.endings:pop()
   if not ending then return end
+
   if ending:match "^<" then
     self.buffer:string(self:indents() .. ending, {newline = true})
   else
     self.buffer:code(ending)
   end
+  if callback then callback(self) end
 end
 
 function methods:__close_open_tags()
