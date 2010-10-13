@@ -36,7 +36,7 @@ local function run_tests(files, full_report)
   for file, _ in pairs(files) do
     telescope.load_contexts(file, contexts)
   end
-  report_func         = full_report and telescope.test_report or telescope.summary_report
+  local report_func   = full_report and telescope.test_report or telescope.summary_report
   local results       = telescope.run(contexts)
   local summary, data = report_func(contexts, results)
   local errors        = telescope.error_report(contexts, results)
@@ -54,9 +54,10 @@ local function test_and_notify(files, test_files)
   if check_modified(files) then
     local data, summary, errors = run_tests(test_files)
     local image = data.errors + data.failed == 0 and "pass" or "fail"
-    os.execute(string.format("echo '%s' | growlnotify --name Telescope --image ~/.autotest_images/%s.png", summary, image))
     print(summary)
     if errors then print(errors) end
+    local command = ("echo '%s' | growlnotify --name Telescope --image ~/.autotest_images/%s.png"):format(summary, image)
+    os.execute(command)
   end
 end
 
