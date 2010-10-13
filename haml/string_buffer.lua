@@ -12,7 +12,8 @@ function methods:code(value)
   self.buffer[#self.buffer + 1] = self.adapter.code(value)
 end
 
-function methods:newline()
+function methods:newline(force)
+  if not force and self.suppress_whitespace then return end
   self.buffer[#self.buffer + 1] = self.adapter.newline()
 end
 
@@ -24,6 +25,14 @@ end
 -- <li><tt>interpolate</tt> If true, then invoke string interpolation.</li>
 -- </ul>
 function methods:string(value, opts)
+  local value = value
+  if self.suppress_whitespace then
+    if value:match("^%s*$") then
+      return
+    else
+      value = value:gsub("^%s*", "")
+    end
+  end
   local opts = opts or {}
   self.buffer[#self.buffer + 1] = self.adapter.string(value, opts)
   if opts.newline then self:newline() end
@@ -49,8 +58,9 @@ end
 
 function new(adapter)
   local string_buffer = {
-    adapter = adapter,
-    buffer = {}
+    adapter             = adapter,
+    buffer              = {},
+    suppress_whitespace = false
   }
   return setmetatable(string_buffer, {__index = methods})
 end

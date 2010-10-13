@@ -27,7 +27,6 @@ function methods:precompile(phrases)
   self.next_phrase    = {}
   self.prev_phrase    = {}
   self.space_sequence = nil
-  self.indenting      = true
 
   if self.options.file then
     self.buffer:code(("r:f(%q)"):format(self.options.file))
@@ -62,9 +61,6 @@ function methods:indent_diff()
 end
 
 function methods:indents(n)
-  if self.indenting == false or self.show_whitespace == false then
-    return ""
-  end
   local l = self.endings:indent_level()
   return self.options.indent:rep(n and n + l or l)
 end
@@ -85,21 +81,15 @@ function methods:close_tags(func)
 end
 
 function methods:close_current()
-  if not self.show_whitespace then
-    self.buffer:rstrip()
+  -- reset some per-tag state settings for each chunk.
+  if self.buffer.suppress_whitespace then
+    self.buffer:chomp()
+    self.buffer.suppress_whitespace = false
   end
-  -- reset some per-tag state settings for each chunk
-  self.show_whitespace = true
 
   local ending = self.endings:pop()
   if not ending then return end
   if ending:match "^<" then
-    -- support implicit whitespace preservation for pre and textare tags
-    local end_tag = ending:match("</(.*)>")
-    if self.options.preserve[end_tag] then
-      self.buffer:rstrip()
-      self.indenting = true
-    end
     self.buffer:string(self:indents() .. ending, {newline = true})
   else
     self.buffer:code(ending)
@@ -146,7 +136,8 @@ function methods:__handle_current_phrase()
     code.code_for(self)
   elseif self.curr_phrase.unparsed then
     self:close_tags()
-    self.buffer:string(self:indents() .. self.curr_phrase.unparsed, {newline = true})
+    self.buffer:string(self:indents() .. self.curr_phrase.unparsed)
+    self.buffer:newline(true)
   end
 end
 
@@ -155,7 +146,6 @@ end
 function new(options)
   options = ext.merge_tables(default_haml_options, options)
   local precompiler = {
-    show_whitespace = true,
     options         = options,
     adapter         = require(("haml.%s_adapter"):format(options.adapter)).get_adapter(options)
   }

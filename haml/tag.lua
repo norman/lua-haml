@@ -41,9 +41,10 @@ function tag_for(state)
   -- close any open tags if need be
   state:close_tags()
 
-  -- set whitespace removal is modifier set
-  if c.inner_whitespace_modifier then
-    state.show_whitespace = false
+  -- Set whitespace removal is modifier set or if tag is configured to
+  -- automatically preserve whitespace ("pre" and "textarea" by default).
+  if c.inner_whitespace_modifier or state.options.preserve[c.tag] then
+    state.buffer.suppress_whitespace = true
   end
 
   -- open the tag
@@ -73,11 +74,5 @@ function tag_for(state)
       state.buffer:string(state.endings:pop())
     end
   end
-  if state.options.preserve[c.tag] then
-    state.indenting = false
-  else
-    if state.show_whitespace then
-      state.buffer:newline()
-    end
-  end
+  state.buffer:newline()
 end
