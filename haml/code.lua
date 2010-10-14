@@ -4,13 +4,13 @@ local function ending_for(state)
   return state.adapter.ending_for(state.curr_phrase.code)
 end
 
+local function should_preserve(state)
+  return state.curr_phrase.operator == "preserved_script"
+end
+
 local function should_escape(state)
-  if state.curr_phrase.operator == "unescaped_script" then
-    return false
-  elseif state.curr_phrase.operator == "escaped_script" then
-    return true
-  else
-    return state.options.escape_html
+  if state.curr_phrase.operator ~= "unescaped_script" then
+    return state.curr_phrase.operator == "escaped_script" or state.options.escape_html
   end
 end
 
@@ -29,6 +29,8 @@ function code_for(state)
     state.buffer:string(state.options.indent:rep(state.endings:indent_level()))
     if should_escape(state) then
       state.buffer:code(('r:b(r:escape_html(%s))'):format(state.curr_phrase.code))
+    elseif should_preserve(state) then
+      state.buffer:code(('r:b(r:preserve_html(%s))'):format(state.curr_phrase.code))
     else
       state.buffer:code(('r:b(%s)'):format(state.curr_phrase.code))
     end

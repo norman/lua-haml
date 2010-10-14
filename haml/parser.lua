@@ -45,7 +45,8 @@ local operator_symbols = {
   silent_script       = P"-",
   tag                 = P"%",
   escaped_script      = P"&=",
-  unescaped_script    = P"!="
+  unescaped_script    = P"!=",
+  preserved_script    = P"~",
 }
 
 -- This builds a table of capture patterns that return the operator name rather
@@ -59,7 +60,8 @@ local script_operator = P(
   operators.silent_script +
   operators.script +
   operators.escaped_script +
-  operators.unescaped_script
+  operators.unescaped_script +
+  operators.preserved_script
 )
 
 -- (X)HTML Doctype or XML prolog

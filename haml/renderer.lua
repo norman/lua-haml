@@ -57,7 +57,19 @@ function methods:interp(str)
 end
 
 function methods:escape_html(...)
-  return ext.escape_html(...)
+  return ext.escape_html(..., self.options.html_escapes)
+end
+
+local function escape_newlines(a, b, c)
+  return a .. b:gsub("\n", "&#x000A;") .. c
+end
+
+function methods:preserve_html(string)
+  local string  = string
+  for tag, _ in pairs(self.options.preserve) do
+    string = string:gsub(("(<%s>)(.*)(</%s>)"):format(tag, tag), escape_newlines)
+  end
+  return string
 end
 
 function methods:attr(attr)
