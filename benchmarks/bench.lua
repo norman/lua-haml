@@ -11,31 +11,31 @@ local template = [=[
   %body
     %h1 simple markup
     %div#content
+    %ul
+      - for _, letter in ipairs({"a", "b", "c", "d", "e", "f", "g"}) do
+        %li= letter
 ]=]
 
 local start = socket.gettime()
 for i = 1,n do
-  local html = haml.render(template)
+  local engine = haml.new()
+  local html = engine:render(template)
 end
 local done = socket.gettime()
 
 print "Uncached:"
 print(("%s seconds"):format(done - start))
 
-
-local haml_parser      = require "haml.parser"
-local haml_precompiler = require "haml.precompiler"
-local haml_renderer    = require "haml.renderer"
-
 local start = socket.gettime()
 
-local phrases     = haml_parser.tokenize(template)
-local precompiler = haml_precompiler.new({})
-local compiled    = precompiler:precompile(phrases)
-local renderer    = haml_renderer.new(compiled, {})
+local engine        = haml.new()
+local phrases       = engine:parse(template)
+local compiled      = engine:compile(phrases)
+local haml_renderer = require "haml.renderer"
+local renderer      = haml_renderer.new(compiled)
 
 for i = 1,n do
-  renderer:render()
+  renderer:render(compiled)
 end
 local done = socket.gettime()
 
