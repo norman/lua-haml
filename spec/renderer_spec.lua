@@ -18,7 +18,8 @@ describe("The LuaHaml Renderer", function()
   for _, t in ipairs(tests) do
     test(string.format("should render '%s' as '%s'", string.gsub(t[1], "\n", "\\n"),
         string.gsub(t[2], "\n", "\\n")), function()
-        assert_equal(t[2], haml.render(t[1], {}, locals))
+        local engine = haml.new()
+        assert_equal(t[2], engine:render(t[1], locals))
     end)
   end
 
@@ -30,7 +31,8 @@ describe("The LuaHaml Renderer", function()
     }
     local code = "%p(id=get_id)"
     local html = "<p id='hello'></p>"
-    assert_equal(html, haml.render(code, {}, locals))
+    local engine = haml.new()
+    assert_equal(html, engine:render(code, locals))
   end)
 
 end)

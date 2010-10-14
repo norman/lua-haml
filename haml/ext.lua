@@ -20,7 +20,6 @@ function log(level, v)
 end
 
 function escape_html(str, escapes)
-  local escapes = escapes or default_haml_options.html_escapes
   local chars = {}
   for k, _ in pairs(escapes) do
     insert(chars, k)

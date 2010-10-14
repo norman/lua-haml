@@ -105,11 +105,11 @@ function methods:make_yield_func()
 end
 
 function methods:render(locals)
-  -- Reset state
+  local locals      = locals or {}
   self.buffer       = {}
   self.current_line = 0
   self.current_file = "<unknown>"
-  self.locals   = locals or {}
+  self.locals       = locals
 
   setmetatable(self.env, {__index = function(table, key)
     return locals[key] or _G[key]
@@ -130,7 +130,7 @@ end
 
 function new(precompiled, options)
   local renderer = {
-    options = ext.merge_tables(default_haml_options, options),
+    options = options,
     func    = assert(loadstring(precompiled)),
     env     = {}
   }

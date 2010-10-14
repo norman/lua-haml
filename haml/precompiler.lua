@@ -7,7 +7,6 @@ local header               = require "haml.header"
 local string_buffer        = require "haml.string_buffer"
 local tag                  = require "haml.tag"
 
-local default_haml_options = _G["default_haml_options"]
 local ipairs               = ipairs
 local require              = require
 local setmetatable         = setmetatable
@@ -147,10 +146,9 @@ end
 --- Create a new Haml precompiler
 -- @param options Precompiler options.
 function new(options)
-  options = ext.merge_tables(default_haml_options, options)
   local precompiler = {
-    options         = options,
-    adapter         = require(("haml.%s_adapter"):format(options.adapter)).get_adapter(options)
+    options = options,
+    adapter = require(("haml.%s_adapter"):format(options.adapter)).get_adapter(options)
   }
   return setmetatable(precompiler, {__index = methods})
 end
