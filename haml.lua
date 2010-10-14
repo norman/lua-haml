@@ -29,6 +29,8 @@ default_haml_options = {
   newline      = "\n",
   preserve     = {pre = true, textarea = true},
   space        = "  ",
+  -- provided for compatiblity; does nothing
+  ugly         = false,
   html_escapes = {
     ["'"] = '&#039;',
     ['"'] = '&quot;',
