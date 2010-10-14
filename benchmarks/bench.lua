@@ -1,6 +1,8 @@
 require "socket"
 require "haml"
 
+local n = 5000
+
 local template = [=[
 !!! html
 %html
@@ -12,7 +14,7 @@ local template = [=[
 ]=]
 
 local start = socket.gettime()
-for i = 1,1000 do
+for i = 1,n do
   local html = haml.render(template)
 end
 local done = socket.gettime()
@@ -30,10 +32,10 @@ local start = socket.gettime()
 local phrases     = haml_parser.tokenize(template)
 local precompiler = haml_precompiler.new({})
 local compiled    = precompiler:precompile(phrases)
-local renderer    = haml_renderer.new({}, {})
+local renderer    = haml_renderer.new(compiled, {})
 
-for i = 1,1000 do
-  renderer:render(compiled)
+for i = 1,n do
+  renderer:render()
 end
 local done = socket.gettime()
 

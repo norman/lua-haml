@@ -44,8 +44,8 @@ function render(haml_string, options, locals)
   local phrases     = haml_parser.tokenize(haml_string)
   local precompiler = haml_precompiler.new(options)
   local template    = precompiler:precompile(phrases)
-  local renderer    = haml_renderer.new(options, locals)
-  return renderer:render(template)
+  local renderer    = haml_renderer.new(template, options)
+  return renderer:render(locals)
 end
 
 --- Render a Haml file.

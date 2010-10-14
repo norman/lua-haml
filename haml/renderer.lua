@@ -12,6 +12,7 @@ local pcall        = pcall
 local setfenv      = setfenv
 local setmetatable = setmetatable
 local sorted_pairs = ext.sorted_pairs
+local type         = type
 
 module "haml.renderer"
 
@@ -91,40 +92,18 @@ function methods:make_yield_func()
   end
 end
 
-function methods:render(precompiled)
+function methods:render(locals)
   -- Reset state
   self.buffer       = {}
   self.current_line = 0
   self.current_file = "<unknown>"
+  self.locals   = locals or {}
 
-  -- Load the precompiled code
-  local func = assert(loadstring(precompiled))
+  setmetatable(self.env, {__index = function(table, key)
+    return locals[key] or _G[key]
+  end})
 
-  -- Build environment for the template
-  local env  = getfenv()
-
-  -- the renderer object itself
-  env.r = self
-
-  -- set up DSL helper functions
-  env.yield   = self:make_yield_func()
-  env.partial = self:make_partial_func()
-
-  -- assign locals as env vars
-  for k, v in pairs(self.locals) do
-    env[k] = v
-  end
-
-  -- also make locals available directly for interpolation
-  env.locals = self.locals
-
-  -- allow access to globals
-  setmetatable(env, {__index = _G})
-
-  setfenv(func, env)
-
-  -- now do the actual rendering
-  local succeeded, err = pcall(func)
+  local succeeded, err = pcall(self.func)
   if not succeeded then
     error(("\nError in %s at line %d:"):format(self.current_file,
       self.current_line) .. err:gsub('%[.*:', ''))
@@ -134,12 +113,21 @@ function methods:render(precompiled)
     self.buffer[#self.buffer] = self.buffer[#self.buffer]:gsub("%s*$", "")
   end
   return concat(self.buffer, "")
+
 end
 
-function new(options, locals)
+function new(precompiled, options)
   local renderer = {
-    locals  = locals or {},
-    options = ext.merge_tables(default_haml_options, options)
+    options = ext.merge_tables(default_haml_options, options),
+    func    = assert(loadstring(precompiled)),
+    env     = {}
   }
-  return setmetatable(renderer, {__index = methods})
+  setmetatable(renderer, {__index = methods})
+  renderer.env = {
+    r       = renderer,
+    yield   = renderer:make_yield_func(),
+    partial = renderer:make_partial_func(),
+  }
+  setfenv(renderer.func, renderer.env)
+  return renderer
 end

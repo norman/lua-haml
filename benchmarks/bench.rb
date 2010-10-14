@@ -1,6 +1,8 @@
 require "benchmark"
 require "haml"
 
+n = 5000
+
 haml = "!!! html
 %html
   %head
@@ -9,7 +11,6 @@ haml = "!!! html
     %h1 simple markup
     %div#content"
 
-n = 1000
 Benchmark.bmbm do |bench|
   bench.report("haml (ugly) #{Haml::VERSION}") do
     for i in 0..n do
