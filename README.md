@@ -8,18 +8,16 @@ language for Lua.
 A Haml language reference can be found
 [here](http://haml-lang.com/docs/yardoc/HAML_REFERENCE.md.html).
 
-Lua Haml currently supports the main features of Ruby's Haml, and can be used
-for real work. Only a few small details (noted below) remain unimplemented.
+Lua Haml currently supports **all** features of Ruby's Haml other than attribute
+methods and multiline content.
 
-### Working features
-
-The following features of Ruby's Haml are working in Lua Haml:
+### The following features of Ruby's Haml are supported in Lua Haml:
 
 * Options: escape\_html, format, autoclose, encoding, suppress_eval, attribute\_wrapper
 * Plain text
 * Escapes
 * HTML elements
-* Ruby-style attributes
+* Emulated Ruby-style attributes
 * HTML-style attributes
 * Classes and id's (. and #)
 * Implicit div elements
@@ -27,11 +25,11 @@ The following features of Ruby's Haml are working in Lua Haml:
 * Doctypes and XML prologs
 * Haml comments
 * Code evaluation
-* Ruby-style string interpolation ("#{var}")
+* Emulated Ruby-style string interpolation ("#{var}")
 * Running Lua
 * Lua blocks
 * Whitespace preservation (via filter)
-* Filters: plain, javascript, preserve, escaped, lua, markdown, css, custom
+* Filters: plain, javascript, preserve, escaped, lua, markdown, css, custom, cdata
 * Partial templates. Lua Haml provides a simple default partial implementation,
   which can be overridden by frameworks as they see fit.
 * HTML comments
@@ -41,14 +39,11 @@ The following features of Ruby's Haml are working in Lua Haml:
 * Boolean attributes
 * Whitespace removal
 * Whitespace preservation (implicit for pre/textarea)
-* Configuration attribute wrapper (single quote or double quote)
-* Suppress code evaluation/interpolation
 
 ### To do
 
-The following features of Ruby's Haml are not yet working in Lua Haml:
-
-* Multiline content
+* Multiline content is the only feature left on my TODO list. I'll probably
+  finish it later tonight.
 
 The following features of Ruby's Haml may eventually be implemented but are low
 priority:
@@ -63,7 +58,7 @@ priority:
 * Object reference - This feature is idiomatic to the Rails framework and
   doesn't really apply to Lua.
 * Ugly mode - Because of how Lua Haml is designed, there's no performance
-  penalty for outputting indented code. So there's no real reason to implement
+  penalty for outputting indented code. So there's no reason to implement
   this option.
 * Encoding comment declarations - This is Ruby 1.9 specific and not needed for
   Lua.
