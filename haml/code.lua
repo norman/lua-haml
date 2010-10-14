@@ -19,6 +19,10 @@ function code_for(state)
     state:close_tags()
   end
 
+  if state.options.suppress_eval then
+    return state.buffer:newline()
+  end
+
   if state.curr_phrase.operator == "silent_script" then
     state.buffer:code(state.curr_phrase.code)
     local ending = ending_for(state)

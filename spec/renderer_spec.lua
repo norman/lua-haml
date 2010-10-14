@@ -35,4 +35,36 @@ describe("The LuaHaml Renderer", function()
     assert_equal(html, engine:render(code, locals))
   end)
 
+  test("should suppress_eval with script operators", function()
+    local code = "%p\n  = 'hello'"
+    local html = "<p>\n\n</p>"
+    local engine = haml.new({suppress_eval = true})
+    assert_equal(html, engine:render(code, locals))
+  end)
+
+  test("should suppress_eval with tag script operators", function()
+    local code = "%p= 'hello'"
+    local html = "<p></p>"
+    local engine = haml.new({suppress_eval = true})
+    assert_equal(html, engine:render(code, locals))
+  end)
+
+  test("should not interpolate when suppress_eval is set", function()
+    local code = "%p #{var}"
+    local html = "<p>#{var}</p>"
+    local engine = haml.new({suppress_eval = true})
+    assert_equal(html, engine:render(code, {var = "hello"}))
+  end)
+
+  test("should not call function attributes when suppress_eval is set", function()
+    local locals = {
+      get_id = function()
+        return "hello"
+      end
+    }
+    local code = "%p(id=get_id)"
+    local html = "<p></p>"
+    local engine = haml.new({suppress_eval = true})
+    assert_equal(html, engine:render(code, locals))
+  end)
 end)

@@ -9,8 +9,7 @@ A Haml language reference can be found
 [here](http://haml-lang.com/docs/yardoc/HAML_REFERENCE.md.html).
 
 Lua Haml currently supports the main features of Ruby's Haml, and can be used
-for real work. However, some of the finer details of the language remain
-unimplemented.
+for real work. Only a few small details (noted below) remain unimplemented.
 
 ### Working features
 
@@ -32,9 +31,9 @@ The following features of Ruby's Haml are working in Lua Haml:
 * Running Lua
 * Lua blocks
 * Whitespace preservation (via filter)
-* Filters: plain, javascript, preserve, escaped, lua, markdown, custom
+* Filters: plain, javascript, preserve, escaped, lua, markdown, css, custom
 * Partial templates. Lua Haml provides a simple default partial implementation,
-	which can be overridden by frameworks as they see fit.
+  which can be overridden by frameworks as they see fit.
 * HTML comments
 * Conditional comments
 * Escaping HTML
@@ -47,7 +46,7 @@ The following features of Ruby's Haml are working in Lua Haml:
 
 The following features of Ruby's Haml are not yet working in Lua Haml:
 
-* Options: suppress\_eval, attr\_wrapper
+* Options: attr\_wrapper
 * Multiline content
 
 The following features of Ruby's Haml may eventually be implemented but are low

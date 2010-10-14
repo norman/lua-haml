@@ -85,7 +85,9 @@ function tag_for(state)
       if c.inline_content then
         state.buffer:string(strip(c.inline_content), {interpolate = true})
       elseif c.inline_code then
-        state.buffer:code('r:b(r:interp(' .. c.inline_code .. '))')
+        if not state.options.suppress_eval then
+          state.buffer:code('r:b(r:interp(' .. c.inline_code .. '))')
+        end
       end
       if c.outer_whitespace_modifier then
         state.buffer.suppress_whitespace = true

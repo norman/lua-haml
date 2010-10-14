@@ -35,6 +35,7 @@ end
 --- Does Ruby-style string interpolation.
 -- e.g.: in "hello #{var}!"
 function methods:interp(str)
+  if self.options.suppress_eval then return str end
   if type(str) ~= "string" then return str end
   -- match position, then "#" followed by balanced "{}"
   return str:gsub('([\\]*)#()(%b{})', function(a, b, c)
