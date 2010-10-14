@@ -42,7 +42,7 @@ function psplit(s, sep)
 end
 
 function do_error(chunk, message, ...)
-  error(string.format("Haml error: " .. message, ...) .. " (around line " .. chunk .. ")")
+  error(("Haml error: " .. message):format(...) .. " (around line " .. chunk .. ")")
 end
 
 function render_table(t)

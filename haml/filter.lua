@@ -6,6 +6,7 @@ local escape_html    = ext.escape_html
 local insert         = table.insert
 local require        = require
 local strip          = ext.strip
+local do_error       = ext.do_error
 
 module "haml.filter"
 
@@ -85,8 +86,26 @@ local function plain_filter(state)
   state.buffer:newline()
 end
 
+local function css_filter(state)
+  local content = state.curr_phrase.content
+  local options = state.options
+  local indent_level = state:indent_level()
+  local buffer = {}
+  insert(buffer, state:indents() .. "<style type='text/css'>")
+  insert(buffer, change_indents(content:gsub(options.newline .. '*$', ''), 2, options))
+  insert(buffer, state:indents() .. "</style>")
+  if options.format == "xhtml" then
+    insert(buffer, 2, state:indents(1) .. "/*<![CDATA[*/")
+    insert(buffer, #buffer, state:indents(1) .. "/*]]>*/")
+  end
+  local output = concat(buffer, options.newline)
+  state.buffer:string(output, {long = true, interpolate = true})
+  state.buffer:newline()
+end
+
 filters = {
   cdata      = cdata_filter,
+  css        = css_filter,
   escaped    = escaped_filter,
   javascript = javascript_filter,
   lua        = code_filter,
