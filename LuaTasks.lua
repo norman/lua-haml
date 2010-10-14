@@ -70,6 +70,24 @@ local function autospec()
   end
 end
 
+local function compare()
+  local params = tlua.get_params()
+  local file = params[1] or "temp.haml"
+  print("Ruby:")
+  print("-----")
+  os.execute(("haml %s"):format(file))
+  print("\nLua:")
+  print("----")
+  os.execute(("./bin/luahaml %s"):format(file))
+end
+
+local function bench_compare()
+  os.execute("ruby benchmarks/bench.rb")
+  os.execute("lua benchmarks/bench.lua")
+end
+
+tlua.task("compare", "Compare Ruby and Lua Haml outputs", compare)
+tlua.task("bench_compare", "Compare speed to Ruby Haml", bench_compare)
 tlua.task("spec", "Run specs", spec)
 tlua.task("autospec", "Run specs automatically as files are changed", autospec)
 tlua.default_task = "spec"
