@@ -136,27 +136,28 @@ end
 
 function render_attributes(attributes, options)
   local options = options or {}
+  local q = options.attribute_wrapper or "'"
   local buffer = {""}
   for k, v in sorted_pairs(attributes) do
     if type(v) == "table" then
       if k == "class" then
         sort(v)
-        insert(buffer, ("%s='%s'"):format(k, concat(v, ' ')))
+        insert(buffer, ("%s=" .. q .. "%s" .. q):format(k, concat(v, ' ')))
       elseif k == "id" then
-        insert(buffer, ("%s='%s'"):format(k, concat(v, '_')))
+        insert(buffer, ("%s=" .. q .. "%s" .. q):format(k, concat(v, '_')))
       end
     elseif type(v) == "function" then
       if not options.suppress_eval then
-        insert(buffer, ("%s='%s'"):format(k, tostring(v())))
+        insert(buffer, ("%s=" .. q .. "%s" .. q):format(k, tostring(v())))
       end
     elseif type(v) == "boolean" then
       if options.format == "xhtml" then
-        insert(buffer, ("%s='%s'"):format(k, k))
+        insert(buffer, ("%s=" .. q .. "%s" .. q):format(k, k))
       else
         insert(buffer, k)
       end
     else
-      insert(buffer, ("%s='%s'"):format(k, tostring(v)))
+      insert(buffer, ("%s=" .. q .. "%s" .. q):format(k, tostring(v)))
     end
   end
   return concat(buffer, " ")

@@ -15,7 +15,7 @@ for real work. Only a few small details (noted below) remain unimplemented.
 
 The following features of Ruby's Haml are working in Lua Haml:
 
-* Options: escape\_html, format, autoclose, encoding
+* Options: escape\_html, format, autoclose, encoding, suppress_eval, attribute\_wrapper
 * Plain text
 * Escapes
 * HTML elements
@@ -41,12 +41,13 @@ The following features of Ruby's Haml are working in Lua Haml:
 * Boolean attributes
 * Whitespace removal
 * Whitespace preservation (implicit for pre/textarea)
+* Configuration attribute wrapper (single quote or double quote)
+* Suppress code evaluation/interpolation
 
 ### To do
 
 The following features of Ruby's Haml are not yet working in Lua Haml:
 
-* Options: attr\_wrapper
 * Multiline content
 
 The following features of Ruby's Haml may eventually be implemented but are low

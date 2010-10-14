@@ -20,19 +20,20 @@ module "haml"
 -- @field newline The string value to use for newlines. Defaults to "\n".
 -- @field space The string value to use for spaces. Defaults to " ".
 default_haml_options = {
-  adapter       = "lua",
-  auto_close    = true,
-  escape_html   = false,
-  encoding      = "utf-8",
-  format        = "xhtml",
-  indent        = "  ",
-  newline       = "\n",
-  preserve      = {pre = true, textarea = true},
-  space         = "  ",
-  suppress_eval = false,
+  adapter           = "lua",
+  attribute_wrapper = "'",
+  auto_close        = true,
+  escape_html       = false,
+  encoding          = "utf-8",
+  format            = "xhtml",
+  indent            = "  ",
+  newline           = "\n",
+  preserve          = {pre = true, textarea = true},
+  space             = "  ",
+  suppress_eval     = false,
   -- provided for compatiblity; does nothing
-  ugly          = false,
-  html_escapes = {
+  ugly              = false,
+  html_escapes      = {
     ["'"] = '&#039;',
     ['"'] = '&quot;',
     ['&'] = '&amp;',
