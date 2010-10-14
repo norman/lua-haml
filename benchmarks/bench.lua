@@ -1,7 +1,6 @@
 require "socket"
 require "haml"
 
-
 local template = [=[
 !!! html
 %html

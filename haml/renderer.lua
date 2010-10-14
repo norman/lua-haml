@@ -129,7 +129,11 @@ function methods:render(precompiled)
     error(("\nError in %s at line %d:"):format(self.current_file,
       self.current_line) .. err:gsub('%[.*:', ''))
   end
-  return ext.strip(concat(self.buffer, ""))
+  -- strip trailing spaces
+  if #self.buffer > 0 then
+    self.buffer[#self.buffer] = self.buffer[#self.buffer]:gsub("%s*$", "")
+  end
+  return concat(self.buffer, "")
 end
 
 function new(options, locals)
