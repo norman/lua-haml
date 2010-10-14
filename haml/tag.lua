@@ -21,6 +21,7 @@ auto_closing_tags = {
 --- Whether we should auto close the tag for the current precompiler state.
 local function should_auto_close(state)
   return
+    state.curr_phrase.self_closing_modifier or
     auto_closing_tags[state.curr_phrase.tag] and
     state.options.auto_close and
     not state.curr_phrase.inline_content
@@ -62,7 +63,7 @@ function tag_for(state)
   end
 
   -- complete the opening tag
-  if  should_auto_close(state) then
+  if should_auto_close(state) then
     if state.options.format == "xhtml" then
       state.buffer:string(' />')
     else
