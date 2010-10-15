@@ -15,6 +15,31 @@ local type                 = type
 --- Haml precompiler
 module "haml.precompiler"
 
+local function handle_current_phrase(compiler)
+  local cp = compiler.curr_phrase
+  local operator = cp.operator
+  if operator == "header" then
+    header.header_for(compiler)
+  elseif operator == "filter" then
+    filter.filter_for(compiler)
+  elseif operator == "silent_comment" then
+    compiler:close_tags()
+  elseif operator == "markup_comment" then
+    comment.comment_for(compiler)
+  elseif operator == "conditional_comment" then
+    comment.comment_for(compiler)
+  elseif cp.tag then
+    tag.tag_for(compiler)
+  elseif cp.code then
+    code.code_for(compiler)
+  elseif cp.unparsed then
+    compiler:close_tags()
+    compiler.buffer:string(compiler:indents() .. cp.unparsed)
+    compiler.buffer:newline(true)
+  end
+end
+
+
 local methods = {}
 
 --- Precompile Haml into Lua code.
@@ -39,7 +64,7 @@ function methods:precompile(phrases)
     self:__detect_whitespace_format()
     self:__validate_whitespace()
     self.buffer:code(("r:at(%d)"):format(phrase.pos))
-    self:__handle_current_phrase()
+    handle_current_phrase(self)
   end
 
   self:__close_open_tags()
@@ -119,28 +144,6 @@ function methods:__validate_whitespace()
   if self.curr_phrase.space:len() <= prev_space:len() then return end
   if self.curr_phrase.space == (prev_space .. self.space_sequence) then return end
   ext.do_error(self.curr_phrase.pos, "bad indentation")
-end
-
-function methods:__handle_current_phrase()
-  if self.curr_phrase.operator == "header" then
-    header.header_for(self)
-  elseif self.curr_phrase.operator == "filter" then
-    filter.filter_for(self)
-  elseif self.curr_phrase.operator == "silent_comment" then
-    self:close_tags()
-  elseif self.curr_phrase.operator == "markup_comment" then
-    comment.comment_for(self)
-  elseif self.curr_phrase.operator == "conditional_comment" then
-    comment.comment_for(self)
-  elseif self.curr_phrase.tag then
-    tag.tag_for(self)
-  elseif self.curr_phrase.code then
-    code.code_for(self)
-  elseif self.curr_phrase.unparsed then
-    self:close_tags()
-    self.buffer:string(self:indents() .. self.curr_phrase.unparsed)
-    self.buffer:newline(true)
-  end
 end
 
 --- Create a new Haml precompiler
