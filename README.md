@@ -8,73 +8,39 @@ language for Lua.
 A Haml language reference can be found
 [here](http://haml-lang.com/docs/yardoc/HAML_REFERENCE.md.html).
 
-Lua Haml currently supports **all** features of Ruby's Haml other than attribute
-methods and multiline content.
+Lua Haml implements almost 100% of Ruby Haml, and attempts to be as compatible
+as possible with it, with the following exceptions:
 
-### The following features of Ruby's Haml are supported in Lua Haml:
-
-* Options: escape\_html, format, autoclose, encoding, suppress_eval, attribute\_wrapper
-* Plain text
-* Escapes
-* HTML elements
-* Emulated Ruby-style attributes
-* HTML-style attributes
-* Classes and id's (. and #)
-* Implicit div elements
-* Self-closing tags
-* Doctypes and XML prologs
-* Haml comments
-* Code evaluation
-* Emulated Ruby-style string interpolation ("#{var}")
-* Running Lua
-* Lua blocks
-* Whitespace preservation (via filter)
-* Filters: plain, javascript, preserve, escaped, lua, markdown, css, custom, cdata
-* Partial templates. Lua Haml provides a simple default partial implementation,
-  which can be overridden by frameworks as they see fit.
-* HTML comments
-* Conditional comments
-* Escaping HTML
-* Unescaping HTML
-* Boolean attributes
-* Whitespace removal
-* Whitespace preservation (implicit for pre/textarea)
-
-### To do
-
-* Multiline content is the only feature left on my TODO list. I'll probably
-  finish it later tonight.
-
-The following features of Ruby's Haml may eventually be implemented but are low
-priority:
-
-* Attribute methods - This feature significantly complicates the already
-  complicated task of parsing tag attributes. Also, it would have to be added to
-  Ruby-style attributes which are discouraged in Lua-Haml, or the creation of a
+* Your script blocks are in Lua rather than Ruby, obviously.
+* A few Ruby-specific filters are not implemented, namely `:maruku`, `:ruby` and `:sass`.
+* No attribute methods. This feature would have to be added to Ruby-style
+  attributes which are discouraged in Lua-Haml, or the creation of a
   Lua-specific attribute format, which I don't want to add.
-* Helpers - Since Lua has functions as first-class values, you can add functions
-  to the locals table. In this case Lua the language provides something missing
-  from Ruby, so there's no real need to add anything specific to Lua-Haml.
-* Object reference - This feature is idiomatic to the Rails framework and
+* No object reference. This feature is idiomatic to the Rails framework and
   doesn't really apply to Lua.
-* Ugly mode - Because of how Lua Haml is designed, there's no performance
-  penalty for outputting indented code. So there's no reason to implement
-  this option.
-* Encoding comment declarations - This is Ruby 1.9 specific and not needed for
-  Lua.
+* No ugly mode. Because of how Lua Haml is designed, there's no performance
+  penalty for outputting indented code, so there's no reason to implement this
+  option.
 
-To see an example of what you can do with the currently supported features, view
-the "currently supported language" template in the spec directory.
+
+Here's a [Haml
+template](http://github.com/norman/lua-haml/tree/master/sample.haml) that uses
+most of Lua Haml's features.
+
+## TODO
+
+Lua Haml is now feature complete, but has not been formally released. At the
+moment, error checking and reporting are a bit weak, so if you have errors in
+your Haml template they can be hard to track down.
+
+Once I've had a chance to improve this area of the code, then I'll do a stable
+release.
 
 ## Getting it
 
-Install using LuaRocks:
+The easiest way to install is from the current Git master using LuaRocks:
 
-    luarocks install luahaml --from=http://luarocks.org/repositories/rocks-cvs/
-
-Don't be put off by the "CVS" in the URL, this will install the latest Lua Haml
-from the stable branch on Github.
-
+    luarocks build luahaml http://github.com/norman/lua-haml/raw/master/luahaml-scm-1.rockspec
 
 ## Hacking it
 
@@ -97,11 +63,6 @@ Please report them on the [Github issue tracker](http://github.com/norman/lua-ha
 ## Author
 
 [Norman Clarke](mailto://norman@njclarke.com)
-
-## Attributions
-
-Some of the sample files in test/samples were taken from [Ruby's
-Haml](http://github.com/nex3/haml/).
 
 ## Thanks
 

@@ -1,37 +1,47 @@
-- title = "Lua Haml: Currently Supported Language"
+- local title = "Lua Haml: Currently Supported Language"
 !!! XML
 !!!
 %html(xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en")
   %head
     %title= title
     %meta(http-equiv="Content-Type" content="text/html; charset=utf-8")
-    %style(type="text/css")
-      :plain
-        body { background-color: #fff }
-        h1 { font-size: 25px; }
-        textarea { font-family: monaco, fixed; font-size: 14px; }
+    :css
+      body { background-color: #0ff }
+      h1 { font-size: 25px; }
+      textarea { font-family: monaco, fixed; font-size: 14px; }
   %body
     %h1= title
     %p
-      This file demonstrates every implemented feature of Lua Haml.
+      This file demonstrates most of Lua Haml's features.
     %p
       If you're viewing the output and wondering what's so interesting, then
       you should probably be looking at the Haml source instead.
     #content
-      - greetings = {:en => "hello world!", :de => "hallo welt!"}
+      - local greetings = {en = "hello world!", es = "¡hola mundo!", pt = "olá mundo!"}
       %ul#greetings.multilingual
-        - greetings.each do |lang, greeting|
+        - for lang, greeting in pairs(greetings) do
           %li.greeting(class=lang)= greeting
+    %p
+      &= "<'\"escaped & escaped\"'>"
+      != "<'\"NOT escaped & escaped\"'>"
+      = "<'\"MAYBE escaped & escaped\"'> (depending on runtime options)"
     #escaped_content
       \#this content is escaped
     #stuff
       This is nested tag content.
+    -# This is a comment, which is here to explain that since Lua has no native string interpolation,
+    -# the feature is emulated in Lua Haml. In order to make a variable available for string interpolation,
+    -# you have to assign it to the "locals" table. Then you can interpolate variables inside content and
+    -# filters, which can be useful, for example, to generate Javascript:
+    - locals.greetings = greetings
     :javascript
-      var greeting_en = "#{greetings[:en]}";
-    %p "#{greetings[:en]}"
+      //alert("#{greetings.pt}");
+    %p= "#{greetings.en}"
+    %p #{greetings.en}
     #more_stuff
       %textarea(cols="100" rows="17")
         :preserve
+
                 ___           ___           ___           ___
                /\__\         /\  \         /\__\         /\__\
               /:/  /        /::\  \       /::|  |       /:/  /
@@ -48,7 +58,12 @@
                              thanks
                      to
                                           http://www.network-science.de/ascii
-  #more_stuff
+  #more_stuff(type="multline-content")
+    %p= 1 + |
+        2 + |
+        3 + |
+        4   |
+  #more_more_stuff
     :plain
       <p>
         <a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10-blue"
