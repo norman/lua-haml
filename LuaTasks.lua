@@ -52,12 +52,12 @@ end
 
 local function test_and_notify(files, test_files)
   if check_modified(files) then
-    local data, summary, errors = run_tests(test_files)
-    local image = data.errors + data.failed == 0 and "pass" or "fail"
-    print(summary)
-    if errors then print(errors) end
-    local command = ("echo '%s' | growlnotify --name Telescope --image ~/.autotest_images/%s.png"):format(summary, image)
-    os.execute(command)
+    local f = assert(io.popen("tsc `find . -name '*_spec.lua'`", 'r'))
+    local s = assert(f:read('*a'))
+    io.stdout:write(s)
+    f:close()
+    local image = (s:match("0 fail") and s:match("0 err")) and "pass" or "fail"
+    os.execute(string.format("echo '%s' | growlnotify --name Telescope --image ~/.autotest_images/%s.png", s:gsub("\n.*", ""), image))
   end
 end
 
