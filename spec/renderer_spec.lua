@@ -8,8 +8,13 @@ local tests = {
   {'%p="hello"', '<p>hello</p>'},
   {"- a = 'b'\n%p=a", "<p>b</p>"},
   {"- for k,v in pairs({a = 'a'}) do\n  %p(class=k)=v", "<p class='a'>a</p>"},
+
   -- External filters
   {":markdown\n  # a", "<h1>a</h1>"},
+
+  -- Multiline blocks
+  {"%p= 1 + |\n  2 |", "<p>3</p>"},
+
 }
 
 

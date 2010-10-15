@@ -28,7 +28,8 @@ local leading_whitespace  = Cg(S" \t"^0, "space")
 local inline_whitespace   = S" \t"
 local eol                 = P"\n" + "\r\n" + "\r"
 local empty_line          = Cg(P"", "empty_line")
-local unparsed            = Cg((1 - eol)^1, "unparsed")
+local multiline_modifier  = Cg(P"|", "multiline_modifier")
+local unparsed            = Cg((1 - eol - multiline_modifier)^1, "unparsed")
 local default_tag         = "div"
 local singlequoted_string = P("'" * ((1 - S "'\r\n\f\\") + (P'\\' * 1))^0 * "'")
 local doublequoted_string = P('"' * ((1 - S '"\r\n\f\\') + (P'\\' * 1))^0 * '"')
@@ -79,8 +80,6 @@ local modifiers = {
   inner_whitespace = Cg(P"<", "inner_whitespace_modifier"),
   outer_whitespace = Cg(P">", "outer_whitespace_modifier")
 }
-
-local multiline_modifier = Cg(P"|", "multiline_modifier")
 
 -- Markup attributes
 function parse_html_style_attributes(a)
@@ -153,7 +152,8 @@ local  html_name    = R("az", "AZ", "09") + S":-_"
 local  explicit_tag = "%" * Cg(html_name^1, "tag")
 local  implict_tag  = Cg(-S(1) * #css / function() return default_tag end, "tag")
 local  haml_tag     = (explicit_tag + implict_tag) * Cg(Ct(css) / flatten_ids_and_classes, "css")^0
-local inline_code = operators.script * inline_whitespace^0 * Cg(unparsed^0 / function(a) return a:gsub("\\", "\\\\") end, "inline_code")
+local inline_code = operators.script * inline_whitespace^0 * Cg(unparsed^0 * -multiline_modifier / function(a) return a:gsub("\\", "\\\\") end, "inline_code")
+local multiline_code = operators.script * inline_whitespace^0 * Cg(((1 - multiline_modifier)^1 * multiline_modifier)^0 / function(a) return a:gsub("%s*|%s*", " ") end, "inline_code")
 local inline_content = inline_whitespace^0 * Cg(unparsed, "inline_content")
 local tag_modifiers = (modifiers.self_closing + (modifiers.inner_whitespace + modifiers.outer_whitespace))
 
@@ -169,7 +169,7 @@ local chunk_capture = #Cg((P(1) - eol)^1 / format_chunk, "chunk")
 -- Core Haml grammar
 local haml_element = chunk_capture * leading_whitespace * (
   -- Haml markup
-  (haml_tag * attributes^0 * tag_modifiers^0 * (inline_code + inline_content)^0) +
+  (haml_tag * attributes^0 * tag_modifiers^0 * (inline_code + multiline_code + inline_content)^0) +
   -- Doctype or prolog
   (header) +
   -- Silent comment
