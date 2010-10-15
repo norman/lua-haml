@@ -4,25 +4,11 @@ local unpack = unpack
 
 module "haml.tag"
 
---- These tags will be auto-closed if the output format is XHTML (the default).
-auto_closing_tags = {
-  area  = true,
-  base  = true,
-  br    = true,
-  col   = true,
-  hr    = true,
-  img   = true,
-  input = true,
-  link  = true,
-  meta  = true,
-  param = true
-}
-
 --- Whether we should auto close the tag for the current precompiler state.
 local function should_auto_close(state)
   return
     state.curr_phrase.self_closing_modifier or
-    auto_closing_tags[state.curr_phrase.tag] and
+    state.options.auto_closing_tags[state.curr_phrase.tag] and
     state.options.auto_close and
     not state.curr_phrase.inline_content
 end

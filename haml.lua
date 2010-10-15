@@ -39,6 +39,19 @@ default_haml_options = {
     ['&'] = '&amp;',
     ['<'] = '&lt;',
     ['>'] = '&gt;'
+  },
+  --- These tags will be auto-closed if the output format is XHTML (the default).
+  auto_closing_tags = {
+    area  = true,
+    base  = true,
+    br    = true,
+    col   = true,
+    hr    = true,
+    img   = true,
+    input = true,
+    link  = true,
+    meta  = true,
+    param = true
   }
 }
 
