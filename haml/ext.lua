@@ -3,6 +3,7 @@ local lpeg   = require "lpeg"
 local assert               = assert
 local concat               = table.concat
 local default_haml_options = _G["default_haml_options"]
+local error                = error
 local insert               = table.insert
 local ipairs               = ipairs
 local loadstring           = loadstring

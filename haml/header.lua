@@ -1,3 +1,6 @@
+local ext = require "haml.ext"
+local do_error = ext.do_error
+
 module "haml.header"
 
 --- The HTML4 doctypes; default is 4.01 Transitional.
