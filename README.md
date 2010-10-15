@@ -40,7 +40,7 @@ release.
 
 The easiest way to install is from the current Git master using LuaRocks:
 
-    luarocks build luahaml http://github.com/norman/lua-haml/raw/master/luahaml-scm-1.rockspec
+    luarocks build http://github.com/norman/lua-haml/raw/master/luahaml-scm-1.rockspec
 
 ## Hacking it
 
@@ -50,7 +50,7 @@ The [Github repository](http://github.com/norman/lua-haml) is located at:
 
 To run the specs, you should also install Telescope:
 
-    luarocks install telescope --from=http://luarocks.org/repositories/rocks-cvs/
+    luarocks install telescope
 
 You can then run them using [Tlua](http://github.com/norman/tlua), or do
 
