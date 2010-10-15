@@ -22,7 +22,6 @@ as possible with it, with the following exceptions:
   penalty for outputting indented code, so there's no reason to implement this
   option.
 
-
 Here's a [Haml
 template](http://github.com/norman/lua-haml/tree/master/sample.haml) that uses
 most of Lua Haml's features.
