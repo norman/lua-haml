@@ -19,6 +19,7 @@ module "haml.renderer"
 local methods = {}
 
 local function interpolate_value(str, locals)
+  local locals = locals or {}
   -- load stuff between braces
   local code = str:sub(2, str:len()-1)
   -- avoid doing an eval if we're simply returning a value that's in scope
@@ -46,14 +47,14 @@ function methods:interp(str)
         return '#' .. c
       -- unless the backslash is also escaped by another backslash
       elseif #a % 2 == 0 then
-        return a:sub(1, #a / 2) .. interpolate_value(c, self.locals)
+        return a:sub(1, #a / 2) .. interpolate_value(c, self.env.locals)
       -- otherwise remove the escapes before outputting
       else
         local prefix = #a == 1 and "" or a:sub(0, #a / 2)
         return prefix .. '#' .. c
       end
     end
-    return interpolate_value(c, self.locals)
+    return interpolate_value(c, self.env.locals)
   end)
 end
 
@@ -110,7 +111,7 @@ function methods:render(locals)
   self.buffer       = {}
   self.current_line = 0
   self.current_file = "<unknown>"
-  self.locals       = locals
+  self.env.locals   = locals or {}
 
   setmetatable(self.env, {__index = function(table, key)
     return locals[key] or _G[key]
