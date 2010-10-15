@@ -80,6 +80,8 @@ local modifiers = {
   outer_whitespace = Cg(P">", "outer_whitespace_modifier")
 }
 
+local multiline_modifier = Cg(P"|", "multiline_modifier")
+
 -- Markup attributes
 function parse_html_style_attributes(a)
   local name   = C((alnum + S".-:_")^1 )
