@@ -23,10 +23,8 @@ for i = 1,n do
 end
 local done = socket.gettime()
 
-print "Uncached:"
+print "Compile and render:"
 print(("%s seconds"):format(done - start))
-
-local start = socket.gettime()
 
 local engine        = haml.new()
 local phrases       = engine:parse(template)
@@ -34,10 +32,11 @@ local compiled      = engine:compile(phrases)
 local haml_renderer = require "haml.renderer"
 local renderer      = haml_renderer.new(compiled)
 
+local start = socket.gettime()
 for i = 1,n do
   renderer:render(compiled)
 end
 local done = socket.gettime()
 
-print "Cached:"
+print "Render:"
 print(("%s seconds"):format(done - start))

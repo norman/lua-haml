@@ -14,16 +14,18 @@ haml = '!!! html
     - ["a", "b", "c", "d", "e", "f", "g"].each do |letter|
       %li= letter'
 
+compiled = Haml::Engine.new(haml, :format => :html5, :ugly => true)
+
+
 Benchmark.bmbm do |bench|
-  bench.report("haml (ugly) #{Haml::VERSION}") do
+  bench.report("haml #{Haml::VERSION} - compile & render") do
     for i in 0..n do
       Haml::Engine.new(haml, :format => :html5, :ugly => true).render
     end
   end
-  bench.report("haml (ugly) #{Haml::VERSION} (cached)") do
-    t = Haml::Engine.new(haml, :format => :html5, :ugly => true)
+  bench.report("haml #{Haml::VERSION} - render") do
     for i in 0..n do
-      t.render
+      compiled.render
     end
   end
 end

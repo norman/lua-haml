@@ -131,7 +131,7 @@ end
 
 function new(precompiled, options)
   local renderer = {
-    options = options,
+    options = options or {},
     func    = assert(loadstring(precompiled)),
     env     = {}
   }
