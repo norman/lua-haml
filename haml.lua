@@ -64,7 +64,7 @@ function methods:render_file(file, locals)
   local haml_string = fh:read '*a'
   fh:close()
   self.options.file = file
-  return render(haml_string, locals)
+  return self:render(haml_string, locals)
 end
 
 function methods:parse(haml_string)
