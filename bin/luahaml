@@ -54,7 +54,7 @@ local function read_stdin()
 end
 
 local function run_parser(haml_string)
-  local engine  = haml.new()
+  local engine  = haml.new(haml_options)
   local phrases = engine:parse(haml_string)
   for _, t in pairs(phrases) do
     print(ext.render_table(t))
@@ -62,13 +62,13 @@ local function run_parser(haml_string)
 end
 
 local function run_precompiler(haml_string)
-  local engine   = haml.new()
+  local engine   = haml.new(haml_options)
   local compiled = engine:compile(engine:parse(haml_string))
   print(compiled)
 end
 
 local function render(haml_string)
-  local engine = haml.new()
+  local engine = haml.new(haml_options)
   local output = engine:render(haml_string, haml_options)
   print(output)
 end
