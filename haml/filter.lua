@@ -120,7 +120,7 @@ function filter_for(state)
   if filters[state.curr_phrase.filter] then
     func = filters[state.curr_phrase.filter]
   else
-    do_error(state.curr_phrase.chunk, "No such filter \"%s\"", state.curr_phrase.filter)
+    do_error(state.curr_phrase.pos, "No such filter \"%s\"", state.curr_phrase.filter)
   end
   return func(state)
 end

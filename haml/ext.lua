@@ -41,8 +41,8 @@ function psplit(s, sep)
   return lpeg.match(p, s)
 end
 
-function do_error(chunk, message, ...)
-  error(("Haml error: " .. message):format(...) .. " (around line " .. chunk .. ")")
+function do_error(position, message, ...)
+  error(("Haml error: " .. message):format(...) .. " (at position " .. position .. ")")
 end
 
 function render_table(t)

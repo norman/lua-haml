@@ -44,7 +44,7 @@ local function doctype_for(state)
     return state.buffer:string(doctype, {newline = true})
 
   else
-    do_error(state.curr_phrase.chunk, 'don\'t understand doctype "%s"', state.curr_phrase.doctype)
+    do_error(state.curr_phrase.pos, 'don\'t understand doctype "%s"', state.curr_phrase.doctype)
   end
 
 end
@@ -53,7 +53,7 @@ end
 function header_for(state)
 
   if state.next_phrase and (#(state.next_phrase.space) or 0) > 0 then
-    do_error(state.curr_phrase.chunk, "you can not nest within a doctype declaration or XML prolog")
+    do_error(state.curr_phrase.pos, "you can not nest within a doctype declaration or XML prolog")
   end
 
   if state.curr_phrase.prolog then

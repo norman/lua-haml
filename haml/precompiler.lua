@@ -38,7 +38,7 @@ function methods:precompile(phrases)
     self.curr_phrase = phrase
     self:__detect_whitespace_format()
     self:__validate_whitespace()
-    self.buffer:code(("r:at(%s)"):format(phrase.chunk[1]))
+    self.buffer:code(("r:at(%d)"):format(phrase.pos))
     self:__handle_current_phrase()
   end
 
@@ -118,7 +118,7 @@ function methods:__validate_whitespace()
   if self.prev_phrase then prev_space = self.prev_phrase.space end
   if self.curr_phrase.space:len() <= prev_space:len() then return end
   if self.curr_phrase.space == (prev_space .. self.space_sequence) then return end
-  ext.do_error(self.curr_phrase.chunk[2], "bad indentation")
+  ext.do_error(self.curr_phrase.pos, "bad indentation")
 end
 
 function methods:__handle_current_phrase()

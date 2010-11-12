@@ -157,17 +157,8 @@ local multiline_code = operators.script * inline_whitespace^0 * Cg(((1 - multili
 local inline_content = inline_whitespace^0 * Cg(unparsed, "inline_content")
 local tag_modifiers = (modifiers.self_closing + (modifiers.inner_whitespace + modifiers.outer_whitespace))
 
-local format_chunk = (function()
-  local line = 0
-  return function(chunk)
-    line = line + 1
-    return {line, ext.strip(chunk)}
-  end
-end)()
-local chunk_capture = #Cg((P(1) - eol)^1 / format_chunk, "chunk")
-
 -- Core Haml grammar
-local haml_element = chunk_capture * leading_whitespace * (
+local haml_element = Cg(Cp(), "pos") * leading_whitespace * (
   -- Haml markup
   (haml_tag * attributes^0 * tag_modifiers^0 * (inline_code + multiline_code + inline_content)^0) +
   -- Doctype or prolog

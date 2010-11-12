@@ -78,8 +78,8 @@ function methods:attr(attr)
   return ext.render_attributes(attr, self.options)
 end
 
-function methods:at(line)
-  self.current_line = line
+function methods:at(pos)
+  self.current_pos = pos
 end
 
 function methods:f(file)
@@ -109,7 +109,7 @@ end
 function methods:render(locals)
   local locals      = locals or {}
   self.buffer       = {}
-  self.current_line = 0
+  self.current_pos  = 0
   self.current_file = "<unknown>"
   self.env.locals   = locals or {}
 
@@ -119,8 +119,8 @@ function methods:render(locals)
 
   local succeeded, err = pcall(self.func)
   if not succeeded then
-    error(("\nError in %s at line %d:"):format(self.current_file,
-      self.current_line) .. err:gsub('%[.*:', ''))
+    error(("\nError in %s at offset %d:"):format(self.current_file,
+      self.current_pos - 1) .. err:gsub('%[.*:', '') .. (" (I know this message sucks; error messages will improve soon!)"))
   end
   -- strip trailing spaces
   if #self.buffer > 0 then
