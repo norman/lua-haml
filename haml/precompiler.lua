@@ -39,7 +39,6 @@ local function handle_current_phrase(compiler)
   end
 end
 
-
 local methods = {}
 
 --- Precompile Haml into Lua code.

@@ -7,11 +7,13 @@ local error        = error
 local getfenv      = getfenv
 local insert       = table.insert
 local loadstring   = loadstring
+local open         = io.open
 local pairs        = pairs
 local pcall        = pcall
 local setfenv      = setfenv
 local setmetatable = setmetatable
 local sorted_pairs = ext.sorted_pairs
+local tostring     = tostring
 local type         = type
 
 module "haml.renderer"
@@ -110,7 +112,7 @@ function methods:render(locals)
   local locals      = locals or {}
   self.buffer       = {}
   self.current_pos  = 0
-  self.current_file = "<unknown>"
+  self.current_file = nil
   self.env.locals   = locals or {}
 
   setmetatable(self.env, {__index = function(table, key)
@@ -119,8 +121,22 @@ function methods:render(locals)
 
   local succeeded, err = pcall(self.func)
   if not succeeded then
-    error(("\nError in %s at offset %d:"):format(self.current_file,
-      self.current_pos - 1) .. err:gsub('%[.*:', '') .. (" (I know this message sucks; error messages will improve soon!)"))
+
+    local line_number
+
+    if self.current_file then
+      local file = assert(open(self.current_file, "r"))
+      local str = file:read(self.current_pos)
+      line_number = #str - #str:gsub("\n", "") + 1
+    end
+
+    error(
+      ("\nError in %s at line %s (offset %d):"):format(
+        self.current_file or "<unknown>",
+        line_number or "<unknown>",
+        self.current_pos - 1) ..
+      tostring(err):gsub('%[.*:', '')
+    )
   end
   -- strip trailing spaces
   if #self.buffer > 0 then
@@ -133,6 +149,7 @@ end
 function new(precompiled, options)
   local renderer = {
     options = options or {},
+    -- TODO: capture compile errors here and determine line number
     func    = assert(loadstring(precompiled)),
     env     = {}
   }
