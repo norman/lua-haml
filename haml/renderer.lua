@@ -10,6 +10,7 @@ local loadstring   = loadstring
 local open         = io.open
 local pairs        = pairs
 local pcall        = pcall
+local require      = require
 local setfenv      = setfenv
 local setmetatable = setmetatable
 local sorted_pairs = ext.sorted_pairs
@@ -93,9 +94,11 @@ function methods:b(string)
 end
 
 function methods:make_partial_func()
+  local renderer = self
+  local haml = require "haml"
   return function(file, locals)
-    local haml     = require "haml"
-    local rendered = haml.render_file(("%s.haml"):format(file), self.options, locals)
+    local engine   = haml.new(self.options)
+    local rendered = engine:render_file(("%s.haml"):format(file), locals)
     -- if we're in a partial, by definition the last entry added to the buffer
     -- will be the current spaces
     return rendered:gsub("\n", "\n" .. self.buffer[#self.buffer])
