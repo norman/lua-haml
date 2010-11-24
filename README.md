@@ -28,18 +28,21 @@ most of Lua Haml's features.
 
 ## TODO
 
-Lua Haml is now feature complete, but has not been formally released. At the
-moment, error checking and reporting are a bit weak, so if you have errors in
-your Haml template they can be hard to track down.
+Lua Haml is now feature complete, but is still considered beta quality. That
+said, I am using it for a production website, and will work quickly to fix any
+bugs that are reported.  So please feel free to use it for serious work - just
+not the Space Shuttle please.
 
-Once I've had a chance to improve this area of the code, then I'll do a stable
-release.
 
 ## Getting it
 
-The easiest way to install is from the current Git master using LuaRocks:
+The easiest way to install is via LuaRocks:
 
-    luarocks build http://github.com/norman/lua-haml/raw/master/luahaml-scm-1.rockspec
+    luarocks install luahaml
+
+You can also always install the latest master branch from Git via Luarocks too:
+
+    luarocks install luahaml --from=http://luarocks.org/repositories/rocks-cvs
 
 ## Hacking it
 
@@ -66,7 +69,8 @@ Please report them on the [Github issue tracker](http://github.com/norman/lua-ha
 ## Thanks
 
 To Hampton Caitlin, Nathan Weizenbaum and Chris Eppstein for their work on the
-original Haml.
+original Haml. Thanks also to Daniele Alessandri for being LuaHaml's earliest
+"real" user, and a source of constant encouragement.
 
 ## License
 
