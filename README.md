@@ -31,7 +31,7 @@ most of Lua Haml's features.
 Lua Haml is now feature complete, but is still considered beta quality. That
 said, I am using it for a production website, and will work quickly to fix any
 bugs that are reported.  So please feel free to use it for serious work - just
-not the Space Shuttle please.
+not the Space Shuttle, ok?
 
 
 ## Getting it
@@ -40,7 +40,7 @@ The easiest way to install is via LuaRocks:
 
     luarocks install luahaml
 
-You can also always install the latest master branch from Git via Luarocks too:
+You can also always install the latest master branch from Git via Luarocks:
 
     luarocks install luahaml --from=http://luarocks.org/repositories/rocks-cvs
 
