@@ -46,7 +46,7 @@ You can also always install the latest master branch from Git via Luarocks:
 
 ## Installing without Luarocks
 
-If you do not wish to use Luarocks, just put haml.lua and the haml directories
+If you do not wish to use Luarocks, just put `haml.lua` and the `haml` directories
 somewhere on your package path, and place `luahaml` somewhere in your execution
 path.
 
