@@ -44,6 +44,41 @@ You can also always install the latest master branch from Git via Luarocks:
 
     luarocks install luahaml --from=http://luarocks.org/repositories/rocks-cvs
 
+## Installing without Luarocks
+
+If you do not wish to use Luarocks, just put haml.lua and the haml directories
+somewhere on your package path, and place `luahaml` somewhere in your execution
+path.
+
+Here's one of many ways you could do this:
+
+    git clone git://github.com/norman/lua-haml.git
+    cd lua-haml
+    cp bin/luahaml ~/bin
+    cp -rp haml haml.lua /usr/local/my_lua_libs_dir
+    export LUA_PATH=";;/usr/local/my_lua_libs_dir/?.lua"
+
+Note that you can also download a .zip or .tar.gz from Github if you do not use
+Git.
+
+
+## Using it in your application
+
+Here's a simple usage example:
+
+    -- in file.haml
+    %p= "Hello, " .. name .. "!"
+
+    -- in your application
+    local haml         = require "haml"
+    local haml_options = {format = "html5"}
+    local engine       = haml.new(options)
+    local locals       = {name = "Joe"}
+    local rendered     = engine:render_file("file.haml", locals)
+
+    -- output
+    <p>Hello, Joe!</p>
+
 ## Hacking it
 
 The [Github repository](http://github.com/norman/lua-haml) is located at:
