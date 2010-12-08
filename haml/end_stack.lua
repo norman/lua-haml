@@ -33,7 +33,7 @@ function methods:pop()
 end
 
 function methods:last()
-  local last = self.endings[#self.endings]
+  return self.endings[#self.endings]
 end
 
 function methods:indent_level()
