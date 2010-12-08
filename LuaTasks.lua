@@ -44,6 +44,7 @@ local function run_tests(files, full_report)
 end
 
 local function spec()
+  package.path = "./?.lua;" .. package.path
   local params = tlua.get_params()
   local data, summary, errors = run_tests(glob("*_spec.lua"), params[1] == "-f")
   print(summary)
