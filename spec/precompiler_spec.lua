@@ -2,6 +2,27 @@ require "haml"
 
 describe("The LuaHaml Precompiler:", function()
 
+  local engine = haml.new()
+
+
+  describe("conditional blocks", function()
+    it("should handle single if", function()
+      assert_equal("<p>a</p>", engine:render("- if true then\n  %p a"))
+    end)
+
+    it("should handle if/else", function()
+      assert_equal("<p>a</p>", engine:render("- if true then\n  %p a\n- else\n  %p b"))
+    end)
+
+    it("should handle if/elseif", function()
+      assert_equal("<p>a</p>", engine:render("- if true then\n  %p a\n- elseif false then\n  %p b"))
+    end)
+
+    it("should handle if/elseif/else", function()
+      assert_equal("<p>a</p>", engine:render("- if true then\n  %p a\n- elseif false then\n  %p b\n- else\n  %p c"))
+    end)
+  end)
+
   describe("the endstack", function()
 
     local es

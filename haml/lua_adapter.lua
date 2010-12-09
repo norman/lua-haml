@@ -22,7 +22,6 @@ end
 local function serialize_table(t, opts)
   local buffer = {}
   local opts   = opts or {}
-
   insert(buffer, "{")
   for k, v in pairs(t) do
     if type(v) == "table" then
@@ -37,13 +36,19 @@ end
 
 local functions = {}
 
-function functions.should_close(state)
+function functions.close_tags(state)
   local code = state.curr_phrase.code
-  return not (code:match("^%s*else[^%w]*") or code:match("^%s*elseif[^%w]*"))
+  state:close_tags(function(ending)
+    if code:match("^%s*else") then
+      return ending ~= "end -- if"
+    else
+      return true
+    end
+  end)
 end
 
 function functions.newline()
-  return 'r:b "\\n"'
+  return 'r:b("\\n")'
 end
 
 function functions.code(value)
@@ -62,10 +67,12 @@ function functions.format_attributes(...)
 end
 
 function functions.ending_for(code)
-  if code:match "^%s*elseif[^%w]*" then
-    return nil
-  elseif code:match "do%s*$" or code:match "then%s*$" then
-    return "end"
+  if code:match "^%s*if.*" then
+    return "end -- if"
+  elseif code:match "^%s*else[^%w]*" then
+    -- return "end -- else"
+  elseif code:match "do%s*$" then
+    return "end -- do"
   end
   return nil
 end
