@@ -37,7 +37,8 @@ end
 
 local functions = {}
 
-function functions.should_close(code)
+function functions.should_close(state)
+  local code = state.curr_phrase.code
   return not (code:match("^%s*else[^%w]*") or code:match("^%s*elseif[^%w]*"))
 end
 

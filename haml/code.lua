@@ -15,7 +15,7 @@ local function should_escape(state)
 end
 
 function code_for(state)
-  if state.adapter.should_close(state.curr_phrase.code) then
+  if state.adapter.should_close(state) then
     state:close_tags()
   end
 
