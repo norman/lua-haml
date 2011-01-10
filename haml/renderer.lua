@@ -98,7 +98,7 @@ function methods:make_partial_func()
   local haml = require "haml"
   return function(file, locals)
     local engine   = haml.new(self.options)
-    local rendered = engine:render_file(("%s.haml"):format(file), locals)
+    local rendered = engine:render_file(("%s.haml"):format(file), locals or renderer.env.locals)
     -- if we're in a partial, by definition the last entry added to the buffer
     -- will be the current spaces
     return rendered:gsub("\n", "\n" .. self.buffer[#self.buffer])
