@@ -100,7 +100,7 @@ function methods:close_tags(func)
       if func and not func(self.endings:last()) then return end
         self:close_current()
       i = i + 1
-    until i == 0
+    until i >= 0
   end
 end
 
