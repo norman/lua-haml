@@ -2,7 +2,7 @@ package = "luahaml"
 version = "0.2.0-0"
 source = {
    url = "http://cloud.github.com/downloads/norman/lua-haml/lua-haml-0.2.0-0.tar.gz",
-   md5 = "689f32b1813efff537683e71890c9323"
+   md5 = "8e487ba87011657c6b9b75a109c0f90e"
 }
 description = {
    summary = "An implementation of the Haml markup language for Lua.",
