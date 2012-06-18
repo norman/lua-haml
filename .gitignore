@@ -3,3 +3,4 @@ doc
 docs
 *.swp
 coverage.html
+pkg
