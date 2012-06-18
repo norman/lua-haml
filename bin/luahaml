@@ -3,9 +3,9 @@
 local haml = require "haml"
 local ext  = require "haml.ext"
 
-local VERSION = "0.1.0"
+local VERSION = "0.2.0"
 
-local banner = "LuaHaml %s, copyright Norman Clarke <norman@njclarke.com> 2009-2010"
+local banner = "LuaHaml %s, copyright Norman Clarke <norman@njclarke.com> 2009-2012"
 
 local usage = [[
 
