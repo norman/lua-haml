@@ -2,11 +2,11 @@
 
 ## About
 
-Lua Haml is an implementation of the [Haml](http://haml-lang.com) markup
+Lua Haml is an implementation of the [Haml](http://haml.info) markup
 language for Lua.
 
 A Haml language reference can be found
-[here](http://haml-lang.com/docs/yardoc/HAML_REFERENCE.md.html).
+[here](http://haml.info/docs/yardoc/HAML_REFERENCE.md.html).
 
 Lua Haml implements almost 100% of Ruby Haml, and attempts to be as compatible
 as possible with it, with the following exceptions:

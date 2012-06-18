@@ -9,8 +9,8 @@ local open         = io.open
 local setmetatable = setmetatable
 --- An implementation of the Haml markup language for Lua.
 -- <p>
--- For more information on Haml, please see <a href="http://haml-lang.com">The Haml website</a>
--- and the <a href="http://haml-lang.com/docs/yardoc/HAML_REFERENCE.md.html">Haml language reference</a>.
+-- For more information on Haml, please see <a href="http://haml.info">The Haml website</a>
+-- and the <a href="http://haml.info/docs/yardoc/HAML_REFERENCE.md.html">Haml language reference</a>.
 -- </p>
 module "haml"
 
