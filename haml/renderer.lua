@@ -16,6 +16,7 @@ local setmetatable = setmetatable
 local sorted_pairs = ext.sorted_pairs
 local tostring     = tostring
 local type         = type
+local rawset       = rawset
 
 module "haml.renderer"
 
@@ -120,7 +121,9 @@ function methods:render(locals)
 
   setmetatable(self.env, {__index = function(table, key)
     return locals[key] or _G[key]
-  end})
+  end,
+  __newindex = function(table, key, val) rawset(locals, key, val) end
+  })
 
   local succeeded, err = pcall(self.func)
   if not succeeded then
