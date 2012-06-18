@@ -10,6 +10,7 @@ spec:
 package: clean
 	mkdir -p pkg
 	git clone . pkg/$(DIST_NAME)
+	rm -rf  pkg/$(DIST_NAME)/.git
 	cd pkg && tar czfp "$(DIST_NAME).tar.gz" $(DIST_NAME)
 	rm -rf pkg/$(DIST_NAME)
 	md5 pkg/$(DIST_NAME).tar.gz
