@@ -13,7 +13,7 @@ local function key_val(k, v, interpolate)
   if type(k) == "number" then
     return ('%s, '):format(v)
   elseif type(k) == "string" and interpolate then
-    return ('["%s"] = r:interp(%s), '):format(k, v)
+    return ('["%s"] = %s, '):format(k, ext.interpolate_code(v))
   else
     return ('["%s"] = %s, '):format(k, v)
   end
@@ -56,9 +56,12 @@ function functions.code(value)
 end
 
 function functions.string(value, opts)
-  local code = "r:b(%s)"
-  if opts.interpolate then code = "r:b(r:interp(%s))" end
-  return code:format(("%q"):format(value))
+  if opts.interpolate and value:match('#{.-}') then
+    return ("r:b(\"%s\")"):format(ext.interpolate_code(value))
+  else
+    return ("r:b(%s)"):format(("%q"):format(value))
+  end
+
 end
 
 --- Format tables into tag attributes.
