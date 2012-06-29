@@ -69,10 +69,17 @@ function tag_for(state)
 
     if should_close_inline(state) then
       if c.inline_content then
-        state.buffer:string(strip(c.inline_content), {interpolate = true})
+        state.buffer:string(strip(c.inline_content), {interpolate = not state.options.suppress_eval})
       elseif c.inline_code then
         if not state.options.suppress_eval then
-          state.buffer:code('r:b(r:interp(' .. c.inline_code .. '))')
+          -- Note that this is a rather naive check: if there's a double quoted
+          -- string with interpolation anywhere, it will do interpolation
+          -- everywhere. At some point, this should probably be fixed.
+          if c.inline_code:match('".-#{.-}"') then
+            state.buffer:code('r:b(' .. ext.interpolate_code(c.inline_code) .. ')')
+          else
+            state.buffer:code('r:b(' .. c.inline_code .. ')')
+          end
         end
       end
       if c.outer_whitespace_modifier then

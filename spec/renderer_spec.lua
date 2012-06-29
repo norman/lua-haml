@@ -61,6 +61,20 @@ describe("The LuaHaml Renderer", function()
     assert_equal(html, engine:render(code, {var = "hello"}))
   end)
 
+  test("should interpolate locals in attributes", function()
+    local code = "- local foo = \"bar\"\n%p{:class => \"foo-#{foo}\"}"
+    local html = "<p class='foo-bar'></p>"
+    local engine = haml.new()
+    assert_equal(html, engine:render(code))
+  end)
+
+  test("should interpolate locals in script", function()
+    local code = "- local foo = 'bar'\n%a= \"foo-#{foo}\""
+    local html = "<a>foo-bar</a>"
+    local engine = haml.new()
+    assert_equal(html, engine:render(code))
+  end)
+
   test("should not call function attributes when suppress_eval is set", function()
     local locals = {
       get_id = function()

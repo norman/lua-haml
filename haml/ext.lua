@@ -15,6 +15,16 @@ local type                 = type
 
 module "haml.ext"
 
+function interpolate_code(str)
+  return str:gsub('([\\]*)#{(.-)}', function(slashes, match)
+    if #slashes == 1 then
+      return '#{' .. match .. '}'
+    else
+      return slashes .. '" ..' .. match .. ' .. "'
+    end
+  end)
+end
+
 -- Remove this before releasing
 function log(level, v)
   -- io.stderr:write(string.format("%s: %s\n", level, v))
