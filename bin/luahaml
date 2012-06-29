@@ -1,4 +1,5 @@
 #!/usr/bin/env lua
+pcall(require, "luarocks.require")
 
 local haml = require "haml"
 local ext  = require "haml.ext"
