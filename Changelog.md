@@ -1,3 +1,13 @@
+## 0.3.0 (NOT RELEASED YET)
+
+* String interpolation now works with local variables.
+
+* Fixed markup comment handling - previously LuaHaml didn't parse Haml inside
+  comments, which was incorrect behavior.
+
+* Fixed bug where when the last line of Haml was immediately preceded by a
+  markup comment, then the line was not added to the buffer.
+
 ## 0.2.0 (2012-06-18)
 
 * Added a __newindex function on to the metatable for Haml environments.
