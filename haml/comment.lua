@@ -10,11 +10,14 @@ function comment_for(state)
     if state.curr_phrase.unparsed then
       state.buffer:string(state:indents() .. "<!-- ")
       state.buffer:string(state.curr_phrase.unparsed)
-      state.buffer:string(state:indents() .. " -->")
-    elseif state.curr_phrase.content then
-      state.buffer:string(state:indents() .. "<!--", {newline = true})
-      state.buffer:string(state.curr_phrase.content, {newline = true})
-      state.buffer:string(state:indents() .. "-->", {newline = true})
+      state.buffer:rstrip()
+      state.buffer:string(" -->")
+      state.buffer:newline()
+    else
+      -- state.buffer:string(state:indents() .. "<!--", {newline = true})
+      -- state.buffer:string(state:indents() .. "-->", {newline = true})
+      state.buffer:string(state:indents() .. '<!--', {newline = true})
+      state.endings:push("-->")
     end
 
   elseif state.curr_phrase.operator == "conditional_comment" then

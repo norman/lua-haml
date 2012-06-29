@@ -170,7 +170,7 @@ local haml_element = Cg(Cp(), "pos") * leading_whitespace * (
   -- IE conditional comments
   (operators.conditional_comment * Cg((P(1) - "]")^1, "condition")) * "]" +
   -- Markup comment
-  (operators.markup_comment * inline_whitespace^0 * unparsed^0 * eol^0 * nested_content) +
+  (operators.markup_comment * inline_whitespace^0 * unparsed^0) +
   -- Filtered block
   (operators.filter * Cg((P(1) - eol)^0, "filter") * eol * nested_content) +
   -- Escaped

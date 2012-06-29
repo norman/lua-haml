@@ -114,7 +114,7 @@ function methods:close_current()
   local ending, callback = self.endings:pop()
   if not ending then return end
 
-  if ending:match "^<" then
+  if ending:match('>$') then
     self.buffer:string(self:indents() .. ending, {newline = true})
   else
 

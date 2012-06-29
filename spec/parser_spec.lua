@@ -167,14 +167,9 @@ describe("The LuaHaml parser", function()
 
     it("should parse nested markup comments", function()
       local output = parse("/\n  a")
-      assert_equal("  a", output[1].content)
+      assert_equal("a", output[2].unparsed)
     end)
 
-    it("should parse both inline and nested markup comments", function()
-      local output = parse("/a\n  b")
-      assert_equal("a", output[1].unparsed)
-      assert_equal("  b", output[1].content)
-    end)
   end)
 
   describe("When handling conditional comments", function()

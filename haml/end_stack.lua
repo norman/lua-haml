@@ -13,7 +13,7 @@ function methods:push(ending, callback)
   else
     insert(self.endings, ending)
   end
-  if ending:match '^<' then
+  if ending:match('>$') then
     self.indents = self.indents + 1
   end
 end
@@ -26,7 +26,7 @@ function methods:pop()
     callback = ending[2]
     ending   = ending[1]
   end
-  if ending:match '^<' then
+  if ending:match('>$') then
     self.indents = self.indents - 1
   end
   return ending, callback
